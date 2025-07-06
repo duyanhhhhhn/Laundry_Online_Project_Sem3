@@ -8,11 +8,10 @@ namespace Laundry_Online_Web_FE.Models.Repositories
 {
     internal interface IRepository<T> where T : class
     {
-        void Create(T entity);
-        int Update(T entity);
-        int Delete(T entity);
+        bool Create(T entity);
+        bool Update(T entity);
+        bool Delete(T entity);
         HashSet<T> All();
-        HashSet<T> findAll();
         HashSet<T> FindByKeyword(string keyword);
     }
 }
