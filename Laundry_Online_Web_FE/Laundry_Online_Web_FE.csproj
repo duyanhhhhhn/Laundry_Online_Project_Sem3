@@ -145,11 +145,16 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Auth\AdminAuthorizeAttribute.cs" />
+    <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
+    <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
+    <Compile Include="Models\Dao\CustomerDAO.cs" />
     <Compile Include="Models\Dao\EmployeeDAO.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
     <Compile Include="Models\Entities\Customer.cs">
@@ -191,7 +196,9 @@
     <Compile Include="Models\Entities\sysdiagram.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ModelViews\CustomerView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
+    <Compile Include="Models\Repositories\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\IRepository.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
@@ -272,6 +279,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Customer\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
