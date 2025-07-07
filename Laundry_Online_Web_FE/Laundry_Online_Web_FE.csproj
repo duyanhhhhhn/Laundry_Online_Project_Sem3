@@ -191,10 +191,17 @@
     <Compile Include="Models\Entities\sysdiagram.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ModelViews\ServiceView.cs" />
-    <Compile Include="Models\Repositories\ServiceRepository.cs" />
+    <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
+    <Compile Include="Models\ModelViews\CustomerView.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
+    <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
+    <Compile Include="Models\ModelViews\InvoiceView.cs" />
+    <Compile Include="Models\ModelViews\PackageView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
+    <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
+    <Compile Include="Models\Repositories\InvoiceRepository.cs" />
+    <Compile Include="Models\Repositories\PackageRepository.cs" />
+    <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -270,6 +277,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\ModelViews\DTO\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
