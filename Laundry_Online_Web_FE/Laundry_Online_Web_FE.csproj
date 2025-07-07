@@ -192,12 +192,10 @@
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ModelViews\ServiceView.cs" />
-    <Compile Include="Models\Repositories\IRepository.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
-    <Compile Include="Models\Repositories\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
