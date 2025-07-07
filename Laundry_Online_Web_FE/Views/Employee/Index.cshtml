@@ -1,0 +1,60 @@
+﻿@model HashSet<Laundry_Online_Web_FE.Models.ModelViews.EmployeeView>
+@{
+    ViewBag.Title = "Danh sách nhân viên";
+}
+
+<h2>Danh sách nhân viên đang hoạt động</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Họ tên</th>
+            <th>Số điện thoại</th>
+            <th>Vai trò</th>
+            <th>Lương</th>
+            <th>Ngày vào làm</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            int index = 1;
+            foreach (var emp in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@(emp.FirstName + " " + emp.LastName)</td>
+                    <td>@emp.Phone</td>
+                    <td>@(emp.Role == 0 ? "Admin" : "Nhân viên")</td>
+                    <td>@emp.Salary.ToString("N0") ₫</td>
+                    <td>@emp.HireDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (emp.Active == 1)
+                        {
+                            <span class="label label-success">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="label label-danger">Đã khoá</span>
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Sửa", "Edit", new { id = emp.Id }, new { @class = "btn btn-sm btn-warning" })
+                        @Html.ActionLink("Khoá/Mở", "Toggle", new { id = emp.Id }, new { @class = "btn btn-sm btn-info" })
+                        @Html.ActionLink("Xem", "Details", new { id = emp.Id }, new { @class = "btn btn-sm btn-primary" })
+                    </td>
+                </tr>
+                index++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="8" class="text-center text-muted">Không có nhân viên nào được hiển thị</td>
+            </tr>
+        }
+    </tbody>
+</table>
