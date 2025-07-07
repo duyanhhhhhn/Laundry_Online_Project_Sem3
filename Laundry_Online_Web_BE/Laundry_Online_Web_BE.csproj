@@ -147,6 +147,54 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\Customer.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\CustomerPackage.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\Employee.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\Invoice.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\InvoiceItem.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\OnlineLaundryModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OnlineLaundryModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\OnlineLaundryModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\OnlineLaundryModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\Package.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\Service.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
+    <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\EmployeeView.cs" />
+    <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
+    <Compile Include="Models\ModelViews\InvoiceView.cs" />
+    <Compile Include="Models\ModelViews\PackageView.cs" />
+    <Compile Include="Models\ModelViews\Service.cs" />
+    <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
+    <Compile Include="Models\Repositories\PackageRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +217,16 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Models\Entities\OnlineLaundryModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+      <LastGenOutput>OnlineLaundryModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Entities\OnlineLaundryModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+      <LastGenOutput>OnlineLaundryModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -176,6 +234,13 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\AdminArea\Views\web.config" />
+    <EntityDeploy Include="Models\Entities\OnlineLaundryModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>OnlineLaundryModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Entities\OnlineLaundryModel.edmx.diagram">
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -207,8 +272,6 @@
     <Folder Include="Areas\AdminArea\Controllers\" />
     <Folder Include="Areas\AdminArea\Data\" />
     <Folder Include="Areas\AdminArea\Views\Shared\" />
-    <Folder Include="Models\Entities\" />
-    <Folder Include="Models\ModelViews\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
