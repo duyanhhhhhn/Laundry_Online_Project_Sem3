@@ -7,7 +7,7 @@ using Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE.Models.Repositories
 {
-    public class CustomerRepo : IRepository<CustomerView>
+    public class CustomerRepo
     {
         public static CustomerRepo _instance = null;
         public static CustomerRepo Instance
