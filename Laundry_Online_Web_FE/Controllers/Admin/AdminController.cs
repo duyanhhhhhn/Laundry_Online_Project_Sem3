@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
+    [Authorize(Roles = "Admin,Employee")]
     public class AdminController : Controller
     {
         // GET: Admin

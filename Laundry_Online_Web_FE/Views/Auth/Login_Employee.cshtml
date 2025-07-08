@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewBag.Title = "Login_Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Đăng nhập</h3></div>
+                <div class="card-body">
+                    <form action="@Url.Action("CheckEmployee")" method="post">
+                        <div class="form-group mb-3">
+                            <label for="PhoneNumber">Số điện thoại</label>
+                            <input class="form-control" type="text" name="PhoneNumber" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="inputPassword">Mật khẩu</label>
+                            <input class="form-control"  type="password" name="PassWord" />
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
+                            <input class="btn" type="submit" name="btnLogin" value="Đăng Nhập"
+                                   style="background-color: darksalmon; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
