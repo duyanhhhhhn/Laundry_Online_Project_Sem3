@@ -7,6 +7,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews
 {
     public class CustomerView
     {
+        public int Id { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
