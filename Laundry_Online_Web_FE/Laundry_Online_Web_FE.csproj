@@ -145,11 +145,18 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\Admin\AdminController.cs" />
+    <Compile Include="Controllers\Auth\AuthController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Auth\AdminAuthorizeAttribute.cs" />
+    <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
+    <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
+    <Compile Include="Models\Dao\CustomerDAO.cs" />
     <Compile Include="Models\Dao\EmployeeDAO.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
     <Compile Include="Models\Entities\Customer.cs">
@@ -193,6 +200,10 @@
     </Compile>
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\LoginView.cs" />
+    <Compile Include="Models\ModelViews\ServiceView.cs" />
+    <Compile Include="Models\Repositories\CustomerRepo.cs" />
+    <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
     <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
     <Compile Include="Models\ModelViews\InvoiceView.cs" />
@@ -206,6 +217,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Admin\assets\demo\chart-area-demo.js" />
+    <Content Include="Content\Admin\assets\demo\chart-bar-demo.js" />
+    <Content Include="Content\Admin\assets\demo\chart-pie-demo.js" />
+    <Content Include="Content\Admin\assets\demo\datatables-demo.js" />
+    <Content Include="Content\Admin\assets\img\error-404-monochrome.svg" />
+    <Content Include="Content\Admin\css\bootstrap.css" />
+    <Content Include="Content\Admin\css\font-awesome.min.css" />
+    <Content Include="Content\Admin\css\responsive.css" />
+    <Content Include="Content\Admin\css\style.css" />
+    <Content Include="Content\Admin\css\styles.css" />
+    <Content Include="Content\Admin\js\bootstrap.js" />
+    <Content Include="Content\Admin\js\custom.js" />
+    <Content Include="Content\Admin\js\datatables-simple-demo.js" />
+    <Content Include="Content\Admin\js\jquery-3.4.1.min.js" />
+    <Content Include="Content\Admin\js\scripts.js" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -248,6 +274,11 @@
     <Content Include="Models\Entities\OnlineLaundryModel.edmx.diagram">
       <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Content>
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\Admin\fonts\octin_sports_rg.ttf" />
+    <Content Include="Content\Admin\css\style.css.map" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -274,6 +305,11 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutClient.cshtml" />
+    <Content Include="Views\Auth\Index.cshtml" />
+    <Content Include="Views\Auth\Login_Employee.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
