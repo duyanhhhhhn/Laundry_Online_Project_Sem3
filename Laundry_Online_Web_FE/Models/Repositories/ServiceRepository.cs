@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Laundry_Online_Web_FE.Models.Repositories
 {
-    public sealed class ServiceRepository : IRepository<ServiceView>
+    public sealed class ServiceRepository 
     {
         public HashSet<ServiceView> All()
         {

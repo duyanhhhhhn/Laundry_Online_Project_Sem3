@@ -10,7 +10,7 @@ using Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE.Models.Repositories
 {
-    public class EmployeeRepo : IRepository<EmployeeView>
+    public class EmployeeRepo
     {
         private static EmployeeRepo _instance = null;
 
@@ -39,7 +39,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return EmployeeDAO.Instance.ReturnEmployee(phone, password);
         }
 
-        public int ToggleEmployee(int id)
+        public bool ToggleEmployee(int id)
         {
             return EmployeeDAO.Instance.SetActive(id);
         }
@@ -59,7 +59,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return EmployeeDAO.Instance.GetById(id);
         }
 
-        public int ResetEmployeePassword(int id, string newPassword)
+        public bool ResetEmployeePassword(int id, string newPassword)
         {
             return EmployeeDAO.Instance.ResetPassword(id, newPassword);
         }
@@ -74,14 +74,9 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             EmployeeDAO.Instance.Create(entity);
         }
 
-        public int Update(EmployeeView entity)
+        public bool Update(EmployeeView entity)
         {
             return EmployeeDAO.Instance.Update(entity);
-        }
-
-        public int Delete(EmployeeView entity)
-        {
-            return ToggleEmployee(entity.Id);
         }
 
         public HashSet<EmployeeView> All()
@@ -89,12 +84,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return EmployeeDAO.Instance.Search("");
         }
 
-        public HashSet<EmployeeView> findAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public HashSet<EmployeeView> FindByKeyword(string keyword)
+        public HashSet<EmployeeView> Search(string keyword)
         {
             return EmployeeDAO.Instance.Search(keyword);
         }

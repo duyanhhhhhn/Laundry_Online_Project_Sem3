@@ -62,7 +62,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             return false;
         }
 
-        public int Update(EmployeeView emp)
+        public bool Update(EmployeeView emp)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                         existing.salary = emp.Salary;
                         existing.hire_date = emp.HireDate;
                         en.SaveChanges();
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -87,7 +87,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 Debug.WriteLine("Update Error: " + ex.Message);
             }
 
-            return 0;
+            return false;
         }
 
         public HashSet<EmployeeView> GetAdmins()
@@ -212,7 +212,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             return new EmployeeView();
         }
 
-        public int SetActive(int id)
+        public bool SetActive(int id)
         {
             try
             {
@@ -223,7 +223,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                     {
                         emp.active = emp.active == 1 ? 0 : 1;
                         en.SaveChanges();
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -232,7 +232,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 Debug.WriteLine("SetActive Error: " + ex.Message);
             }
 
-            return 0;
+            return false;
         }
 
 
@@ -252,7 +252,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             }
         }
 
-        public int ResetPassword(int id, string newPassword)
+        public bool ResetPassword(int id, string newPassword)
         {
             using (var en = new Entities.OnlineLaundryEntities())
             {
@@ -261,10 +261,10 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 {
                     emp.password = BCrypt.Net.BCrypt.HashPassword(newPassword);
                     en.SaveChanges();
-                    return 1;
+                    return true;
                 }
             }
-            return 0;
+            return false;
         }
 
         public HashSet<EmployeeView> Search(string keyword)
