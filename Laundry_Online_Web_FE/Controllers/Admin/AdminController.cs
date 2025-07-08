@@ -33,6 +33,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             string phone = Request.Form["PhoneNumber"];
             string password = Request.Form["Password"];
             string salary = Request.Form["Salary"];
+            int role = Request.Form["Role"] == "1" ? 1 : 0;
             var newemp = new EmployeeView
             {
                 FirstName = firstName,
@@ -41,7 +42,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 Password = password,
                 HireDate = DateTime.Now,
                 Salary = salary != null ? int.Parse(salary) : 0,
-                Role = 0,
+                Role = role,
                 Active = 1
             };
             EmployeeRepo.Instance.Create(newemp);
