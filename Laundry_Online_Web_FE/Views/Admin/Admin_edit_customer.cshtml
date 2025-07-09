@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewBag.Title = "Admin_edit_customer";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@if (ViewBag.Customer != null)
+{
+    Laundry_Online_Web_FE.Models.ModelViews.CustomerView customer = 
+        (Laundry_Online_Web_FE.Models.ModelViews.CustomerView)ViewBag.Customer
+;
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Edit Customer</h3></div>
+                                <div class="card-body">
+                                    <form method="post" action="@Url.Action("EditCustomer")">
+                                        <input type="hidden" name="CustomerId" value="@customer.Id" />
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input name="FirstName" class="form-control" value="@customer.FirstName" id="FirstName" type="text" placeholder="Enter your first name" />
+                                                    <label for="FirstName">First name</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    <input name="LastName" class="form-control" value="@customer.LastName" id="LastName" type="text" placeholder="Enter your last name" />
+                                                    <label for="LastName">Last name</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input name="PhoneNumber" class="form-control" value="@customer.PhoneNumber" id="PhoneNumber" type="text" placeholder="phone number" />
+                                            <label for="PhoneNumber">Phone Number</label>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input name="Address" class="form-control" id="Address" type="text" placeholder="Address" />
+                                                    <label for="Address">Address</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input name="RegistrationDate" class="form-control" value="@customer.RegistrationDate" id="RegistrationDate" type="datetime" placeholder="Create a password" />
+                                                    <label for="RegistrationDate">Registration Date</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 mb-0">
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-block">Update</button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div id="layoutAuthentication_footer">
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/scripts.js"></script>
+}
+
+

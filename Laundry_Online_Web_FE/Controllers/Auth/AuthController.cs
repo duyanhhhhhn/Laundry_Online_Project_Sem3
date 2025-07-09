@@ -10,52 +10,87 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
     public class AuthController : Controller
     {
         // GET: Auth
-        public ActionResult Login_Customer()
+        public ActionResult Index()
         {
             return View();
         }
         public ActionResult Login_Employee()
         {
+            // Kiểm tra xem người dùng đã đăng nhập chưa
+            if (Session["customer"] != null || Session["employee"] != null)
+            {
+                // Nếu đã đăng nhập, chuyển hướng đến trang chính
+                return RedirectToAction("Admin", "Index");
+            }
             return View();
         }
+        [HttpPost]
         public ActionResult CheckEmployee()
         {
-            string phoneNumber = Request.Form["PhoneNumber"];
+            // Lấy thông tin đăng nhập từ form
+            string phone = Request.Form["PhoneNumber"];
             string password = Request.Form["Password"];
-            var emp = EmployeeRepo.Instance.LoginEmployee(phoneNumber, password);
-            if (emp != null)
+            // Kiểm tra thông tin đăng nhập
+            var employee = EmployeeRepo.Instance.LoginEmployee(phone, password);
+            if (employee != null)
             {
-                Session["User"] = emp;
-                Session["Role"] = emp.Role == 1 ? "Admin" : "Employee";
-
-                return RedirectToAction("Admin",emp);
+                // Lưu thông tin đăng nhập vào session
+                Session["employee"] = employee;
+                // Chuyển hướng đến trang chính của admin
+                return RedirectToAction("Index", "Admin");
             }
-            ViewBag.Error = "Tài khoản nhân viên không hợp lệ!";
-            return RedirectToAction("Login_Employee");
+            else
+            {
+                // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
+                ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
+                return View("Login_Employee");
+            }
         }
-        public ActionResult LoginCustomer()
+        public ActionResult Login_Customer()
         {
-            string phoneNumber = Request.Form["PhoneNumber"];
+            // Kiểm tra xem người dùng đã đăng nhập chưa
+            if (Session["customer"] != null || Session["employee"] != null)
+            {
+                // Nếu đã đăng nhập, chuyển hướng đến trang chính
+                return RedirectToAction("Index", "Customer");
+            }
+            return View();
+        }
+        [HttpPost]
+        public ActionResult CheckCustomer()
+        {
+            // Lấy thông tin đăng nhập từ form
+            string phone = Request.Form["PhoneNumber"];
             string password = Request.Form["Password"];
-            var customer = CustomerRepo.Instance.LoginCustomer(phoneNumber,password);
+            // Kiểm tra thông tin đăng nhập
+            var customer = CustomerRepo.Instance.LoginCustomer(phone, password);
             if (customer != null)
             {
-                Session["User"] = customer;
-                Session["Role"] = "Customer";
-                return RedirectToAction("Index");
+                // Lưu thông tin đăng nhập vào session
+                Session["customer"] = customer;
+                // Chuyển hướng đến trang chính của khách hàng
+                return RedirectToAction("Index", "Customer");
             }
-            ViewBag.Error = "Tài khoản khách hàng không hợp lệ!";
-            return RedirectToAction("Login_Customer");
+            else
+            {
+                // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
+                ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
+                return View("Login_Customer");
+            }
         }
-        public ActionResult Logout_Customer()
+        public ActionResult AdminLogout()
         {
-            Session.Clear();
-            return RedirectToAction("LoginCustomer");
+            // Xóa thông tin đăng nhập khỏi session
+            Session["employee"] = null;
+            // Chuyển hướng về trang đăng nhập
+            return RedirectToAction("Login_Employee");
         }
-        public ActionResult Logout_Employee()
+        public ActionResult CustomerLogout()
         {
-            Session.Clear();
-            return RedirectToAction("LoginEmployee");
+            // Xóa thông tin đăng nhập khỏi session
+            Session["customer"] = null;
+            // Chuyển hướng về trang đăng nhập
+            return RedirectToAction("Client");
         }
     }
 }

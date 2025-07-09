@@ -114,9 +114,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                     existingCustomer.last_name = customer.LastName;
                     existingCustomer.phone_number = customer.PhoneNumber;
                     existingCustomer.address = customer.Address;
-                    existingCustomer.registration_date = DateTime.Now;
-                    existingCustomer.password = BCrypt.Net.BCrypt.HashPassword(customer.Password);
-                    existingCustomer.active = customer.Active;
+                    existingCustomer.registration_date = customer.RegistrationDate;
                     en.SaveChanges();
                     return true; // Update successful
                 }

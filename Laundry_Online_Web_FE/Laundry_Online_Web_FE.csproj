@@ -147,8 +147,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\Auth\AuthController.cs" />
-    <Compile Include="Controllers\CustomerController.cs" />
-    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -304,16 +302,18 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Employee\Index.cshtml" />
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_LayoutClient.cshtml" />
-    <Content Include="Views\Auth\Index.cshtml" />
-    <Content Include="Views\Auth\Login_Employee.cshtml" />
     <Content Include="Views\Admin\Admin_create_customer.cshtml" />
     <Content Include="Views\Admin\Admin_create_employee.cshtml" />
     <Content Include="Views\Admin\EmployeeList.cshtml" />
     <Content Include="Views\Admin\CustomerList.cshtml" />
+    <Content Include="Views\Auth\Login_Employee.cshtml" />
+    <Content Include="Views\Auth\Login_Customer.cshtml" />
+    <Content Include="Views\Admin\Admin_edit_customer.cshtml" />
+    <Content Include="Views\Admin\AllCustomerList.cshtml" />
+    <Content Include="Views\Admin\CustomerInActive.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

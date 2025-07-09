@@ -1,5 +1,17 @@
 ﻿
 @{
+    ViewBag.Title = "CustomerInActive";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@{
+    ViewBag.Title = "AllCustomerList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@{
     ViewBag.Title = "CustomerList";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
@@ -12,7 +24,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                Customer Active <a href="@Url.Action("Admin_create_customer")" class="btn btn-success m-0" style="float: right;">New Customer</a>
+                Customer Inactive <a href="@Url.Action("Admin_create_customer")" class="btn btn-success m-0" style="float: right;">New Customer</a>
             </div>
 
             <div class="card-body">
@@ -95,4 +107,8 @@
     </script>
 
 }
+
+
+
+
 
