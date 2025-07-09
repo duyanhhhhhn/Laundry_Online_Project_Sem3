@@ -39,7 +39,17 @@
                               <td>@emp.Phone</td>
                               <td>@emp.HireDate.ToString("dd/MM/yyyy")</td>
                               <td>@emp.Salary</td>
-                              <td><span class="text-success"><i class="bi bi-check-circle-fill"></i></span></td>
+                              <td>
+                              <td>
+                                  @if (emp.Active == 1)
+                                  {
+                                      <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                  }
+                                  else
+                                  {
+                                      <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                  }
+                              </td>
                               <td>
                                   <a href="@Url.Action("EditEmployee",new { EmpId = emp.Id } )">
                                       <i class="bi bi-pencil"></i>

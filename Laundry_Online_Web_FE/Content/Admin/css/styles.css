@@ -11241,3 +11241,15 @@ body {
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
 }
+.navbar-custom-small .navbar-brand,
+.navbar-custom-small .nav-link,
+.navbar-custom-small .dropdown-toggle,
+.navbar-custom-small .btn {
+    font-size: 0.85rem; /* hoặc 13px, tùy bạn */
+}
+.navbar.navbar-custom-xs .navbar-brand,
+.navbar.navbar-custom-xs .nav-link,
+.navbar.navbar-custom-xs .dropdown-toggle,
+.navbar.navbar-custom-xs .btn {
+    font-size: 0.6875rem; /* 11px (11 ÷ 16) */
+}

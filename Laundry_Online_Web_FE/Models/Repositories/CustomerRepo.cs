@@ -33,7 +33,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
         {
             return CustomerDAO.Instance.DeleteCustomer(entity);
         }
-        public HashSet<CustomerView> All()
+        public HashSet<CustomerView> GetAll()
         {
             return CustomerDAO.Instance.GetAllCustomer();
         }
