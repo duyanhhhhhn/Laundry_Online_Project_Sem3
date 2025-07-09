@@ -184,7 +184,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             {
                 Debug.WriteLine("Error: " + ex.Message);
             }
-            return new EmployeeView();
+            return null;
 
         }
 
