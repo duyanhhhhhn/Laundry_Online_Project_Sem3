@@ -9,6 +9,18 @@ namespace Laundry_Online_Web_FE.Models.Repositories
 {
     public sealed class ServiceRepository 
     {
+        public static ServiceRepository _instance = null;
+        public static ServiceRepository Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new ServiceRepository();
+                }
+                return _instance;
+            }
+        }
         public HashSet<ServiceView> All()
         {
             var list = ServiceDAO.Instance.GetAllServices();
@@ -20,9 +32,9 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return ServiceDAO.Instance.CreateService(entity);
         }
 
-        public bool Delete(ServiceView entity)
+        public bool Delete(int id)
         {
-            return ServiceDAO.Instance.DeleteService(entity.Id);
+            return ServiceDAO.Instance.DeleteService(id);
         }
 
         public HashSet<ServiceView> FindByKeyword(string keyword)

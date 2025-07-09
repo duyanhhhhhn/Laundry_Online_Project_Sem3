@@ -161,5 +161,26 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
             });
         }
+        public ActionResult ServiceList()
+        {
+            HashSet<ServiceView> listSer = new HashSet<ServiceView>();
+            var serviceList = ServiceRepository.Instance.All();
+            if (serviceList != null && serviceList.Count > 0)
+            {
+                listSer = serviceList;
+            }
+            ViewBag.Data = listSer;
+            return View();
+        }
+        public JsonResult ChangeServiceActiveStatus(int id)
+        {
+            var success = ServiceRepository.Instance.Delete(id); 
+
+            return Json(new
+            {
+                status = success ? "success" : "error",
+                message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
+            });
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return false;
             }
         }
-        public List<ServiceView> GetAllServices()
+        public HashSet<ServiceView> GetAllServices()
         {
             try
             {
@@ -65,13 +65,13 @@ namespace Laundry_Online_Web_FE.Models.Dao
                                  Price = s.s_price,
                                  Active = (int)s.s_active,
                              })
-                             .ToList();
+                             .ToHashSet();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("GetAllServices error: " + ex.Message);
-                return new List<ServiceView>();
+                return new HashSet<ServiceView>();
             }
         }
         public bool DeleteService(int id)

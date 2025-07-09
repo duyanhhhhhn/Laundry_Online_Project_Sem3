@@ -210,7 +210,6 @@
     <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
     <Compile Include="Models\Repositories\InvoiceRepository.cs" />
     <Compile Include="Models\Repositories\PackageRepository.cs" />
-    <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -265,6 +264,11 @@
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\Admin\fonts\octin_sports_rg.ttf" />
+    <Content Include="Content\Admin\css\style.css.map" />
     <EntityDeploy Include="Models\Entities\OnlineLaundryModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>OnlineLaundryModel.Designer.cs</LastGenOutput>
@@ -272,11 +276,6 @@
     <Content Include="Models\Entities\OnlineLaundryModel.edmx.diagram">
       <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Content>
-    <Content Include="Content\Admin\fonts\fontawesome-webfont.ttf" />
-    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff" />
-    <Content Include="Content\Admin\fonts\fontawesome-webfont.woff2" />
-    <Content Include="Content\Admin\fonts\octin_sports_rg.ttf" />
-    <Content Include="Content\Admin\css\style.css.map" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -314,6 +313,7 @@
     <Content Include="Views\Admin\Admin_edit_customer.cshtml" />
     <Content Include="Views\Admin\AllCustomerList.cshtml" />
     <Content Include="Views\Admin\CustomerInActive.cshtml" />
+    <Content Include="Views\Admin\ServiceList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

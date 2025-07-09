@@ -1,0 +1,97 @@
+﻿
+@{
+    ViewBag.Title = "ServiceList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@if (ViewBag.Data != null)
+{
+    HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView> ls =
+ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
+    var i = 1;
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Service List  <a href="@Url.Action("")" class="btn btn-success m-0" style="float: right;">New Service</a>
+            </div>
+
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>Name Service</th>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Image</th>
+                            <th>Actice</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.ServiceView ser in ls)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@ser.Title</td>
+                                <td>@ser.Description</td>
+                                <td>@ser.Unit</td>
+                                <td>@ser.Image</td>
+                                <td>
+                                    @if (ser.Active == 1)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("", new { id = ser.Id })">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn-toggle-active"
+                                       data-id="@ser.Id" data-name="@ser.Title">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $(".btn-toggle-active").click(function () {
+            var id = $(this).data("id");
+            var name = $(this).data("name");
+
+
+            if (confirm("Bạn có chắc muốn xoá dịch vụ '" + name + "'?")) {
+                $.ajax({
+                    url: '@Url.Action("ChangeServiceActiveStatus", "Admin")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            location.reload(); 
+                        } else {
+                            alert("Có lỗi xảy ra: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối đến server.");
+                    }
+                });
+            }
+        });
+    });
+    </script>
+
+}
+
