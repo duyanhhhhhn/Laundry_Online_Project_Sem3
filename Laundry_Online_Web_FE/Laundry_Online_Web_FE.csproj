@@ -193,6 +193,9 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
@@ -503,6 +506,8 @@
     <Content Include="Content\Admin\fonts\fontawesome-webfont.woff2" />
     <Content Include="Content\Admin\fonts\octin_sports_rg.ttf" />
     <Content Include="Content\Admin\css\style.css.map" />
+    <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulard907.ttf" />
+    <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulare59e.ttf" />
     <EntityDeploy Include="Models\Entities\OnlineLaundryModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>OnlineLaundryModel.Designer.cs</LastGenOutput>
@@ -510,8 +515,6 @@
     <Content Include="Models\Entities\OnlineLaundryModel.edmx.diagram">
       <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Content>
-    <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulard907.ttf" />
-    <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulare59e.ttf" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -544,16 +547,16 @@
     <Content Include="Views\Admin\EmployeeList.cshtml" />
     <Content Include="Views\Admin\CustomerList.cshtml" />
     <Content Include="Views\Auth\Login_Employee.cshtml" />
-    <Content Include="Views\Auth\Login_Customer.cshtml" />
     <Content Include="Views\Admin\Admin_edit_customer.cshtml" />
     <Content Include="Views\Admin\AllCustomerList.cshtml" />
     <Content Include="Views\Admin\CustomerInActive.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Index.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
     <Content Include="Views\Shared\Client\_PartialHeader.cshtml" />
     <Content Include="Views\Shared\Client\_PartialBreadCrumb.cshtml" />
     <Content Include="Views\Shared\Client\_PartialFooter.cshtml" />
+    <Content Include="Views\Admin\AllEmployeeList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -79,6 +79,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.Data = listEmp;
             return View();
         }
+        public ActionResult AllEmployeeList()
+        {
+            HashSet<EmployeeView> listEmp = new HashSet<EmployeeView>();
+            var empList = EmployeeRepo.Instance.GetAllEmployees();
+            if (empList != null && empList.Count > 0)
+            {
+                listEmp = empList;
+            }
+            ViewBag.Data = listEmp;
+            return View();
+        }
         public ActionResult CustomerList()
         {
             HashSet<CustomerView> listCus = new HashSet<CustomerView>();
@@ -155,6 +166,15 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             var success = CustomerRepo.Instance.ToggleCustomerStatusActive(id); // trả về true/false
 
+            return Json(new
+            {
+                status = success ? "success" : "error",
+                message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
+            });
+        }
+        public JsonResult ChangeEmployeeActiveStatus(int id)
+        {
+            var success = EmployeeRepo.Instance.ToggleEmployee(id); // trả về true/false
             return Json(new
             {
                 status = success ? "success" : "error",

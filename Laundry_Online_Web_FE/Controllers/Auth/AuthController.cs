@@ -46,16 +46,6 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
                 return View("Login_Employee");
             }
         }
-        public ActionResult Login_Customer()
-        {
-            // Kiểm tra xem người dùng đã đăng nhập chưa
-            if (Session["customer"] != null || Session["employee"] != null)
-            {
-                // Nếu đã đăng nhập, chuyển hướng đến trang chính
-                return RedirectToAction("Index", "Customer");
-            }
-            return View();
-        }
         [HttpPost]
         public ActionResult CheckCustomer()
         {
@@ -85,12 +75,6 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
             // Chuyển hướng về trang đăng nhập
             return RedirectToAction("Login_Employee");
         }
-        public ActionResult CustomerLogout()
-        {
-            // Xóa thông tin đăng nhập khỏi session
-            Session["customer"] = null;
-            // Chuyển hướng về trang đăng nhập
-            return RedirectToAction("Client");
-        }
+        
     }
 }

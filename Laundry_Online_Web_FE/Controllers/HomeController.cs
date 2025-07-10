@@ -29,7 +29,19 @@ namespace Laundry_Online_Web_FE.Controllers
 
         public ActionResult Login()
         {
+            if (Session["customer"] != null)
+            {
+                // Nếu đã đăng nhập, chuyển hướng đến trang chính
+                return RedirectToAction("Index", "Customer");
+            }
             return View();
+        }
+        public ActionResult Logout()
+        {
+            // Xóa thông tin đăng nhập khỏi session
+            Session["customer"] = null;
+            // Chuyển hướng về trang đăng nhập
+            return RedirectToAction("Login");
         }
 
         public ActionResult Register()

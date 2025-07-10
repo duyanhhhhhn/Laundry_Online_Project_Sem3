@@ -1,5 +1,11 @@
 ﻿
 @{
+    ViewBag.Title = "AllEmployeeList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@{
     ViewBag.Title = "EmployeeList";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
@@ -12,7 +18,7 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                Employee List <a href="@Url.Action("Admin_create_employee")" class="btn btn-success m-0" style="float: right;">New Employee</a>
+                All Employee <a href="@Url.Action("Admin_create_employee")" class="btn btn-success m-0" style="float: right;">New Employee</a>
             </div>
 
             <div class="card-body">
@@ -95,5 +101,7 @@ $(document).ready(function () {
 });
     </script>
 }
+
+
 
 
