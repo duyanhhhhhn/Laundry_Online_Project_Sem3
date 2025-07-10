@@ -166,7 +166,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         [HttpPost]
         public JsonResult ChangeCustomerActiveStatus(int id)
         {
-            var success = CustomerRepo.Instance.ToggleCustomerStatusActive(id); // trả về true/false
+            var success = CustomerRepo.Instance.ToggleCustomerStatusActive(id);
 
             return Json(new
             {
@@ -177,6 +177,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         public JsonResult ChangeEmployeeActiveStatus(int id)
         {
             var success = EmployeeRepo.Instance.ToggleEmployee(id);
+            return Json(new
+            {
+                status = success ? "success" : "error",
+                message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
+            });
         } // trả về true/false
         public ActionResult ServiceList()
         {
