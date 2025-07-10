@@ -143,6 +143,40 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.Customer = customer;
             return View();
         }
+        [HttpGet]
+        public ActionResult Admin_edit_employee()
+        {
+            int id = 0;
+            if (RouteData.Values["id"] != null)
+            {
+                int.TryParse(RouteData.Values["id"].ToString(), out id);
+            }
+            else
+            {
+                return RedirectToAction("EmployeeList");
+            }
+            var employee = EmployeeRepo.Instance.GetEmployeeById(id);
+            if (employee == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.Employee = employee;
+            return View();
+        }
+        [HttpPost]
+        public ActionResult EditEmployee()
+        {
+            int id = int.Parse(Request.Form["EmployeeId"]);
+            string firstName = Request.Form["FirstName"];
+            string lastName = Request.Form["LastName"];
+            string salary = Request.Form["Salary"];
+            var isEmp = EmployeeRepo.Instance.GetEmployeeById(id);
+            isEmp.FirstName = firstName;
+            isEmp.LastName = lastName;
+            isEmp.Salary = salary != null ? int.Parse(salary) : 0;
+            EmployeeRepo.Instance.Update(isEmp);
+            return RedirectToAction("EmployeeList");
+        }
         [HttpPost]
         public ActionResult EditCustomer()
         {
@@ -161,6 +195,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             CustomerRepo.Instance.Update(isCus);
             return RedirectToAction("CustomerList");
         }
+        
         [HttpPost]
         public JsonResult ChangeCustomerActiveStatus(int id)
         {
