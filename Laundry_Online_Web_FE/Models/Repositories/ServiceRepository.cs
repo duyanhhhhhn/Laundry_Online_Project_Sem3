@@ -48,5 +48,14 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return ServiceDAO.Instance.UpdateService(entity);
 
         }
-    }
+        public ServiceView GetById(int id)
+        {
+            return ServiceDAO.Instance.GetById(id);
+        }
+        public HashSet<ServiceView> GetInactiveServices()
+        {
+             var list = ServiceDAO.Instance.GetInactiveServices();
+             return new HashSet<ServiceView>(list);
+         }
+}
 }

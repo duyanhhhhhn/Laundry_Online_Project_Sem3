@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -182,5 +184,119 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
             });
         }
-    }
+        public ActionResult createService()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult createService(HttpPostedFileBase Image, ServiceView model)
+        {
+            try
+            {
+                string directoryPath = Server.MapPath("~/Content/client/images");
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                if (Image != null && Image.ContentLength > 0)
+                {
+                    string safeFileName = Path.GetFileNameWithoutExtension(Image.FileName)
+                                            .Replace(" ", "_")
+                                            + Path.GetExtension(Image.FileName);
+                    string newFileName = $"{DateTime.Now.Ticks}_{safeFileName}";
+                    string fullPathSave = Path.Combine(directoryPath, newFileName);
+
+                    Image.SaveAs(fullPathSave);
+                    model.Image = newFileName;
+                }
+                else
+                {
+                    model.Image = "defaultimage.jpg";
+                }
+
+                ServiceRepository.Instance.Create(model);
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex.Message);
+                System.IO.File.WriteAllText(Server.MapPath("~/Content/log.txt"), ex.ToString());
+            }
+            return RedirectToAction("ServiceList");
+        }
+        [HttpGet]
+        public ActionResult Admin_edit_service(int id)
+        {
+            var service = ServiceRepository.Instance.GetById(id);
+
+            if (service == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(service);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditService(HttpPostedFileBase Image, ServiceView model)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingService = ServiceRepository.Instance.GetById(model.Id); 
+
+                if (existingService == null)
+                {
+                    ModelState.AddModelError("", "Dịch vụ không tồn tại.");
+                    return View("Admin_edit_service", model);
+                }
+
+                try
+                {
+                    string directoryPath = Server.MapPath("~/Content/client/images");
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        Directory.CreateDirectory(directoryPath);
+                    }
+
+                    if (Image != null && Image.ContentLength > 0)
+                    {
+                        if (!string.IsNullOrEmpty(existingService.Image) && existingService.Image != "defaultimage.jpg")
+                        {
+                            string oldImagePath = Path.Combine(directoryPath, existingService.Image);
+                            if (System.IO.File.Exists(oldImagePath))
+                            {
+                                System.IO.File.Delete(oldImagePath);
+                            }
+                        }
+
+                        string safeFileName = Path.GetFileNameWithoutExtension(Image.FileName)
+                                                    .Replace(" ", "_")
+                                                    + Path.GetExtension(Image.FileName);
+                        string newFileName = $"{DateTime.Now.Ticks}_{safeFileName}";
+                        string fullPathSave = Path.Combine(directoryPath, newFileName);
+
+                        Image.SaveAs(fullPathSave);
+                        model.Image = newFileName;
+                    }
+                    else
+                    {
+                        model.Image = existingService.Image;
+                    }
+
+                    model.Active = existingService.Active;
+
+                    ServiceRepository.Instance.Update(model);
+
+                    return RedirectToAction("ServiceList");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    System.IO.File.WriteAllText(Server.MapPath("~/Content/log.txt"), ex.ToString());
+                    ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật dịch vụ: " + ex.Message);
+                }
+            }
+            return View("Admin_edit_service", model);
+        }
+}
 }

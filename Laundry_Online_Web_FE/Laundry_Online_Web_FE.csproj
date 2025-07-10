@@ -314,9 +314,12 @@
     <Content Include="Views\Admin\AllCustomerList.cshtml" />
     <Content Include="Views\Admin\CustomerInActive.cshtml" />
     <Content Include="Views\Admin\ServiceList.cshtml" />
+    <Content Include="Views\Admin\createService.cshtml" />
+    <Content Include="Views\Admin\Admin_edit_service.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Client\images\" />
     <Folder Include="Models\ModelViews\DTO\" />
   </ItemGroup>
   <ItemGroup>
