@@ -145,8 +145,10 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CustomerPackageController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -193,6 +195,7 @@
     </Compile>
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\DTO\CustomerPackageForm.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
     <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
     <Compile Include="Models\ModelViews\InvoiceView.cs" />
@@ -201,6 +204,8 @@
     <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
     <Compile Include="Models\Repositories\InvoiceRepository.cs" />
     <Compile Include="Models\Repositories\PackageRepository.cs" />
+    <Compile Include="Models\Repositories\RepoBackup\CustomerDAO.cs" />
+    <Compile Include="Models\Repositories\RepoBackup\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -274,10 +279,17 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\CustomerPackage\Create.cshtml" />
+    <Content Include="Views\CustomerPackage\Detail.cshtml" />
+    <Content Include="Views\CustomerPackage\Edit.cshtml" />
+    <Content Include="Views\CustomerPackage\Index.cshtml" />
+    <Content Include="Views\Package\Create.cshtml" />
+    <Content Include="Views\Package\Detail.cshtml" />
+    <Content Include="Views\Package\Edit.cshtml" />
+    <Content Include="Views\Package\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\ModelViews\DTO\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

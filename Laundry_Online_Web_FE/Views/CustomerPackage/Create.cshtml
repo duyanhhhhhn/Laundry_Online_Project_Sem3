@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Tạo gói khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Tạo gói khách hàng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "CustomerPackage")">Quản lý gói khách hàng</a></li>
+        <li class="breadcrumb-item active">Tạo mới</li>
+    </ol>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-plus me-1"></i>
+            Thêm gói khách hàng mới
+        </div>
+        <div class="card-body">
+            <form method="post" action="@Url.Action("CreateCustomerPackage", "CustomerPackage")">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Khách hàng</label>
+                            <select name="Customer_Id" class="form-select" required>
+                                <option value="">-- Chọn khách hàng --</option>
+                                @if (ViewBag.CustomerList != null)
+                                {
+                                    foreach (var customer in ViewBag.CustomerList)
+                                    {
+                                        <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Gói dịch vụ</label>
+                            <select name="Package_Id" class="form-select" required>
+                                <option value="">-- Chọn gói --</option>
+                                @if (ViewBag.PackageList != null)
+                                {
+                                    foreach (var package in ViewBag.PackageList)
+                                    {
+                                        <option value="@package.Id">@package.Package_Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Ngày bắt đầu</label>
+                            <input type="date" name="Date_Start" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Ngày kết thúc</label>
+                            <input type="date" name="Date_End" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Giá trị (VNĐ)</label>
+                            <input type="number" name="Value" class="form-control" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Mã thanh toán</label>
+                            <input type="text" name="Payment_Id" class="form-control" placeholder="Để trống nếu chưa thanh toán">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a href="@Url.Action("Index", "CustomerPackage")" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Set default start date to today
+        document.querySelector('input[name="Date_Start"]').value = new Date().toISOString().split('T')[0];
+        
+        // Set default end date to 30 days from today
+        var endDate = new Date();
+        endDate.setDate(endDate.getDate() + 30);
+        document.querySelector('input[name="Date_End"]').value = endDate.toISOString().split('T')[0];
+    </script>
+}
