@@ -47,7 +47,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return false;
             }
         }
-        public List<ServiceView> GetAllServices()
+        public HashSet<ServiceView> GetAllServices()
         {
             try
             {
@@ -65,13 +65,13 @@ namespace Laundry_Online_Web_FE.Models.Dao
                                  Price = s.s_price,
                                  Active = (int)s.s_active,
                              })
-                             .ToList();
+                             .ToHashSet();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("GetAllServices error: " + ex.Message);
-                return new List<ServiceView>();
+                return new HashSet<ServiceView>();
             }
         }
         public bool DeleteService(int id)
@@ -150,6 +150,66 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return new List<ServiceView>();
             }
         }
+        public HashSet<ServiceView> GetInactiveServices()
+        {
 
+            try
+            {
+                using (var db = new OnlineLaundryEntities())
+                {
+                    return db.Services
+                             .Where(s => s.s_active == 0)
+                             .Select(s => new ServiceView
+                             {
+                                 Id = s.s_id,
+                                 Title = s.s_title,
+                                 Description = s.s_description,
+                                 Image = s.s_image,
+                                 Unit = s.s_unit,
+                                 Price = s.s_price,
+                                 Active = (int)s.s_active,
+                             })
+                             .ToHashSet();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GetAllServices error: " + ex.Message);
+                return new HashSet<ServiceView>();
+            }
+        }
+        public ServiceView GetById(int id)
+        {
+            try
+            {
+                using (var db = new OnlineLaundryEntities())
+                {
+                    var serviceEntity = db.Services
+                                          .FirstOrDefault(s => s.s_id == id);
+
+                    if (serviceEntity == null)
+                    {
+                        return null;
+                    }
+
+                    // Project the entity to ServiceView
+                    return new ServiceView
+                    {
+                        Id = serviceEntity.s_id,
+                        Title = serviceEntity.s_title,
+                        Description = serviceEntity.s_description,
+                        Image = serviceEntity.s_image,
+                        Unit = serviceEntity.s_unit,
+                        Price = serviceEntity.s_price,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetServiceById error for ID {id}: {ex.Message}");
+                // You might also want to re-throw or throw a custom exception,
+                return null;
+            }
+        }
     }
 }
