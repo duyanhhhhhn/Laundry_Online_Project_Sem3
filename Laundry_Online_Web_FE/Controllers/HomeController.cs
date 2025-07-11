@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -32,8 +33,9 @@ namespace Laundry_Online_Web_FE.Controllers
             if (Session["customer"] != null)
             {
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
-                return RedirectToAction("Index", "Customer");
+                return RedirectToAction("Index");
             }
+            ViewBag.Message = TempData["Message"];
             return View();
         }
         public ActionResult Logout()
@@ -46,7 +48,43 @@ namespace Laundry_Online_Web_FE.Controllers
 
         public ActionResult Register()
         {
+            if (Session["customer"] != null)
+            {
+                // Nếu đã đăng nhập, chuyển hướng đến trang chính
+                return RedirectToAction("Index");
+            }
             return View();
         }
+        [HttpPost]
+        public ActionResult Create_Customer()
+        {
+            string firstName = Request.Form["FirstName"];
+            string lastName = Request.Form["LastName"];
+            string phone = Request.Form["PhoneNumber"];
+            string address = Request.Form["Address"];
+            string password = Request.Form["Password"];
+            var customer = new Models.ModelViews.CustomerView
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                PhoneNumber = phone,
+                Address = address,
+                Password = password,
+                RegistrationDate = DateTime.Now,
+                Active = 1
+            };
+            var result = CustomerRepo.Instance.Create(customer);
+            if (result)
+            {
+                TempData["Message"] = "Register success!";
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Register Error. Try again";
+                return View("Register");
+            }
+        }
+
     }
 }

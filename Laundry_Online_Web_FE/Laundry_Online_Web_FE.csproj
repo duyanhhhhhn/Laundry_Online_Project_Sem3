@@ -201,6 +201,7 @@
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\Repositories\CustomerRepo.cs" />
+    <Compile Include="Models\Repositories\InvoiceItemRepo.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
     <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
