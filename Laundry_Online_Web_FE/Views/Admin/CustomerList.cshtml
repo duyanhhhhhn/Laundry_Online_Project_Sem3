@@ -1,0 +1,98 @@
+﻿
+@{
+    ViewBag.Title = "CustomerList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@if (ViewBag.Data != null)
+{
+    HashSet<Laundry_Online_Web_FE.Models.ModelViews.CustomerView> ls =
+        ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.CustomerView>;
+    var i = 1;
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Customer Active <a href="@Url.Action("Admin_create_customer")" class="btn btn-success m-0" style="float: right;">New Customer</a>
+            </div>
+
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Phone</th>
+                            <th>Registration Date</th>
+                            <th>Address</th>
+                            <th>Actice</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.CustomerView cus in ls)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@cus.FirstName</td>
+                                <td>@cus.LastName</td>
+                                <td>@cus.PhoneNumber</td>
+                                <td>@cus.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                                <td>@cus.Address</td>
+                                <td>
+                                    @if (cus.Active == 1)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Admin_edit_customer", new { id = cus.Id })">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn-toggle-active"
+                                       data-id="@cus.Id" data-name="@cus.FirstName">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $(".btn-toggle-active").click(function () {
+            var id = $(this).data("id");
+            var name = $(this).data("name");
+
+            if (confirm("Bạn có chắc muốn thay đổi trạng thái của khách hàng '" + name + "'?")) {
+                $.ajax({
+                    url: '@Url.Action("ChangeCustomerActiveStatus", "Admin")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            location.reload(); // Refresh lại trang để cập nhật trạng thái
+                        } else {
+                            alert("Có lỗi xảy ra: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối đến server.");
+                    }
+                });
+            }
+        });
+    });
+    </script>
+
+}
+

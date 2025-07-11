@@ -23,6 +23,10 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 return _instance;
             }
         }
+        public HashSet<EmployeeView> GetAllEmployees()
+        {
+            return EmployeeDAO.Instance.GetAllEmployees();
+        }
 
         public HashSet<EmployeeView> GetActiveAdmins()
         {

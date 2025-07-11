@@ -1,0 +1,242 @@
+﻿@{
+    ViewBag.Title = "Admin_edit_service";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@model Laundry_Online_Web_FE.Models.ModelViews.ServiceView
+
+<div id="layoutAuthentication">
+    <div id="layoutAuthentication_content">
+        <main>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-7">
+                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <div class="card-header"><h3 class="text-center font-weight-light my-4">Edit Service</h3></div>
+                            <div class="card-body">
+                                <form method="post" action="@Url.Action("EditService", "Admin")" enctype="multipart/form-data">
+                                    @Html.AntiForgeryToken()
+
+                                    @* Trường ẩn để truyền ID của dịch vụ *@
+                                    @Html.HiddenFor(model => model.Id)
+
+                                    <div class="mb-3">
+                                        <div class="form-floating">
+                                            <input name="Title" class="form-control" id="Title" type="text" placeholder="Enter your Title" value="@Model.Title" required />
+                                            <label for="Title">Title</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-floating">
+                                            <textarea name="Description" class="form-control" id="Description" placeholder="Enter your Description" style="height: 150px;" required>@Model.Description</textarea>
+                                            <label for="Description">Description</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Image" class="form-label">Image Upload</label>
+                                        <div class="custom-file-input-wrapper">
+                                            <input type="file" class="custom-file-input" name="Image" id="Image" onchange="updateFileName(this)">
+                                            <label class="custom-file-label" for="Image" id="ImageLabel">Choose new file (or keep existing)</label>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.Image))
+                                        {
+                                            <div class="current-image-preview mt-2 text-center">
+                                                <p>Current Image:</p>
+                                                <img src="@Url.Content("~/content/client/images/" + Model.Image)" alt="Current Service Image" class="img-thumbnail" style="max-width: 150px; height: auto;" />
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-floating">
+                                            <input name="Unit" class="form-control" id="Unit" type="text" placeholder="Create a Unit" value="@Model.Unit" required />
+                                            <label for="Unit">Unit</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-floating">
+                                            <input name="Price" class="form-control" id="Price" type="number" placeholder="Price" value="@Model.Price" required />
+                                            <label for="Price">Price</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 mb-0">
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary btn-block">Update Service</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="~/js/scripts.js"></script>
+
+<script>
+    function updateFileName(input) {
+        var fileName = "Choose new file (or keep existing)";
+        if (input.files && input.files.length > 0) {
+            fileName = input.files[0].name;
+            document.getElementById('ImageLabel').classList.add('selected');
+        } else {
+            document.getElementById('ImageLabel').classList.remove('selected');
+        }
+        document.getElementById('ImageLabel').textContent = fileName;
+    }
+</script>
+
+<style>
+    /* Tổng quan giao diện */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #f0f2f5;
+        border-bottom: 1px solid #e0e0e0;
+        border-top-left-radius: 0.75rem;
+        border-top-right-radius: 0.75rem;
+        padding: 1.5rem;
+    }
+
+        .card-header h3 {
+            color: #343a40;
+            font-weight: 600;
+        }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Các trường nhập liệu Bootstrap */
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: calc(3.5rem + 2px);
+        line-height: 1.25;
+        padding: 1rem 0.75rem;
+    }
+
+    /* Đặc biệt cho textarea */
+    .form-floating > textarea.form-control {
+        height: 150px; /* Chiều cao lớn hơn cho Description */
+        min-height: 58px;
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    /* Tùy chỉnh input file */
+    .custom-file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: block;
+        margin-bottom: 1rem;
+        height: calc(2.25rem + 2px);
+        line-height: 1.5;
+    }
+
+    .custom-file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+    }
+
+    .custom-file-label {
+        display: flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #495057;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+        cursor: pointer;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        z-index: 1;
+        box-sizing: border-box;
+    }
+
+        .custom-file-label::before {
+            content: 'Browse';
+            display: inline-block;
+            background-color: #0d6efd;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            margin-right: 0.75rem;
+            border-radius: 0.2rem;
+            border: 1px solid #0d6efd;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+
+        .custom-file-label:hover {
+            background-color: #e9ecef;
+        }
+
+            .custom-file-label:hover::before {
+                background-color: #0a58ca;
+                border-color: #0a58ca;
+            }
+
+    .custom-file-input:focus + .custom-file-label {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .custom-file-label.selected::after {
+        content: " (Selected)";
+        margin-left: 5px;
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        padding: 0.75rem 1.25rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 0.3rem;
+        transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        .btn-primary:focus {
+            box-shadow: 0 0 0 0.25rem rgba(49, 132, 253, 0.5);
+        }
+</style>

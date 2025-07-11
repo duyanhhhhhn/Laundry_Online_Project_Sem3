@@ -1,0 +1,107 @@
+﻿
+@{
+    ViewBag.Title = "AllEmployeeList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@{
+    ViewBag.Title = "EmployeeList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@if (ViewBag.Data != null)
+{
+    HashSet<Laundry_Online_Web_FE.Models.ModelViews.EmployeeView> ls =
+        ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.EmployeeView>;
+    var i = 1;
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                All Employee <a href="@Url.Action("Admin_create_employee")" class="btn btn-success m-0" style="float: right;">New Employee</a>
+            </div>
+
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Phone</th>
+                            <th>Hire Date</th>
+                            <th>Salary</th>
+                            <th>Actice</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.EmployeeView emp in ls)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@emp.FirstName</td>
+                                <td>@emp.LastName</td>
+                                <td>@emp.Phone</td>
+                                <td>@emp.HireDate.ToString("dd/MM/yyyy")</td>
+                                <td>@emp.Salary</td>
+                                <td>
+                                <td>
+                                    @if (emp.Active == 1)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("EditEmployee",new { EmpId = emp.Id } )">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn-toggle-active"
+                                       data-id="@emp.Id" data-name="@emp.FirstName">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+$(document).ready(function () {
+    $(".btn-toggle-active").click(function () {
+        var id = $(this).data("id");
+        var name = $(this).data("name");
+
+        if (confirm("Bạn có chắc muốn thay đổi trạng thái của nhân viên '" + name + "'?")) {
+            $.ajax({
+                url: '@Url.Action("ChangeEmployeeActiveStatus", "Admin")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.status === "success") {
+                        alert(response.message);
+                        location.reload(); // Refresh lại trang để cập nhật trạng thái
+                    } else {
+                        alert("Có lỗi xảy ra: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Không thể kết nối đến server.");
+                }
+            });
+        }
+    });
+});
+    </script>
+}
+
+
+
+

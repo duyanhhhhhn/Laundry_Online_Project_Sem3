@@ -1,0 +1,80 @@
+﻿
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+
+@Html.Partial("Client/_PartialBreadCrumb")
+
+<div class="container margin-bottom-20 margin-top-30">
+    <h1 class="d-none">Đăng ký tài khoản</h1>
+    <div class="row justify-content-md-center">
+        <div class="col-lg-5 col-md-12">
+            <div class="page-login account-box-shadow">
+                <div id="login">
+                    <div class="evo-account-content">
+                        <ul class="auth-block__menu-list">
+                            <li>
+                                <a href="@Url.Action("Login", "Home")" title="Đăng nhập">Đăng nhập</a>
+                            </li>
+                            <li class="active">
+                                <a href="#" title="Đăng ký">Đăng ký</a>
+                            </li>
+                        </ul>
+                        <form method="post" action="https://washintown.vn/account/register" id="customer_register" accept-charset="UTF-8">
+                            <input name="FormType" type="hidden" value="customer_register" /><input name="utf8" type="hidden" value="true" /><input type="hidden" id="Token-68cd88b928ed4f6197521f1f0550a0d6" name="Token" />
+                            <div class="form-signup">
+
+                            </div>
+                            <div class="form-signup clearfix">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <fieldset class="form-group">
+                                            <label>Họ<span class="required">*</span></label>
+                                            <input placeholder="Nhập Họ" type="text" class="form-control form-control-lg" value="" name="lastName" id="lastName" required data-validation-error-msg="Không được để trống" data-validation="required">
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <fieldset class="form-group">
+                                            <label>Tên<span class="required">*</span></label>
+                                            <input placeholder="Nhập Tên" type="text" class="form-control form-control-lg" value="" name="firstName" id="firstName" required data-validation-error-msg="Không được để trống" data-validation="required">
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <fieldset class="form-group">
+                                            <label>Số điện thoại<span class="required">*</span></label>
+                                            <input placeholder="Nhập Số điện thoại" type="tel" class="number-phone form-control form-control-lg" value="" name="phone" id="phone" required data-validation-error-msg="Không được để trống" data-validation="required">
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <fieldset class="form-group">
+                                            <label>Email<span class="required">*</span></label>
+                                            <input placeholder="Nhập Địa chỉ Email" type="email" class="form-control form-control-lg" data-validation="email" data-validation-error-msg="Email sai định dạng" value="" name="email" id="email" required="" />
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <fieldset class="form-group">
+                                            <label>Mật khẩu<span class="required">*</span></label>
+                                            <input placeholder="Nhập Mật khẩu" type="password" class="form-control form-control-lg" value="" name="password" id="password" required data-validation-error-msg="Không được để trống" data-validation="required">
+                                        </fieldset>
+                                    </div>
+
+                                    <div class="col-md-12 text-center margin-top-10">
+                                        <button type="submit" value="Đăng ký" class="btn btn-style btn-blues">Tạo tài khoản</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@Html.Partial("Client/_PartialFooter")
+
+
+

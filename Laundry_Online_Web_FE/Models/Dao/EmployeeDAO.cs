@@ -13,7 +13,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
     {
         private static readonly object _lock = new object();
         private static EmployeeDAO _instance = null;
-
         private EmployeeDAO() { }
 
         public static EmployeeDAO Instance
@@ -30,7 +29,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return _instance;
             }
         }
-
         public bool Create(EmployeeView emp)
         {
             try
@@ -61,7 +59,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
 
             return false;
         }
-
         public bool Update(EmployeeView emp)
         {
             try
@@ -89,7 +86,25 @@ namespace Laundry_Online_Web_FE.Models.Dao
 
             return false;
         }
-
+        public HashSet<EmployeeView> GetAllEmployees()
+        {
+            using (var en = new Entities.OnlineLaundryEntities())
+            {
+                return en.Employees
+                         .Where(e => e.active == 1)
+                         .Select(e => new EmployeeView
+                         {
+                             Id = e.employee_id,
+                             FirstName = e.first_name,
+                             LastName = e.last_name,
+                             Phone = e.phone_number,
+                             Role = (int)e.role,
+                             HireDate = (DateTime)e.hire_date,
+                             Salary = (int)(e.salary ?? 0),
+                             Active = (int)e.active
+                         }).ToHashSet();
+            }
+        }
         public HashSet<EmployeeView> GetAdmins()
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -109,7 +124,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                          }).ToHashSet();
             }
         }
-
         public HashSet<EmployeeView> GetStaffs()
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -129,7 +143,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                          }).ToHashSet();
             }
         }
-
         public HashSet<EmployeeView> GetByRole(int role, bool onlyActive = true)
         {
             using (var en = new OnlineLaundryEntities())
@@ -152,8 +165,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 }).ToHashSet();
             }
         }
-
-
         public EmployeeView ReturnEmployee(string phone, string pwd)
         {
             try
@@ -184,11 +195,9 @@ namespace Laundry_Online_Web_FE.Models.Dao
             {
                 Debug.WriteLine("Error: " + ex.Message);
             }
-
-            return new EmployeeView();
+            return null;
 
         }
-
         public EmployeeView GetById(int id)
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -211,7 +220,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
             }
             return new EmployeeView();
         }
-
         public bool SetActive(int id)
         {
             try
@@ -234,8 +242,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
 
             return false;
         }
-
-
         public int CountEmployees()
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -243,7 +249,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return en.Employees.Count(e => e.active == 1 && e.role == 0);
             }
         }
-
         public int CountAdmins()
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -251,7 +256,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 return en.Employees.Count(e => e.active == 1 && e.role == 1);
             }
         }
-
         public bool ResetPassword(int id, string newPassword)
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -266,7 +270,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
             }
             return false;
         }
-
         public HashSet<EmployeeView> Search(string keyword)
         {
             using (var en = new Entities.OnlineLaundryEntities())
@@ -288,6 +291,5 @@ namespace Laundry_Online_Web_FE.Models.Dao
                          .ToHashSet();
             }
         }
-
     }
 }
