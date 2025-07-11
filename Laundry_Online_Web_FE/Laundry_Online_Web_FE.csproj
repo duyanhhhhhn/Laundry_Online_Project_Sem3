@@ -148,7 +148,9 @@
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\Admin\CustomerController.cs" />
     <Compile Include="Controllers\Auth\AuthController.cs" />
+    <Compile Include="Controllers\CustomerPackageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -203,6 +205,7 @@
     <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\Repositories\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
+    <Compile Include="Models\ModelViews\DTO\CustomerPackageForm.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
     <Compile Include="Models\ModelViews\InvoiceItemView.cs" />
     <Compile Include="Models\ModelViews\InvoiceView.cs" />
@@ -210,6 +213,8 @@
     <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
     <Compile Include="Models\Repositories\InvoiceRepository.cs" />
     <Compile Include="Models\Repositories\PackageRepository.cs" />
+    <Compile Include="Models\Repositories\RepoBackup\CustomerDAO.cs" />
+    <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -551,7 +556,6 @@
     <Content Include="Views\Admin\Admin_edit_customer.cshtml" />
     <Content Include="Views\Admin\AllCustomerList.cshtml" />
     <Content Include="Views\Admin\CustomerInActive.cshtml" />
-    <Content Include="Views\Shared\Index.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
     <Content Include="Views\Shared\Client\_PartialHeader.cshtml" />
@@ -567,6 +571,19 @@
     <Folder Include="App_Data\" />
     <Folder Include="Content\Client\images\" />
     <Folder Include="Models\ModelViews\DTO\" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\CustomerPackage\Create.cshtml" />
+    <Content Include="Views\CustomerPackage\Detail.cshtml" />
+    <Content Include="Views\CustomerPackage\Edit.cshtml" />
+    <Content Include="Views\CustomerPackage\Index.cshtml" />
+    <Content Include="Views\Package\Create.cshtml" />
+    <Content Include="Views\Package\Detail.cshtml" />
+    <Content Include="Views\Package\Edit.cshtml" />
+    <Content Include="Views\Package\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

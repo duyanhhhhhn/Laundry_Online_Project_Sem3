@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using Laundry_Online_Web_FE.Models.Entities;
@@ -32,20 +33,30 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
-        public List<PackageView> GetAll()
+        public HashSet<PackageView> GetAll()
         {
-            return _context.Packages.Select(p => new PackageView
+            try
             {
-                Id = p.package_id,
-                Package_Name = p.package_name,
-                Description = p.description,
-                Price = p.price,
-                Value = p.value ?? 0,
-                Unit = p.unit,
-                Validity_Day = p.validity_days ?? 30
-            }).ToList();
-        }
+                var data = _context.Packages
+                    .Select(p => new PackageView
+                    {
+                        Id = p.package_id,
+                        Package_Name = p.package_name,
+                        Description = p.description,
+                        Price = p.price,
+                        Value = p.value ?? 0,
+                        Unit = p.unit,
+                        Validity_Day = p.validity_days ?? 30
+                    }).ToHashSet();
 
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetAll Package Error: " + ex.Message);
+                return new HashSet<PackageView>();
+            }
+        }
         public PackageView GetById(int id)
         {
             var p = _context.Packages.FirstOrDefault(x => x.package_id == id);
@@ -63,7 +74,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             };
         }
 
-        public bool Add(PackageView model)
+        public bool Create(PackageView model)
         {
             try
             {
@@ -81,7 +92,11 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 _context.SaveChanges();
                 return true;
             }
-            catch { return false; }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex); 
+                throw;
+            }
         }
 
         public bool Update(PackageView model)

@@ -1,0 +1,109 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.PackageView
+
+@{
+    ViewBag.Title = "Chi tiết gói dịch vụ";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i> Chi tiết gói dịch vụ
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Tên gói</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" value="@Model.Package_Name" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Mô tả</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" readonly>@Model.Description</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Giá</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" value="@Model.Price" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Giá trị</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" value="@Model.Value" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Đơn vị</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" value="@Model.Unit" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-3 col-form-label">Số ngày hiệu lực</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" value="@Model.Validity_Day" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-md-9 offset-md-3">
+                            @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 15px;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .col-form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .form-control[readonly] {
+        background-color: #e9ecef;
+        color: #495057;
+        border-color: #ced4da;
+    }
+
+    .btn {
+        margin-right: 10px;
+    }
+</style>

@@ -1,0 +1,454 @@
+﻿@{
+    ViewBag.Title = "Quản lý gói khách hàng";
+
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Quản lý gói khách hàng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard</a></li>
+        <li class="breadcrumb-item active">Quản lý gói khách hàng</li>
+    </ol>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Danh sách gói khách hàng
+            <div class="float-end">
+                <a href="@Url.Action("Create", "CustomerPackage")" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên khách hàng</th>
+                        <th>Tên gói</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Giá trị</th>
+                        <th>Mã thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var hasData = ViewBag.Data != null && ((IEnumerable<dynamic>)ViewBag.Data).Any();
+                    }
+                    @if (hasData)
+                    {
+                        foreach (var item in ViewBag.Data)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-2">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                        <strong>@item.Customer_Name</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@item.Package_Name</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    @DateTime.Parse(item.Date_Start.ToString()).ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    @DateTime.Parse(item.Date_End.ToString()).ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    <span class="text-success fw-bold">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        @string.Format("{0:N0}", item.Value) VNĐ
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Payment_Id))
+                                    {
+                                        <span class="badge bg-success">@item.Payment_Id</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Chưa thanh toán</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var endDate = DateTime.Parse(item.Date_End.ToString());
+                                        var today = DateTime.Now;
+                                    }
+                                    @if (endDate > today)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i> Đang hoạt động
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle"></i> Đã hết hạn
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Detail", "CustomerPackage", new { id = item.Id })"
+                                           class="btn btn-info btn-sm" title="Chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", "CustomerPackage", new { id = item.Id })"
+                                           class="btn btn-warning btn-sm" title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                                onclick="confirmDelete(@item.Id)" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <div class="py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Không có dữ liệu để hiển thị</p>
+                                    <a href="@Url.Action("Create", "CustomerPackage")" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus"></i> Thêm gói khách hàng đầu tiên
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Tổng gói</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                @{
+                                    var totalCount = 0;
+                                    if (ViewBag.Data != null && ((IEnumerable<dynamic>)ViewBag.Data).Any())
+                                    {
+                                        totalCount = ((IEnumerable<dynamic>)ViewBag.Data).Count();
+                                    }
+                                }
+                                @totalCount
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Đang hoạt động</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                @{
+                                    var activeCount = 0;
+                                    if (ViewBag.Data != null && ((IEnumerable<dynamic>)ViewBag.Data).Any())
+                                    {
+                                        foreach (var item in ViewBag.Data)
+                                        {
+                                            if (DateTime.Parse(item.Date_End.ToString()) > DateTime.Now)
+                                            {
+                                                activeCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                                @activeCount
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Đã hết hạn</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                @{
+                                    var expiredCount = 0;
+                                    if (ViewBag.Data != null && ((IEnumerable<dynamic>)ViewBag.Data).Any())
+                                    {
+                                        foreach (var item in ViewBag.Data)
+                                        {
+                                            if (DateTime.Parse(item.Date_End.ToString()) <= DateTime.Now)
+                                            {
+                                                expiredCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                                @expiredCount
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Tổng giá trị</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                @{
+                                    var totalValue = 0;
+                                    if (ViewBag.Data != null && ((IEnumerable<dynamic>)ViewBag.Data).Any())
+                                    {
+                                        foreach (var item in ViewBag.Data)
+                                        {
+                                            totalValue += (int)item.Value;
+                                        }
+                                    }
+                                }
+                                @string.Format("{0:N0}", totalValue) VNĐ
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- Đảm bảo jQuery được load trước -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS và JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Hàm xác nhận xóa
+        function confirmDelete(id) {
+            // Kiểm tra xem SweetAlert2 đã load chưa
+            if (typeof Swal === 'undefined') {
+                if (confirm('Bạn có chắc chắn muốn xóa gói khách hàng này?')) {
+                    deletePackage(id);
+                }
+                return;
+            }
+
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: 'Bạn có chắc chắn muốn xóa gói khách hàng này?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deletePackage(id);
+                }
+            });
+        }
+
+        // Hàm thực hiện xóa gói
+        function deletePackage(id) {
+            try {
+                // Tạo form và submit
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Delete", "CustomerPackage")';
+
+                // Thêm token chống CSRF nếu có
+                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__RequestVerificationToken';
+                    tokenInput.value = token.value;
+                    form.appendChild(tokenInput);
+                }
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            } catch (error) {
+                console.error('Lỗi khi xóa gói khách hàng:', error);
+                alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        }
+
+        // Khởi tạo khi DOM đã sẵn sàng
+        $(document).ready(function() {
+            try {
+                console.log('Bắt đầu khởi tạo DataTables...');
+
+                // Kiểm tra xem table có tồn tại không
+                if ($('#datatablesSimple').length === 0) {
+                    console.error('Không tìm thấy bảng #datatablesSimple');
+                    return;
+                }
+
+                // Khởi tạo DataTables
+                $('#datatablesSimple').DataTable({
+                    language: {
+                        "sProcessing": "Đang xử lý...",
+                        "sLengthMenu": "Hiển thị _MENU_ mục",
+                        "sZeroRecords": "Không tìm thấy dữ liệu",
+                        "sInfo": "Hiển thị _START_ đến _END_ trong tổng số _TOTAL_ mục",
+                        "sInfoEmpty": "Hiển thị 0 đến 0 trong tổng số 0 mục",
+                        "sInfoFiltered": "(được lọc từ _MAX_ mục)",
+                        "sSearch": "Tìm kiếm:",
+                        "oPaginate": {
+                            "sFirst": "Đầu tiên",
+                            "sPrevious": "Trước",
+                            "sNext": "Tiếp theo",
+                            "sLast": "Cuối cùng"
+                        }
+                    },
+                    pageLength: 10,
+                    order: [[0, 'desc']],
+                    columnDefs: [
+                        { orderable: false, targets: [8] }
+                    ],
+                    responsive: true
+                });
+
+                console.log('DataTables đã được khởi tạo thành công');
+            } catch (error) {
+                console.error('Lỗi khi khởi tạo DataTables:', error);
+            }
+        });
+
+        // Ẩn thông báo tự động sau 5 giây
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+
+    <style>
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+
+        .btn-group .btn {
+            margin-right: 2px;
+        }
+
+            .btn-group .btn:last-child {
+                margin-right: 0;
+            }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .badge {
+            font-size: 0.75em;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .fw-bold {
+            font-weight: 600 !important;
+        }
+
+        /* Thêm style cho DataTables */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #007bff;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                color: #0056b3;
+                background-color: #e9ecef;
+                border-color: #dee2e6;
+            }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+                color: #fff;
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+    </style>
+}

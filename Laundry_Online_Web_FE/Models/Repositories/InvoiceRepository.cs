@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Web;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews;
-
 
 namespace Laundry_Online_Web_BE.Models.Repositories
 {
@@ -32,38 +31,65 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
-        // Lấy tất cả hóa đơn
-        public List<InvoiceView> GetAll()
+        public HashSet<InvoiceView> GetAll()
         {
-            return _context.Invoices.Select(i => MapToView(i)).ToList();
+            try
+            {
+                return _context.Invoices.Select(i => MapToView(i)).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetAll Invoice Error: " + ex.Message);
+                return new HashSet<InvoiceView>();
+            }
         }
 
-        // Lấy hóa đơn theo ID
         public InvoiceView GetById(int id)
         {
-            var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == id);
-            return invoice != null ? MapToView(invoice) : null;
+            try
+            {
+                var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == id);
+                return invoice != null ? MapToView(invoice) : null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetById Invoice Error: " + ex.Message);
+                return null;
+            }
         }
 
-        // Lấy hóa đơn theo ID khách hàng
-        public List<InvoiceView> GetByCustomerId(int customerId)
+        public HashSet<InvoiceView> GetByCustomerId(int customerId)
         {
-            return _context.Invoices
-                .Where(i => i.customer_id == customerId)
-                .Select(i => MapToView(i))
-                .ToList();
+            try
+            {
+                return _context.Invoices
+                    .Where(i => i.customer_id == customerId)
+                    .Select(i => MapToView(i))
+                    .ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetByCustomerId Invoice Error: " + ex.Message);
+                return new HashSet<InvoiceView>();
+            }
         }
 
-        // Tìm kiếm theo từ khóa trong payment_id hoặc notes
-        public List<InvoiceView> Search(string keyword)
+        public HashSet<InvoiceView> Search(string keyword)
         {
-            return _context.Invoices
-                .Where(i => (i.payment_id ?? "").Contains(keyword) || (i.notes ?? "").Contains(keyword))
-                .Select(i => MapToView(i))
-                .ToList();
+            try
+            {
+                return _context.Invoices
+                    .Where(i => (i.payment_id ?? "").Contains(keyword) || (i.notes ?? "").Contains(keyword))
+                    .Select(i => MapToView(i))
+                    .ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Search Invoice Error: " + ex.Message);
+                return new HashSet<InvoiceView>();
+            }
         }
 
-        // Thêm hóa đơn mới
         public bool Add(InvoiceView model)
         {
             try
@@ -91,20 +117,19 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 _context.SaveChanges();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("Add Invoice Error: " + ex.Message);
                 return false;
             }
         }
 
-        // Cập nhật hóa đơn
         public bool Update(InvoiceView model)
         {
             try
             {
                 var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == model.Id);
-                if (invoice == null)
-                    return false;
+                if (invoice == null) return false;
 
                 invoice.customer_id = model.Customer_Id;
                 invoice.employee_id = model.Employee_Id;
@@ -125,32 +150,31 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 _context.SaveChanges();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("Update Invoice Error: " + ex.Message);
                 return false;
             }
         }
 
-        // Xóa hóa đơn
         public bool Delete(int id)
         {
             try
             {
                 var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == id);
-                if (invoice == null)
-                    return false;
+                if (invoice == null) return false;
 
                 _context.Invoices.Remove(invoice);
                 _context.SaveChanges();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("Delete Invoice Error: " + ex.Message);
                 return false;
             }
         }
 
-        // Mapping từ Invoice => InvoiceView
         private InvoiceView MapToView(Invoice i)
         {
             return new InvoiceView
@@ -174,5 +198,4 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             };
         }
     }
-
 }

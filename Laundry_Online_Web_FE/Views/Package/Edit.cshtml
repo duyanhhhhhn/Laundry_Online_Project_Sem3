@@ -1,0 +1,114 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.PackageView
+
+@{
+    ViewBag.Title = "Chỉnh sửa gói dịch vụ";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit"></i> Chỉnh sửa gói dịch vụ
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("EditPackage", "Package", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.HiddenFor(m => m.Id)
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Tên gói</label>
+                            <div class="col-md-9">
+                                <input type="text" name="Package_Name" class="form-control" value="@Model.Package_Name" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Mô tả</label>
+                            <div class="col-md-9">
+                                <textarea name="Description" class="form-control" rows="3">@Model.Description</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Giá</label>
+                            <div class="col-md-9">
+                                <input type="number" name="Price" class="form-control" value="@Model.Price" step="0.01" min="0" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Giá trị</label>
+                            <div class="col-md-9">
+                                <input type="number" name="Value" class="form-control" value="@Model.Value" min="0" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Đơn vị</label>
+                            <div class="col-md-9">
+                                <input type="text" name="Unit" class="form-control" value="@Model.Unit" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label">Số ngày hiệu lực</label>
+                            <div class="col-md-9">
+                                <input type="number" name="Validity_Day" class="form-control" value="@Model.Validity_Day" min="1" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-9 offset-md-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu thay đổi
+                                </button>
+                                @Html.ActionLink("Hủy", "Index", null, new { @class = "btn btn-secondary" })
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 15px;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .col-form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .btn {
+        margin-right: 10px;
+    }
+</style>
