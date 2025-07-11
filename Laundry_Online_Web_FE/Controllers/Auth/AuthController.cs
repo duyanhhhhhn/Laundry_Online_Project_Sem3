@@ -59,13 +59,13 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
                 // Lưu thông tin đăng nhập vào session
                 Session["customer"] = customer;
                 // Chuyển hướng đến trang chính của khách hàng
-                return RedirectToAction("Index", "Customer");
+                return RedirectToAction("Index", "Home");
             }
             else
             {
                 // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
                 ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
-                return View("Login_Customer");
+                return View("Login","Home");
             }
         }
         public ActionResult AdminLogout()

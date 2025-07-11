@@ -557,11 +557,9 @@
     <Content Include="Views\Shared\Client\_PartialBreadCrumb.cshtml" />
     <Content Include="Views\Shared\Client\_PartialFooter.cshtml" />
     <Content Include="Views\Admin\AllEmployeeList.cshtml" />
-
     <Content Include="Views\Admin\ServiceList.cshtml" />
     <Content Include="Views\Admin\createService.cshtml" />
     <Content Include="Views\Admin\Admin_edit_service.cshtml" />
-
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
