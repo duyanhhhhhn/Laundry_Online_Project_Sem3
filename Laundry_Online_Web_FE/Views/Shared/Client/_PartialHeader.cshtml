@@ -1,4 +1,9 @@
-﻿<header class="header">
+﻿@{
+    var customer = Session["Customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
+    var name = customer != null ? customer.FirstName + " " + customer.LastName : "";
+}
+@model Laundry_Online_Web_FE.Models.ModelViews.DTO.HeaderModel
+<header class="header">
     <div class="top-bar clearfix">
         <div class="container">
             <div class="evo-topbar-left">
@@ -31,234 +36,228 @@
             </div>
         </div>
         @*<div class="ant-menu d-none d-lg-block">
+                <ul id="nav" class="nav">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="Home">Home</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="About Us">About Us</a>
+                    </li>
+                    <li class=" nav-item has-childs   has-mega">
+                        <a href="#" class="nav-link" title="Services">Services <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 490.656 490.656" style="enable-background:new 0 0 490.656 490.656;" xml:space="preserve" width="25px" height="25px"><path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0    c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667    C491.696,131.368,491.696,124.605,487.536,120.445z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#141414" /></svg></a>
+                        <div class="mega-content">
+                            <div class="container">
+                                <ul class="level0">
+                                    <li class="level1 parent item fix-navs">
+                                        <a class="hmega" href="#" title="Shoe Care - Restoration">Shoe Care - Restoration</a>
+                                        <ul class="level1">
+                                            <li class="level2">
+                                                <a href="#" title="Sneaker Cleaning">Sneaker Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Leather Shoe Cleaning">Leather Shoe Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Shoe Restoration">Shoe Restoration</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Repair">Repair</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="level1 parent item fix-navs">
+                                        <a class="hmega" href="#" title="Laundry & Dry Cleaning">Laundry & Dry Cleaning</a>
+                                        <ul class="level1">
+                                            <li class="level2">
+                                                <a href="#" title="Quick Wash & Dry">Quick Wash & Dry</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Laundry Package Combo">Laundry Package Combo</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Premium Dry Cleaning">Premium Dry Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Large Blanket Laundry">Large Blanket Laundry</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="House Cleaning">House Cleaning</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="level1 parent item fix-navs">
+                                        <a class="hmega" href="#" title="House Cleaning">House Cleaning</a>
+                                        <ul class="level1">
+                                            <li class="level2">
+                                                <a href="#" title="Sofa Cleaning">Sofa Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Mattress Cleaning">Mattress Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Carpet Cleaning">Carpet Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Curtain Cleaning">Curtain Cleaning</a>
+                                            </li>
+                                            <li class="level2">
+                                                <a href="#" title="Appliance Cleaning">Appliance Cleaning</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="level1 item">
+                                        <a class="hmega" href="#" title="Shoe Care Products">Shoe Care Products</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="Promotions">Promotions</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="Shoe Care Tips">Shoe Care Tips</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="Contact Us">Contact Us</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="#" title="Service Price List">Service Price List</a>
+                    </li>
+
+                    <li>
+                        <div class="header-fill col-lg-3 col-sm-5 col-5">
+                            @{
+                                var customer = Session["Customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
+                                var name = customer != null ? customer.FirstName + " " + customer.LastName : "";
+                            }
+                            <div class="evo-header-account d-none d-lg-inline-block">
+                                <a href="#" class="header-account d-none d-lg-inline-block" aria-label="Account" title="Account">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </a>
+                                @if (!string.IsNullOrEmpty(name))
+                                {
+                                    <span style="margin-left: 5px; color: blue;">@name</span>
+                                }
+                                <ul>
+                                    @if (!string.IsNullOrEmpty(name))
+                                    {
+                                        <li><a href="@Url.Action("Logout", "Home")" title="Logout">Logout</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a href="@Url.Action("Login", "Home")" title="Login">Login</a></li>
+                                        <li><a href="@Url.Action("Register", "Home")" title="Register">Register</a></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item booking-calendar-item ">
+                        <a class="nav-link" href="#" title="Book a service">
+                            <svg version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><path d="m457 60h-36v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-150v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-36c-30.327 0-55 24.673-55 55v342c0 30.327 24.673 55 55 55h402c30.327 0 55-24.673 55-55v-342c0-30.327-24.673-55-55-55zm-96-15c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-240 0c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-91 70c0-13.785 11.215-25 25-25h36v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h150v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h36c13.785 0 25 11.215 25 25v67h-452zm452 342c0 13.785-11.215 25-25 25h-402c-13.785 0-25-11.215-25-25v-245h452z" fill="#ffffff" data-original="#000000" style="" class="" /><path d="m306.764 272h23.473v165c0 8.284 6.716 15 15 15s15-6.716 15-15v-180c0-8.284-6.716-15-15-15h-38.473c-8.284 0-15 6.716-15 15s6.715 15 15 15z" fill="#ffffff" data-original="#000000" style="" class="" /><path d="m211.764 422c-14.886 0-27.658-11.09-29.71-25.796-.192-1.378-.29-2.792-.29-4.204 0-8.284-6.716-15-15-15s-15 6.716-15 15c0 2.793.194 5.603.577 8.35 4.109 29.445 29.655 51.65 59.423 51.65 33.084 0 60-26.916 60-60 0-17.908-7.896-33.997-20.377-45 12.481-11.003 20.377-27.092 20.377-45 0-33.084-26.916-60-60-60-28.607 0-53.367 20.35-58.874 48.387-1.597 8.129 3.699 16.013 11.828 17.61 8.12 1.596 16.012-3.699 17.609-11.828 2.751-14.004 15.131-24.169 29.437-24.169 16.542 0 30 13.458 30 30s-13.458 30-30 30c-8.284 0-15 6.716-15 15s6.716 15 15 15c16.542 0 30 13.458 30 30s-13.458 30-30 30z" fill="#ffffff" data-original="#000000" style="" class="" /></svg>
+                            Book a service
+                        </a>
+                    </li>
+                </ul>
+            </div>*@
+        <div class="ant-menu d-none d-lg-block">
             <ul id="nav" class="nav">
-                <li class="nav-item ">
-                    <a class="nav-link" href="#" title="Home">Home</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index")" title="Home">Home</a>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item">
                     <a class="nav-link" href="#" title="About Us">About Us</a>
                 </li>
-                <li class=" nav-item has-childs   has-mega">
-                    <a href="#" class="nav-link" title="Services">Services <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 490.656 490.656" style="enable-background:new 0 0 490.656 490.656;" xml:space="preserve" width="25px" height="25px"><path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0    c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667    C491.696,131.368,491.696,124.605,487.536,120.445z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#141414" /></svg></a>
+                <li class="nav-item has-childs has-mega">
+                    <a href="#" class="nav-link" title="Services">Services <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 490.656 490.656" fill="currentColor"><path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0 c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667 C491.696,131.368,491.696,124.605,487.536,120.445z" /></svg></a>
                     <div class="mega-content">
                         <div class="container">
                             <ul class="level0">
-                                <li class="level1 parent item fix-navs">
-                                    <a class="hmega" href="#" title="Shoe Care - Restoration">Shoe Care - Restoration</a>
-                                    <ul class="level1">
-                                        <li class="level2">
-                                            <a href="#" title="Sneaker Cleaning">Sneaker Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Leather Shoe Cleaning">Leather Shoe Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Shoe Restoration">Shoe Restoration</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Repair">Repair</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="level1 parent item fix-navs">
+                                @foreach (var service in Model.Services)
+                                {
+                                    <li class="level1 parent item fix-navs">
+                                        <a class="hmega" href="#" title="Laundry & Dry Cleaning">@service.Title</a>
+                                    </li>
+                                }
+
+                                @*<li class="level1 parent item fix-navs">
                                     <a class="hmega" href="#" title="Laundry & Dry Cleaning">Laundry & Dry Cleaning</a>
                                     <ul class="level1">
-                                        <li class="level2">
-                                            <a href="#" title="Quick Wash & Dry">Quick Wash & Dry</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Laundry Package Combo">Laundry Package Combo</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Premium Dry Cleaning">Premium Dry Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Large Blanket Laundry">Large Blanket Laundry</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="House Cleaning">House Cleaning</a>
-                                        </li>
+                                        <li class="level2"><a href="#" title="Quick Wash & Dry">Quick Wash & Dry</a></li>
+                                        <li class="level2"><a href="#" title="Laundry Package Combo">Laundry Package Combo</a></li>
+                                        <li class="level2"><a href="#" title="Premium Dry Cleaning">Premium Dry Cleaning</a></li>
+                                        <li class="level2"><a href="#" title="Large Blanket Laundry">Large Blanket Laundry</a></li>
+                                        <li class="level2"><a href="#" title="House Cleaning">House Cleaning</a></li>
                                     </ul>
                                 </li>
                                 <li class="level1 parent item fix-navs">
                                     <a class="hmega" href="#" title="House Cleaning">House Cleaning</a>
                                     <ul class="level1">
-                                        <li class="level2">
-                                            <a href="#" title="Sofa Cleaning">Sofa Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Mattress Cleaning">Mattress Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Carpet Cleaning">Carpet Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Curtain Cleaning">Curtain Cleaning</a>
-                                        </li>
-                                        <li class="level2">
-                                            <a href="#" title="Appliance Cleaning">Appliance Cleaning</a>
-                                        </li>
+                                        <li class="level2"><a href="#" title="Sofa Cleaning">Sofa Cleaning</a></li>
+                                        <li class="level2"><a href="#" title="Mattress Cleaning">Mattress Cleaning</a></li>
+                                        <li class="level2"><a href="#" title="Carpet Cleaning">Carpet Cleaning</a></li>
+                                        <li class="level2"><a href="#" title="Curtain Cleaning">Curtain Cleaning</a></li>
+                                        <li class="level2"><a href="#" title="Appliance Cleaning">Appliance Cleaning</a></li>
                                     </ul>
                                 </li>
                                 <li class="level1 item">
                                     <a class="hmega" href="#" title="Shoe Care Products">Shoe Care Products</a>
-                                </li>
+                                </li>*@
                             </ul>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item">
                     <a class="nav-link" href="#" title="Promotions">Promotions</a>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item">
                     <a class="nav-link" href="#" title="Shoe Care Tips">Shoe Care Tips</a>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item">
                     <a class="nav-link" href="#" title="Contact Us">Contact Us</a>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item">
                     <a class="nav-link" href="#" title="Service Price List">Service Price List</a>
                 </li>
 
-                <li>
-                    <div class="header-fill col-lg-3 col-sm-5 col-5">
-                        @{
-                            var customer = Session["Customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
-                            var name = customer != null ? customer.FirstName + " " + customer.LastName : "";
+                <li class="nav-item evo-header-account ml-auto">
+
+                    <a href="#" class="nav-link" aria-label="Account" title="Account">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        @if (!string.IsNullOrEmpty(name))
+                        {
+                            <span style="margin-left: 5px; color: white;">@name</span>
                         }
-                        <div class="evo-header-account d-none d-lg-inline-block">
-                            <a href="#" class="header-account d-none d-lg-inline-block" aria-label="Account" title="Account">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </a>
-                            @if (!string.IsNullOrEmpty(name))
-                            {
-                                <span style="margin-left: 5px; color: blue;">@name</span>
-                            }
-                            <ul>
-                                @if (!string.IsNullOrEmpty(name))
-                                {
-                                    <li><a href="@Url.Action("Logout", "Home")" title="Logout">Logout</a></li>
-                                }
-                                else
-                                {
-                                    <li><a href="@Url.Action("Login", "Home")" title="Login">Login</a></li>
-                                    <li><a href="@Url.Action("Register", "Home")" title="Register">Register</a></li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
+                    </a>
+                    <ul class="account-dropdown">
+                        @if (!string.IsNullOrEmpty(name))
+                        {
+                            <li><a href="@Url.Action("Logout", "Home")" title="Logout">Logout</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="@Url.Action("Login", "Home")" title="Login">Login</a></li>
+                            <li><a href="@Url.Action("Register", "Home")" title="Register">Register</a></li>
+                        }
+                    </ul>
                 </li>
 
-                <li class="nav-item booking-calendar-item ">
+                <li class="nav-item booking-calendar-item">
                     <a class="nav-link" href="#" title="Book a service">
-                        <svg version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><path d="m457 60h-36v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-150v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-36c-30.327 0-55 24.673-55 55v342c0 30.327 24.673 55 55 55h402c30.327 0 55-24.673 55-55v-342c0-30.327-24.673-55-55-55zm-96-15c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-240 0c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-91 70c0-13.785 11.215-25 25-25h36v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h150v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h36c13.785 0 25 11.215 25 25v67h-452zm452 342c0 13.785-11.215 25-25 25h-402c-13.785 0-25-11.215-25-25v-245h452z" fill="#ffffff" data-original="#000000" style="" class="" /><path d="m306.764 272h23.473v165c0 8.284 6.716 15 15 15s15-6.716 15-15v-180c0-8.284-6.716-15-15-15h-38.473c-8.284 0-15 6.716-15 15s6.715 15 15 15z" fill="#ffffff" data-original="#000000" style="" class="" /><path d="m211.764 422c-14.886 0-27.658-11.09-29.71-25.796-.192-1.378-.29-2.792-.29-4.204 0-8.284-6.716-15-15-15s-15 6.716-15 15c0 2.793.194 5.603.577 8.35 4.109 29.445 29.655 51.65 59.423 51.65 33.084 0 60-26.916 60-60 0-17.908-7.896-33.997-20.377-45 12.481-11.003 20.377-27.092 20.377-45 0-33.084-26.916-60-60-60-28.607 0-53.367 20.35-58.874 48.387-1.597 8.129 3.699 16.013 11.828 17.61 8.12 1.596 16.012-3.699 17.609-11.828 2.751-14.004 15.131-24.169 29.437-24.169 16.542 0 30 13.458 30 30s-13.458 30-30 30c-8.284 0-15 6.716-15 15s6.716 15 15 15c16.542 0 30 13.458 30 30s-13.458 30-30 30z" fill="#ffffff" data-original="#000000" style="" class="" /></svg>
+                        <svg version="1.1" width="18" height="18" viewBox="0 0 512 512" xml:space="preserve" fill="#FFFFFF"><path d="m457 60h-36v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-150v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-36c-30.327 0-55 24.673-55 55v342c0 30.327 24.673 55 55 55h402c30.327 0 55-24.673 55-55v-342c0-30.327-24.673-55-55-55zm-96-15c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-240 0c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-91 70c0-13.785 11.215-25 25-25h36v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h150v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h36c13.785 0 25 11.215 25 25v67h-452zm452 342c0 13.785-11.215 25-25 25h-402c-13.785 0-25-11.215-25-25v-245h452z" /><path d="m306.764 272h23.473v165c0 8.284 6.716 15 15 15s15-6.716 15-15v-180c0-8.284-6.716-15-15-15h-38.473c-8.284 0-15 6.716-15 15s6.715 15 15 15z" /><path d="m211.764 422c-14.886 0-27.658-11.09-29.71-25.796-.192-1.378-.29-2.792-.29-4.204 0-8.284-6.716-15-15-15s-15 6.716-15 15c0 2.793.194 5.603.577 8.35 4.109 29.445 29.655 51.65 59.423 51.65 33.084 0 60-26.916 60-60 0-17.908-7.896-33.997-20.377-45 12.481-11.003 20.377-27.092 20.377-45 0-33.084-26.916-60-60-60-28.607 0-53.367 20.35-58.874 48.387-1.597 8.129 3.699 16.013 11.828 17.61 8.12 1.596 16.012-3.699 17.609-11.828 2.751-14.004 15.131-24.169 29.437-24.169 16.542 0 30 13.458 30 30s-13.458 30-30 30c-8.284 0-15 6.716-15 15s6.716 15 15 15c16.542 0 30 13.458 30 30s-13.458 30-30 30z" /></svg>
                         Book a service
                     </a>
                 </li>
             </ul>
-        </div>*@
-    <div class="ant-menu d-none d-lg-block">
-        <ul id="nav" class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="Home">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="About Us">About Us</a>
-            </li>
-
-            <li class="nav-item has-childs has-mega">
-                <a href="#" class="nav-link" title="Services">Services <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 490.656 490.656" fill="currentColor"><path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0 c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667 C491.696,131.368,491.696,124.605,487.536,120.445z" /></svg></a>
-                <div class="mega-content">
-                    <div class="container">
-                        <ul class="level0">
-                            <li class="level1 parent item fix-navs">
-                                <a class="hmega" href="#" title="Shoe Care - Restoration">Shoe Care - Restoration</a>
-                                <ul class="level1">
-                                    <li class="level2"><a href="#" title="Sneaker Cleaning">Sneaker Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Leather Shoe Cleaning">Leather Shoe Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Shoe Restoration">Shoe Restoration</a></li>
-                                    <li class="level2"><a href="#" title="Repair">Repair</a></li>
-                                </ul>
-                            </li>
-                            <li class="level1 parent item fix-navs">
-                                <a class="hmega" href="#" title="Laundry & Dry Cleaning">Laundry & Dry Cleaning</a>
-                                <ul class="level1">
-                                    <li class="level2"><a href="#" title="Quick Wash & Dry">Quick Wash & Dry</a></li>
-                                    <li class="level2"><a href="#" title="Laundry Package Combo">Laundry Package Combo</a></li>
-                                    <li class="level2"><a href="#" title="Premium Dry Cleaning">Premium Dry Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Large Blanket Laundry">Large Blanket Laundry</a></li>
-                                    <li class="level2"><a href="#" title="House Cleaning">House Cleaning</a></li>
-                                </ul>
-                            </li>
-                            <li class="level1 parent item fix-navs">
-                                <a class="hmega" href="#" title="House Cleaning">House Cleaning</a>
-                                <ul class="level1">
-                                    <li class="level2"><a href="#" title="Sofa Cleaning">Sofa Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Mattress Cleaning">Mattress Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Carpet Cleaning">Carpet Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Curtain Cleaning">Curtain Cleaning</a></li>
-                                    <li class="level2"><a href="#" title="Appliance Cleaning">Appliance Cleaning</a></li>
-                                </ul>
-                            </li>
-                            <li class="level1 item">
-                                <a class="hmega" href="#" title="Shoe Care Products">Shoe Care Products</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="Promotions">Promotions</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="Shoe Care Tips">Shoe Care Tips</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="Contact Us">Contact Us</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" title="Service Price List">Service Price List</a>
-            </li>
-
-            <li class="nav-item evo-header-account ml-auto">
-                @{
-                    var customer = Session["Customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
-                    var name = customer != null ? customer.FirstName + " " + customer.LastName : "";
-                }
-                <a href="#" class="nav-link" aria-label="Account" title="Account">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    @if (!string.IsNullOrEmpty(name))
-                    {
-                        <span style="margin-left: 5px; color: white;">@name</span>
-                    }
-                </a>
-                <ul class="account-dropdown">
-                    @if (!string.IsNullOrEmpty(name))
-                    {
-                        <li><a href="@Url.Action("Logout", "Home")" title="Logout">Logout</a></li>
-                    }
-                    else
-                    {
-                        <li><a href="@Url.Action("Login", "Home")" title="Login">Login</a></li>
-                        <li><a href="@Url.Action("Register", "Home")" title="Register">Register</a></li>
-                    }
-                </ul>
-            </li>
-
-            <li class="nav-item booking-calendar-item">
-                <a class="nav-link" href="#" title="Book a service">
-                    <svg version="1.1" width="18" height="18" viewBox="0 0 512 512" xml:space="preserve" fill="#FFFFFF"><path d="m457 60h-36v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-150v-15c0-24.813-20.187-45-45-45s-45 20.187-45 45v15h-36c-30.327 0-55 24.673-55 55v342c0 30.327 24.673 55 55 55h402c30.327 0 55-24.673 55-55v-342c0-30.327-24.673-55-55-55zm-96-15c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-240 0c0-8.271 6.729-15 15-15s15 6.729 15 15v60c0 8.271-6.729 15-15 15s-15-6.729-15-15zm-91 70c0-13.785 11.215-25 25-25h36v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h150v15c0 24.813 20.187 45 45 45s45-20.187 45-45v-15h36c13.785 0 25 11.215 25 25v67h-452zm452 342c0 13.785-11.215 25-25 25h-402c-13.785 0-25-11.215-25-25v-245h452z" /><path d="m306.764 272h23.473v165c0 8.284 6.716 15 15 15s15-6.716 15-15v-180c0-8.284-6.716-15-15-15h-38.473c-8.284 0-15 6.716-15 15s6.715 15 15 15z" /><path d="m211.764 422c-14.886 0-27.658-11.09-29.71-25.796-.192-1.378-.29-2.792-.29-4.204 0-8.284-6.716-15-15-15s-15 6.716-15 15c0 2.793.194 5.603.577 8.35 4.109 29.445 29.655 51.65 59.423 51.65 33.084 0 60-26.916 60-60 0-17.908-7.896-33.997-20.377-45 12.481-11.003 20.377-27.092 20.377-45 0-33.084-26.916-60-60-60-28.607 0-53.367 20.35-58.874 48.387-1.597 8.129 3.699 16.013 11.828 17.61 8.12 1.596 16.012-3.699 17.609-11.828 2.751-14.004 15.131-24.169 29.437-24.169 16.542 0 30 13.458 30 30s-13.458 30-30 30c-8.284 0-15 6.716-15 15s6.716 15 15 15c16.542 0 30 13.458 30 30s-13.458 30-30 30z" /></svg>
-                    Book a service
-                </a>
-            </li>
-        </ul>
-    </div>
+        </div>
     </div>
 </header>
 

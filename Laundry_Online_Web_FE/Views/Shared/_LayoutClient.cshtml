@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
-
+﻿@{ 
+    var headerModel = ViewBag.Model as Laundry_Online_Web_FE.Models.ModelViews.DTO.HeaderModel;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8" />
@@ -50,7 +52,7 @@
 </head>
 <body>
     <div>
-        @Html.Partial("Client/_PartialHeader")
+        @Html.Partial("Client/_PartialHeader", headerModel)
         @RenderBody()
     </div>
 </body>

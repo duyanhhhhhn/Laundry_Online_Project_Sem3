@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_BE.Models.Repositories;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
@@ -11,9 +13,18 @@ namespace Laundry_Online_Web_FE.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
+            return View(model);
         }
-
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

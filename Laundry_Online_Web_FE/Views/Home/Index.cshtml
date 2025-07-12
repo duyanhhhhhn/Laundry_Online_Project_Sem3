@@ -3,12 +3,13 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
+@model Laundry_Online_Web_FE.Models.ModelViews.DTO.HeaderModel
 <section class="awe-section-1">
     <div class="section_slider home-slider swiper-container evo-width-slider">
         <div class="swiper-wrapper">
 
             <div class="swiper-slide">
-                <a href="bang-gia-dich-vu.html" class="clearfix" title="Bảng giá các dịch vụ Washintown">
+                <a href="@Url.Action("Index")" class="clearfix" title="Bảng giá các dịch vụ Washintown">
                     <picture>
                         <source media="(min-width: 1200px)"
                                 srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929">
@@ -96,11 +97,6 @@
 <section class="awe-section-2">
     <div class="section_search_feature container">
         <div class="row">
-
-
-
-
-
             <div class="col-lg-3 col-md-3 col-6 item item-1">
                 <div class="img">
                     <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_1.svg?1751540074929" alt="Miễn phí vận chuyển" />
@@ -110,11 +106,6 @@
                     <p>Miễn phí vận chuyển với đơn hàng trên 200.000đ (*) Áp dụng khu vực Quận 7</p>
                 </div>
             </div>
-
-
-
-
-
             <div class="col-lg-3 col-md-3 col-6 item item-2">
                 <div class="img">
                     <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_2.svg?1751540074929" alt="Trả 0đ khi không hài lòng" />
@@ -499,32 +490,14 @@
             <div class="content row">
                 <div class="col-lg-3 ant-title-tab">
                     <div class="titlecp clearfix">
-                        <img width="60" height="60" class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_icon_1.svg?1751540074929" alt="Chăm sóc - Phục hồi giày" /> <h3><a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc - Phục hồi giày">Chăm sóc - Phục hồi giày</a></h3>
+                        <img width="60" height="60" class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_icon_1.svg?1751540074929" alt="Chăm sóc - Phục hồi giày" /> <h3><a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc - Phục hồi giày">My Service</a></h3>
                         <span class="hidden-lg button_show_tab">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </span>
                     </div>
-                    <ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
 
-                        <li class="tab-link has-content" data-tab="tab-1" data-url="/ve-sinh-sneaker">
-                            <span title="Vệ sinh Sneaker">Vệ sinh Sneaker</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-2" data-url="/cham-soc-giay-da">
-                            <span title="Vệ sinh giày da">Vệ sinh giày da</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-3" data-url="/phuc-hoi-giay">
-                            <span title="Phục hồi giày">Phục hồi giày</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-4" data-url="/sua-giay">
-                            <span title="Sửa chữa">Sửa chữa</span>
-                        </li>
-
-                    </ul>
                     <a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc phục hồi giày" class="d-none d-lg-block ant-banner-index-product">
                         <picture>
                             <source media="(min-width: 1200px)"
@@ -540,153 +513,33 @@
                     </a>
                 </div>
                 <div class="col-lg-9">
+                    <div class="row">
+                        @foreach (var service in Model.Services)
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex">
+                                <a href="@Url.Action("ServiceDetail", "Home", new { id = service.Id })" class="text-decoration-none text-dark w-100">
+                                    <div class="card w-100 shadow-sm border-0 d-flex flex-column h-100">
+                                        <div class="card-header bg-white text-center border-bottom">
+                                            <h6 class="card-title mb-0 text-truncate" title="@service.Title">@service.Title</h6>
+                                        </div>
+                                        <div style="height: 180px; overflow: hidden;">
+                                            <img src="@service.Image"
+                                                 alt="@service.Title"
+                                                 class="w-100 h-100"
+                                                 style="object-fit: cover;" />
+                                        </div>
+                                        <div class="card-body text-center mt-auto">
+                                            <p class="text-danger fw-bold mb-0">@string.Format("{0:N0}₫", service.Price ?? 0)</p>
+                                        </div>
 
-                    <div class="tab-1 tab-content row">
-
-
-
-
-
-
-                        <div class="col-lg-3 col-md-3 col-6">
-
-                            <div class="evo-product-item">
-                                <div class="thumb-evo">
-
-                                    <a class="thumb-img" href="ve-sinh-giay-sneakers.html" title="Vệ sinh gi&#224;y Re-fresh">
-                                        <span class="tt-img">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/ve-sinh-giay-re-fresh-jpg-v-1751370089100.jpg?v=1751370118623" alt="Vệ sinh gi&#224;y Re-fresh" />
-                                        </span>
-
-                                        <span class="tt-img-roll-over">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/ve-sinh-giay-refresh-copy.jpg?v=1751370118623" alt="Vệ sinh gi&#224;y Re-fresh" />
-                                        </span>
-
-                                    </a>
-                                    <form action="https://washintown.vn/cart/add" method="post" enctype="multipart/form-data" class="product-button hidden-sm hidden-xs hidden-md variants form-nut-grid form-ajaxtocart" data-id="product-actions-22274623">
-
-
-                                        <input type="hidden" name="variantId" value="49745879" />
-                                        <button type="button" title="Thêm vào giỏ" class="action add_to_cart">
-                                            <svg x="0px" y="0px" viewBox="0 0 489 489" style="enable-background:new 0 0 489 489;" xml:space="preserve">
-                                            <path d="M440.1,422.7l-28-315.3c-0.6-7-6.5-12.3-13.4-12.3h-57.6C340.3,42.5,297.3,0,244.5,0s-95.8,42.5-96.6,95.1H90.3
-							 c-7,0-12.8,5.3-13.4,12.3l-28,315.3c0,0.4-0.1,0.8-0.1,1.2c0,35.9,32.9,65.1,73.4,65.1h244.6c40.5,0,73.4-29.2,73.4-65.1
-							 C440.2,423.5,440.2,423.1,440.1,422.7z M244.5,27c37.9,0,68.8,30.4,69.6,68.1H174.9C175.7,57.4,206.6,27,244.5,27z M366.8,462
-							 H122.2c-25.4,0-46-16.8-46.4-37.5l26.8-302.3h45.2v41c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h139.3v41
-							 c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h45.2l26.9,302.3C412.8,445.2,392.1,462,366.8,462z" />
-				</svg>
-                                        </button>
-
-
-                                        <button class="action btn-wish js-btn-wishlist" title="Thêm vào danh sách yêu thích" data-handle="ve-sinh-giay-sneakers"><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 51.997 51.997' style='enable-background:new 0 0 51.997 51.997;' xml:space='preserve'><path d='M51.911,16.242C51.152,7.888,45.239,1.827,37.839,1.827c-4.93,0-9.444,2.653-11.984,6.905c-2.517-4.307-6.846-6.906-11.697-6.906c-7.399,0-13.313,6.061-14.071,14.415c-0.06,0.369-0.306,2.311,0.442,5.478c1.078,4.568,3.568,8.723,7.199,12.013l18.115,16.439l18.426-16.438c3.631-3.291,6.121-7.445,7.199-12.014C52.216,18.553,51.97,16.611,51.911,16.242z M49.521,21.261c-0.984,4.172-3.265,7.973-6.59,10.985L25.855,47.481L9.072,32.25c-3.331-3.018-5.611-6.818-6.596-10.99c-0.708-2.997-0.417-4.69-0.416-4.701l0.015-0.101C2.725,9.139,7.806,3.826,14.158,3.826c4.687,0,8.813,2.88,10.771,7.515l0.921,2.183l0.921-2.183c1.927-4.564,6.271-7.514,11.069-7.514c6.351,0,11.433,5.313,12.096,12.727C49.938,16.57,50.229,18.264,49.521,21.261z' /></svg></button>
-                                    </form>
-                                </div>
-                                <a href="ve-sinh-giay-sneakers.html" title="Vệ sinh gi&#224;y Re-fresh" class="title">Vệ sinh gi&#224;y Re-fresh</a>
-                                <div class="flex-prices">
-
-
-                                    <strong class="product-price">79.000₫</strong>
-
-
-                                </div>
+                                    </div>
+                                </a>
                             </div>
-                        </div>
-
-
-                        <div class="col-lg-3 col-md-3 col-6">
-
-                            <div class="evo-product-item">
-                                <div class="thumb-evo">
-
-                                    <a class="thumb-img" href="cham-soc-giay-sneaker-cao-cap.html" title="Chăm s&#243;c gi&#224;y Sneaker cao cấp">
-                                        <span class="tt-img">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/cham-soc-giay-sneaker-cao-cap-jpg-v-1751429147177.jpg?v=1751429180120" alt="Chăm s&#243;c gi&#224;y Sneaker cao cấp" />
-                                        </span>
-
-                                        <span class="tt-img-roll-over">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/cham-soc-giay-sneaker-cao-cap-copy.jpg?v=1751429180120" alt="Chăm s&#243;c gi&#224;y Sneaker cao cấp" />
-                                        </span>
-
-                                    </a>
-                                    <form action="https://washintown.vn/cart/add" method="post" enctype="multipart/form-data" class="product-button hidden-sm hidden-xs hidden-md variants form-nut-grid form-ajaxtocart" data-id="product-actions-22274618">
-
-
-                                        <input type="hidden" name="variantId" value="49745880" />
-                                        <button type="button" title="Thêm vào giỏ" class="action add_to_cart">
-                                            <svg x="0px" y="0px" viewBox="0 0 489 489" style="enable-background:new 0 0 489 489;" xml:space="preserve">
-                                            <path d="M440.1,422.7l-28-315.3c-0.6-7-6.5-12.3-13.4-12.3h-57.6C340.3,42.5,297.3,0,244.5,0s-95.8,42.5-96.6,95.1H90.3
-							 c-7,0-12.8,5.3-13.4,12.3l-28,315.3c0,0.4-0.1,0.8-0.1,1.2c0,35.9,32.9,65.1,73.4,65.1h244.6c40.5,0,73.4-29.2,73.4-65.1
-							 C440.2,423.5,440.2,423.1,440.1,422.7z M244.5,27c37.9,0,68.8,30.4,69.6,68.1H174.9C175.7,57.4,206.6,27,244.5,27z M366.8,462
-							 H122.2c-25.4,0-46-16.8-46.4-37.5l26.8-302.3h45.2v41c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h139.3v41
-							 c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h45.2l26.9,302.3C412.8,445.2,392.1,462,366.8,462z" />
-				</svg>
-                                        </button>
-
-
-                                        <button class="action btn-wish js-btn-wishlist" title="Thêm vào danh sách yêu thích" data-handle="cham-soc-giay-sneaker-cao-cap"><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 51.997 51.997' style='enable-background:new 0 0 51.997 51.997;' xml:space='preserve'><path d='M51.911,16.242C51.152,7.888,45.239,1.827,37.839,1.827c-4.93,0-9.444,2.653-11.984,6.905c-2.517-4.307-6.846-6.906-11.697-6.906c-7.399,0-13.313,6.061-14.071,14.415c-0.06,0.369-0.306,2.311,0.442,5.478c1.078,4.568,3.568,8.723,7.199,12.013l18.115,16.439l18.426-16.438c3.631-3.291,6.121-7.445,7.199-12.014C52.216,18.553,51.97,16.611,51.911,16.242z M49.521,21.261c-0.984,4.172-3.265,7.973-6.59,10.985L25.855,47.481L9.072,32.25c-3.331-3.018-5.611-6.818-6.596-10.99c-0.708-2.997-0.417-4.69-0.416-4.701l0.015-0.101C2.725,9.139,7.806,3.826,14.158,3.826c4.687,0,8.813,2.88,10.771,7.515l0.921,2.183l0.921-2.183c1.927-4.564,6.271-7.514,11.069-7.514c6.351,0,11.433,5.313,12.096,12.727C49.938,16.57,50.229,18.264,49.521,21.261z' /></svg></button>
-                                    </form>
-                                </div>
-                                <a href="cham-soc-giay-sneaker-cao-cap.html" title="Chăm s&#243;c gi&#224;y Sneaker cao cấp" class="title">Chăm s&#243;c gi&#224;y Sneaker cao cấp</a>
-                                <div class="flex-prices">
-
-
-                                    <strong class="product-price">99.000₫</strong>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-lg-3 col-md-3 col-6">
-
-                            <div class="evo-product-item">
-                                <div class="thumb-evo">
-
-                                    <a class="thumb-img" href="cham-soc-ve-sinh-giay-toan-dien.html" title="Chăm s&#243;c vệ sinh gi&#224;y to&#224;n diện">
-                                        <span class="tt-img">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/cham-soc-ve-sinh-giay-toan-dien-jpg-v-1751419298467.jpg?v=1751419341220" alt="Chăm s&#243;c vệ sinh gi&#224;y to&#224;n diện" />
-                                        </span>
-
-                                        <span class="tt-img-roll-over">
-                                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/products/cham-soc-ve-sinh-giay-toan-dien.jpg?v=1751419341220" alt="Chăm s&#243;c vệ sinh gi&#224;y to&#224;n diện" />
-                                        </span>
-
-                                    </a>
-                                    <form action="https://washintown.vn/cart/add" method="post" enctype="multipart/form-data" class="product-button hidden-sm hidden-xs hidden-md variants form-nut-grid form-ajaxtocart" data-id="product-actions-29656216">
-
-
-                                        <input type="hidden" name="variantId" value="82262597" />
-                                        <button type="button" title="Thêm vào giỏ" class="action add_to_cart">
-                                            <svg x="0px" y="0px" viewBox="0 0 489 489" style="enable-background:new 0 0 489 489;" xml:space="preserve">
-                                            <path d="M440.1,422.7l-28-315.3c-0.6-7-6.5-12.3-13.4-12.3h-57.6C340.3,42.5,297.3,0,244.5,0s-95.8,42.5-96.6,95.1H90.3
-							 c-7,0-12.8,5.3-13.4,12.3l-28,315.3c0,0.4-0.1,0.8-0.1,1.2c0,35.9,32.9,65.1,73.4,65.1h244.6c40.5,0,73.4-29.2,73.4-65.1
-							 C440.2,423.5,440.2,423.1,440.1,422.7z M244.5,27c37.9,0,68.8,30.4,69.6,68.1H174.9C175.7,57.4,206.6,27,244.5,27z M366.8,462
-							 H122.2c-25.4,0-46-16.8-46.4-37.5l26.8-302.3h45.2v41c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h139.3v41
-							 c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5v-41h45.2l26.9,302.3C412.8,445.2,392.1,462,366.8,462z" />
-				</svg>
-                                        </button>
-
-
-                                        <button class="action btn-wish js-btn-wishlist" title="Thêm vào danh sách yêu thích" data-handle="cham-soc-ve-sinh-giay-toan-dien"><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 51.997 51.997' style='enable-background:new 0 0 51.997 51.997;' xml:space='preserve'><path d='M51.911,16.242C51.152,7.888,45.239,1.827,37.839,1.827c-4.93,0-9.444,2.653-11.984,6.905c-2.517-4.307-6.846-6.906-11.697-6.906c-7.399,0-13.313,6.061-14.071,14.415c-0.06,0.369-0.306,2.311,0.442,5.478c1.078,4.568,3.568,8.723,7.199,12.013l18.115,16.439l18.426-16.438c3.631-3.291,6.121-7.445,7.199-12.014C52.216,18.553,51.97,16.611,51.911,16.242z M49.521,21.261c-0.984,4.172-3.265,7.973-6.59,10.985L25.855,47.481L9.072,32.25c-3.331-3.018-5.611-6.818-6.596-10.99c-0.708-2.997-0.417-4.69-0.416-4.701l0.015-0.101C2.725,9.139,7.806,3.826,14.158,3.826c4.687,0,8.813,2.88,10.771,7.515l0.921,2.183l0.921-2.183c1.927-4.564,6.271-7.514,11.069-7.514c6.351,0,11.433,5.313,12.096,12.727C49.938,16.57,50.229,18.264,49.521,21.261z' /></svg></button>
-                                    </form>
-                                </div>
-                                <a href="cham-soc-ve-sinh-giay-toan-dien.html" title="Chăm s&#243;c vệ sinh gi&#224;y to&#224;n diện" class="title">Chăm s&#243;c vệ sinh gi&#224;y to&#224;n diện</a>
-                                <div class="flex-prices">
-
-
-                                    <strong class="product-price">139.000₫</strong>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
+                        }
                     </div>
 
+
+                        
                     <div class="tab-2 tab-content row">
 
                     </div>
