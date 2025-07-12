@@ -7,6 +7,10 @@
 {
     <div class="alert alert-success">@ViewBag.Message</div>
 }
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
 @Html.Partial("Client/_PartialBreadCrumb")
 
 <div class="container margin-bottom-20 margin-top-30">
@@ -48,7 +52,7 @@
                                     <div class="pull-xs-left text-center" style="margin-top: 15px;">
                                         <button class="btn btn-style btn-blues" type="submit" value="Đăng nhập">Login</button>
                                     </div>
-                                    
+
                                 </div>
                             </form>
 

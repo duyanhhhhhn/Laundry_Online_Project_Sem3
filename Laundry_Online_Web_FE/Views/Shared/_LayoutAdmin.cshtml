@@ -1,6 +1,7 @@
 ﻿@{
     Layout = null;
-    var fullName = Session["AdminFullName"] != null ? Session["AdminFullName"].ToString() : "Tài khoản";
+    var employee = Session["employee"] as Laundry_Online_Web_FE.Models.ModelViews.EmployeeView;
+    string fullName = (employee != null) ? employee.FirstName + " " + employee.LastName : "Tài khoản";
 }
 
 <!DOCTYPE html>
@@ -32,8 +33,9 @@
         <!-- Right navbar -->
         <ul class="navbar-nav ms-auto me-3 me-lg-4">
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-white" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user fa-fw"></i> 
+                <a class="nav-link dropdown-toggle text-white" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user fa-fw"></i>
+                    <span class="ms-2">@fullName</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="@Url.Action("AdminLogout", "Auth")">Logout</a></li>
@@ -93,7 +95,6 @@
                                 <a class="nav-link" href="@Url.Action("EmployeeList", "Admin")">Employee Active</a>
                             </nav>
                         </div>
-
                         <!-- Service -->
                         <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#pagesCollapseService" aria-expanded="false">
                             <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
