@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using Laundry_Online_Web_FE.Models.Entities;
@@ -31,18 +32,28 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             }
         }
 
-        public List<CustomerPackageView> GetAll()
+        public HashSet<CustomerPackageView> GetAll()
         {
-            return _context.Customer_package.Select(cp => new CustomerPackageView
+            try
             {
-                Id = cp.cp_id,
-                Customer_Id = cp.cus_id ?? 0,
-                Package_Id = cp.p_id ?? 0,
-                Date_Start = cp.date_start ?? DateTime.Now,
-                Date_End = cp.date_end ?? DateTime.Now,
-                Value = cp.current_value ?? 0,
-                Payment_Id = cp.payment_id ?? ""
-            }).ToList();
+                var data = _context.Customer_package.Select(cp => new CustomerPackageView
+                {
+                    Id = cp.cp_id,
+                    Customer_Id = cp.cus_id ?? 0,
+                    Package_Id = cp.p_id ?? 0,
+                    Date_Start = cp.date_start ?? DateTime.Now,
+                    Date_End = cp.date_end ?? DateTime.Now,
+                    Value = cp.current_value ?? 0,
+                    Payment_Id = cp.payment_id ?? ""
+                }).ToHashSet();
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetAll CustomerPackage Error: " + ex.Message);
+                return new HashSet<CustomerPackageView>();
+            }
         }
 
         public CustomerPackageView GetById(int id)

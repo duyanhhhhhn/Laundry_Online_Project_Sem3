@@ -1,0 +1,198 @@
+﻿
+@model dynamic
+
+@{
+    ViewBag.Title = "Chi tiết gói khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Chi tiết gói khách hàng</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "CustomerPackage")">Quản lý gói khách hàng</a></li>
+        <li class="breadcrumb-item active">Chi tiết</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Thông tin gói khách hàng
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td width="30%" class="fw-bold">ID:</td>
+                            <td>@Model.Id</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Khách hàng:</td>
+                            <td>
+                                <i class="fas fa-user me-1"></i>
+                                @Model.Customer_Name
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Gói dịch vụ:</td>
+                            <td>
+                                <span class="badge bg-info">@Model.Package_Name</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Ngày bắt đầu:</td>
+                            <td>
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                @DateTime.Parse(Model.Date_Start.ToString()).ToString("dd/MM/yyyy")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Ngày kết thúc:</td>
+                            <td>
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                @DateTime.Parse(Model.Date_End.ToString()).ToString("dd/MM/yyyy")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Giá trị:</td>
+                            <td>
+                                <span class="text-success fw-bold">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    @string.Format("{0:N0}", Model.Value) VNĐ
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Mã thanh toán:</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.Payment_Id))
+                                {
+                                    <span class="badge bg-success">@Model.Payment_Id</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Chưa thanh toán</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Trạng thái:</td>
+                            <td>
+                                @{
+                                    var endDate = DateTime.Parse(Model.Date_End.ToString());
+                                    var today = DateTime.Now;
+                                }
+                                @if (endDate > today)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Đang hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle"></i> Đã hết hạn
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs me-1"></i>
+                    Thao tác
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Edit", "CustomerPackage", new { id = Model.Id })" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.Id)">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                        <a href="@Url.Action("Index", "CustomerPackage")" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="fas fa-chart-line me-1"></i>
+                    Thống kê
+                </div>
+                <div class="card-body">
+                    @{
+                        var startDate = DateTime.Parse(Model.Date_Start.ToString());
+                        var EndDate = DateTime.Parse(Model.Date_End.ToString());
+                        var totalDays = (endDate - startDate).Days;
+                        var remainingDays = (endDate - DateTime.Now).Days;
+                        var usedDays = totalDays - remainingDays;
+                        var percent = totalDays > 0 ? (double)usedDays / totalDays * 100 : 0;
+                        percent = percent > 100 ? 100 : percent;
+                    }
+
+                    <div class="mb-3">
+                        <small class="text-muted">Tổng thời gian</small>
+                        <div class="fw-bold">@totalDays ngày</div>
+                    </div>
+
+                    @if (remainingDays > 0)
+                    {
+                        <div class="mb-3">
+                            <small class="text-muted">Còn lại</small>
+                            <div class="fw-bold text-success">@remainingDays ngày</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted">Đã sử dụng</small>
+                            <div class="fw-bold">@usedDays ngày</div>
+                        </div>
+
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: @percent%" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                                @String.Format("{0:0.##}%", percent)
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <i class="fas fa-exclamation-triangle text-danger fa-2x"></i>
+                            <p class="text-danger fw-bold mt-2">Gói đã hết hạn</p>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function confirmDelete(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa gói khách hàng này?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Delete", "CustomerPackage")';
+
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+}
