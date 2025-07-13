@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.Repositories;
+using Laundry_Online_Web_BE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
