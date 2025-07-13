@@ -489,13 +489,8 @@
         <div class="e-tabs not-dqtab ajax-tab-1" data-section="ajax-tab-1" data-view="grid_4">
             <div class="content row">
                 <div class="col-lg-3 ant-title-tab">
-                    <div class="titlecp clearfix">
-                        <img width="60" height="60" class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_icon_1.svg?1751540074929" alt="Chăm sóc - Phục hồi giày" /> <h3><a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc - Phục hồi giày">My Service</a></h3>
-                        <span class="hidden-lg button_show_tab">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </span>
+                    <div class="titlecp clearfix" style="color : blue">
+                        <h3>Us Package</h3>
                     </div>
 
                     <a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc phục hồi giày" class="d-none d-lg-block ant-banner-index-product">
@@ -517,7 +512,7 @@
                         @foreach (var service in Model.Services)
                         {
                             <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex">
-                                <a href="@Url.Action("ServiceDetail", "Home", new { id = service.Id })" class="text-decoration-none text-dark w-100">
+                                <a href="@Url.Action("DetailService", "Home", new { id = service.Id })" class="text-decoration-none text-dark w-100">
                                     <div class="card w-100 shadow-sm border-0 d-flex flex-column h-100">
                                         <div class="card-header bg-white text-center border-bottom">
                                             <h6 class="card-title mb-0 text-truncate" title="@service.Title">@service.Title</h6>
@@ -529,7 +524,7 @@
                                                  style="object-fit: cover;" />
                                         </div>
                                         <div class="card-body text-center mt-auto">
-                                            <p class="text-danger fw-bold mb-0">@string.Format("{0:N0}₫", service.Price ?? 0) / @service.Unit</p>
+                                            <p class="text-danger fw-bold mb-0">@string.Format("{0:N0} $", service.Price ?? 0) / @service.Unit</p>
                                         </div>
 
                                     </div>
@@ -577,15 +572,10 @@
         <div class="e-tabs not-dqtab ajax-tab-2" data-section="ajax-tab-2" data-view="grid_4">
             <div class="content row">
                 <div class="col-lg-3 ant-title-tab">
-                    <div class="titlecp clearfix">
-                        <img width="60" height="60" class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_icon_2.svg?1751540074929" alt="Giặt ủi & Giặt hấp" /> <h3><a href="giat-ui-giat-hap.html" title="Giặt ủi & Giặt hấp">Giặt ủi & Giặt hấp</a></h3>
-                        <span class="hidden-lg button_show_tab">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </span>
+                    <div class="titlecp clearfix" style="color : blue">
+                        <h3>Us Package</h3>
                     </div>
-                    <ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
+                    @*<ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
 
                         <li class="tab-link has-content" data-tab="tab-1" data-url="/giat-say">
                             <span title="Giặt sấy nhanh">Giặt sấy nhanh</span>
@@ -607,7 +597,7 @@
                             <span title="Vệ sinh nhà cửa">Vệ sinh nhà cửa</span>
                         </li>
 
-                    </ul>
+                    </ul>*@
                     <a href="giat-ui-giat-hap.html" title="giat-ui-giat-hap" class="d-none d-lg-block ant-banner-index-product">
                         <picture>
                             <source media="(min-width: 1200px)"
@@ -623,14 +613,31 @@
                     </a>
                 </div>
                 <div class="col-lg-9">
+                    <div class="row">
+                        @foreach (var package in Model.Packages)
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex">
+                                <a href="@Url.Action("DetailPackage", "Home", new { id =package.Id })" class="text-decoration-none text-dark w-100">
+                                    <div class="card w-100 shadow-sm border-0 d-flex flex-column h-100">
+                                        <div class="card-header bg-white text-center border-bottom">
+                                            <h6 class="card-title mb-0 text-truncate" title="@package.Package_Name">@package.Package_Name</h6>
+                                        </div>
+                                        <div style="height: 180px; overflow: hidden;">
+                                            @*<img src="@package.Image"
+                                                 alt="@package.Title"
+                                                 class="w-100 h-100"
+                                                 style="object-fit: cover;" />*@
+                                        </div>
+                                        <div class="card-body text-center mt-auto">
+                                            <p class="text-danger fw-bold mb-0">@string.Format("{0:N0} $", package.Price)</p>
+                                        </div>
 
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
                     <div class="tab-1 tab-content row">
-
-
-
-
-
-
                         <div class="col-lg-3 col-md-3 col-6">
 
                             <div class="evo-product-item">

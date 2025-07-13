@@ -557,6 +557,8 @@
     <Content Include="Views\Admin\createService.cshtml" />
     <Content Include="Views\Admin\Admin_edit_service.cshtml" />
     <Content Include="Views\Customer\Index.cshtml" />
+    <Content Include="Views\Home\DetailService.cshtml" />
+    <Content Include="Views\Home\DetailPackage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />

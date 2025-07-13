@@ -181,7 +181,7 @@
                                 @foreach (var service in Model.Services)
                                 {
                                     <li class="level1 parent item fix-navs">
-                                        <a class="hmega" href="#" title="Laundry & Dry Cleaning">@service.Title</a>
+                                        <a class="hmega" href="@Url.Action("DetailService", "Home", new { id = service.Id })" title="Laundry & Dry Cleaning">@service.Title</a>
                                     </li>
                                 }
 
