@@ -196,9 +196,6 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
@@ -556,6 +553,7 @@
     <Content Include="Views\Admin\createService.cshtml" />
     <Content Include="Views\Admin\Admin_edit_service.cshtml" />
     <Content Include="Views\Customer\Index.cshtml" />
+    <Content Include="Views\Home\BookService.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />

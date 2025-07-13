@@ -5,16 +5,28 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
-
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
     public class AdminController : Controller
     {
         // GET: Admin
-        public ActionResult Index()
+        public ActionResult Index(int? year)
         {
+            var years = InvoiceRepository.Instance.GetAvailableYears();
+            int selectedYear = year ?? (years.Count > 0 ? years[0] : DateTime.Now.Year);
+
+            var revenues = InvoiceRepository.Instance.GetMonthlyRevenueByYear(selectedYear);
+            var months = Enumerable.Range(1, 12)
+                .Select(m => m.ToString("D2") + "/" + selectedYear)
+                .ToList();
+
+            ViewBag.Months = months;
+            ViewBag.Revenues = revenues;
+            ViewBag.Years = years;
+            ViewBag.SelectedYear = selectedYear;
             return View();
         }
 
