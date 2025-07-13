@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Blog - Mẹo Chăm Sóc Giặt Ủi";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+<style>
+    .blog-card-link {
+        text-decoration: none;
+        color: inherit; 
+    }
+
+        .blog-card-link:hover .card-title {
+            color: #0d6efd; /* Đổi màu tiêu đề khi di chuột qua */
+        }
+
+    .blog-card {
+        transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+    }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <h1 class="display-5 fw-bold">Blog & Mẹo Vặt</h1>
+            <p class="text-muted">Khám phá những bí quyết chăm sóc quần áo và giày dép từ chuyên gia.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        @{
+            var ls = ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.BlogPostView>;
+        }
+
+        @if (ls != null && ls.Any())
+        {
+            foreach (var post in ls)
+            {
+                <div class="col-lg-6 mb-4">
+                    <a href="@Url.Action("BlogDetail", "Blog", new { id = post.ID })" class="blog-card-link">
+                        <div class="card blog-card h-100 shadow-sm border-0">
+                            <div class="row g-0">
+                                <div class="col-md-5 position-relative">
+                                    <img src="@Url.Content("~/content/client/")images/@post.Image" class="img-fluid rounded-start h-100" alt="@post.Title" style="object-fit: cover;">
+
+                                    <div class="position-absolute top-0 start-0 m-2 bg-white text-center px-2 py-1 rounded shadow-sm">
+                                        <div class="fw-bold fs-4 lh-1">@post.CreateDate.ToString("dd")</div>
+                                        <div class="text-uppercase small">@post.CreateDate.ToString("MMM")</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">@post.Title</h5>
+                                        <p class="card-text text-muted">@Html.Raw(post.Description)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <p class="text-center">Chưa có bài viết nào.</p>
+            </div>
+        }
+    </div>
+</div>
