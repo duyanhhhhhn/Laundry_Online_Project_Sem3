@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
@@ -56,7 +58,7 @@ namespace Laundry_Online_Web_FE.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create_Customer()
+        public async Task<ActionResult> Create_Customer()
         {
             string firstName = Request.Form["FirstName"];
             string lastName = Request.Form["LastName"];
@@ -77,6 +79,27 @@ namespace Laundry_Online_Web_FE.Controllers
             if (result)
             {
                 TempData["Message"] = "Register success!";
+
+                try
+                {
+                    string formattedPhone = phone;
+                    if (formattedPhone != null && formattedPhone.StartsWith("0"))
+                    {
+                        formattedPhone = "84" + formattedPhone.Substring(1);
+                    }
+
+                    var smsService = new eSmsService();
+                    string welcomeMessage = "Thank you for successfully registering for an online laundry service account.";
+
+                    string smsResult = await smsService.SendAsync(formattedPhone, welcomeMessage);
+
+                    System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("LOI GUI SMS: " + ex.Message);
+                }
+
                 return RedirectToAction("Login");
             }
             else

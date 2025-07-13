@@ -1,0 +1,42 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.BlogPostView
+
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+
+            <article>
+                <header class="mb-4">
+                    <h1 class="fw-bolder mb-3">@Model.Title</h1>
+                    <div class="text-muted fst-italic">
+                        <i class="far fa-calendar-alt me-2"></i>Đăng ngày: @Model.CreateDate.ToString("dd 'tháng' MM, yyyy")
+                    </div>
+                </header>
+
+                <figure class="mb-4">
+                    <img src="@Url.Content("~/content/client/")images/@Model.Image" class="img-fluid rounded-start h-100" alt="@Model.Title" style="object-fit: cover;">
+
+                </figure>
+
+                <section class="mb-5">
+                    <div class="fs-5">
+                        @Html.Raw(Model.Content)
+                    </div>
+                </section>
+            </article>
+
+            <hr />
+
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Blog")" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Blog List
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
