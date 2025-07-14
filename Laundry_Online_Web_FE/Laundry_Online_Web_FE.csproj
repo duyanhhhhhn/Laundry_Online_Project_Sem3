@@ -216,9 +216,6 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ModelViews\BlogPostView.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />

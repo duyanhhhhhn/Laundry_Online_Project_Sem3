@@ -48,14 +48,22 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
             ViewBag.Message = TempData["Message"];
-            return View();
+            return View(model);
         }
         public ActionResult Logout()
         {
-            // Xóa thông tin đăng nhập khỏi session
             Session["customer"] = null;
-            // Chuyển hướng về trang đăng nhập
             return RedirectToAction("Login");
         }
 
@@ -66,7 +74,17 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            return View();
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
+            return View(model);
         }
         [HttpPost]
         public async Task<ActionResult> Create_Customer()

@@ -15,7 +15,6 @@
                             <div class="card-body">
                                 <form method="post" action="@Url.Action("EditService", "Admin")" enctype="multipart/form-data">
                                     @Html.AntiForgeryToken()
-
                                     @* Trường ẩn để truyền ID của dịch vụ *@
                                     @Html.HiddenFor(model => model.Id)
 
