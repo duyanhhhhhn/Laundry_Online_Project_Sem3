@@ -50,11 +50,17 @@
     <Reference Include="BCrypt.Net-Next, Version=4.0.3.0, Culture=neutral, PublicKeyToken=1e11be04b6288443, processorArchitecture=MSIL">
       <HintPath>..\packages\BCrypt.Net-Next.4.0.3\lib\net48\BCrypt.Net-Next.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.4, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.4\lib\net461\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -135,6 +141,12 @@
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="zxing, Version=0.16.10.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.10\lib\net48\zxing.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.10.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.10\lib\net48\zxing.presentation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
@@ -152,10 +164,12 @@
     <Compile Include="Controllers\BookingController.cs" />
     <Compile Include="Controllers\CustomerPackageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\InvoiceItemController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\BarcodeHelper.cs" />
     <Compile Include="Models\Auth\AdminAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
@@ -341,9 +355,7 @@
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_21f0e.png" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_31f0e.png" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_41f0e.png" />
-    <Content Include="Content\Client\images\638877617260288524_images.jpg" />
     <Content Include="Content\Client\images\638877624178554009_images.jpg" />
-    <Content Include="Content\Client\images\638877768124266503_images.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-19b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-29b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-39b10.jpg" />
@@ -591,6 +603,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Barcodes\" />
+    <Folder Include="Views\InvoiceItem\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

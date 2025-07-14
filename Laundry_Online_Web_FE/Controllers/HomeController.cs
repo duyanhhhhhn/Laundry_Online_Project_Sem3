@@ -190,16 +190,11 @@ namespace Laundry_Online_Web_FE.Controllers
 
                 try
                 {
-                    string formattedPhone = phone;
-                    if (formattedPhone != null && formattedPhone.StartsWith("0"))
-                    {
-                        formattedPhone = "84" + formattedPhone.Substring(1);
-                    }
-
+                  
                     var smsService = new eSmsService();
-                    string welcomeMessage = "Thank you for successfully registering for an online laundry service account.";
+                    string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
 
-                    string smsResult = await smsService.SendAsync(formattedPhone, welcomeMessage);
+                    string smsResult = await smsService.SendAsync(phone, welcomeMessage);
 
                     System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
                 }
