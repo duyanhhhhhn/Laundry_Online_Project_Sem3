@@ -353,5 +353,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View("Admin_edit_service", model);
         }
+        [HttpGet]
+        public ActionResult Admin_edit_BlogPost(int id)
+        {
+            var blog = BlogPostRepository.Instance.GetById(id);
+
+            if (blog == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(blog);
+        }
     }
 }

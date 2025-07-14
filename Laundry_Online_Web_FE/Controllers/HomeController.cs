@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.Repositories;
+using Laundry_Online_Web_BE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -67,7 +69,7 @@ namespace Laundry_Online_Web_FE.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create_Customer()
+        public async Task<ActionResult> Create_Customer()
         {
             string firstName = Request.Form["FirstName"];
             string lastName = Request.Form["LastName"];
@@ -88,6 +90,22 @@ namespace Laundry_Online_Web_FE.Controllers
             if (result)
             {
                 TempData["Message"] = "Register success!";
+
+                try
+                {
+                  
+                    var smsService = new eSmsService();
+                    string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
+
+                    string smsResult = await smsService.SendAsync(phone, welcomeMessage);
+
+                    System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("LOI GUI SMS: " + ex.Message);
+                }
+
                 return RedirectToAction("Login");
             }
             else
