@@ -27,6 +27,103 @@ namespace Laundry_Online_Web_FE.Controllers
             ViewBag.Model = model;
             return View(model);
         }
+        public ActionResult BookService()
+        {
+            // Kiểm tra đăng nhập
+            if (Session["customer"] == null)
+            {
+                TempData["Message"] = "Bạn cần đăng nhập để đặt lịch dịch vụ.";
+                return RedirectToAction("Login");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult SubmitBooking(string ServiceTime, string ServiceDate, string Notes)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                if (Session["customer"] == null)
+                {
+                    return Json(new { success = false, message = "Bạn cần đăng nhập để đặt lịch." });
+                }
+
+                // Lấy thông tin customer từ session
+                var customer = Session["customer"] as Models.ModelViews.CustomerView;
+                if (customer == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy thông tin khách hàng." });
+                }
+
+                // Parse date and time
+                DateTime serviceDateTime;
+                if (!DateTime.TryParse(ServiceDate, out serviceDateTime))
+                {
+                    return Json(new { success = false, message = "Ngày không hợp lệ" });
+                }
+
+                // Combine date and time
+                if (!string.IsNullOrEmpty(ServiceTime))
+                {
+                    if (TimeSpan.TryParse(ServiceTime, out TimeSpan timeSpan))
+                    {
+                        serviceDateTime = serviceDateTime.Date.Add(timeSpan);
+                    }
+                }
+
+                // Create booking invoice using customer from session
+                var bookingInvoice = new Models.ModelViews.InvoiceView
+                {
+                    Customer_Id = customer.Id, // Lấy từ session
+                    Employee_Id = null, // Will be assigned later
+                    Invoice_Date = serviceDateTime,
+                    Delivery_Date = null, // Use service date as delivery date
+                    Pickup_Date = null,
+                    Total_Amount = 0, // Will be calculated when service is confirmed
+                    Payment_Type = 0, // Pay by cash 
+                    Payment_Id = null,
+                    Order_Status = 0, // Processing
+                    Invoice_Type = 1,
+                    CustomerPackage_Id = null,
+                    Status = 0, // No ship
+                    Notes = Notes ?? "Đặt lịch dịch vụ online",
+                    Ship_Cost = 0,
+                    Delivery_Status = 0 // Pending
+                };
+
+                bool success = InvoiceRepository.Instance.Add(bookingInvoice);
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Đặt lịch thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.",
+                        bookingInfo = new
+                        {
+                            customerName = customer.FirstName + " " + customer.LastName,
+                            phone = customer.PhoneNumber,
+                            serviceDate = serviceDateTime.ToString("dd/MM/yyyy"),
+                            serviceTime = ServiceTime
+                        }
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể tạo đơn đặt lịch. Vui lòng thử lại." });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                System.Diagnostics.Debug.WriteLine("Booking error: " + ex.Message);
+                return Json(new { success = false, message = "Đã xảy ra lỗi. Vui lòng thử lại sau." });
+            }
+        }
+
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

@@ -1,8 +1,117 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    ViewBag.Title = "Admin Dashboard";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var months = ViewBag.Months as List<string>;
+    var revenues = ViewBag.Revenues as List<decimal>;
+    var years = ViewBag.Years as List<int>;
+    var selectedYear = (int)ViewBag.SelectedYear;
+    var totalRevenue = revenues?.Sum() ?? 0;
+    var monthNames = new[] { "January", "February", "March", "April", "May", "June",
+                           "July", "August", "September", "October", "November", "December" };
 }
 
-<h2>Index</h2>
+<style>
+    .chart-container {
+        height: 500px; /* Adjust height here */
+        position: relative;
+    }
+</style>
 
+<div class="container-fluid px-4">
+    <h2 class="mt-4 mb-4">Admin Dashboard</h2>
+
+    <!-- Overview Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Revenue @selectedYear</h5>
+                    <h3>@totalRevenue.ToString("N0") VND</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Average Revenue/Month</h5>
+                    <h3>@((totalRevenue / 12).ToString("N0")) VND</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Year Selection -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <form method="get" id="yearForm">
+                <div class="form-group">
+                    <label for="yearSelect">Select Year:</label>
+                    <select id="yearSelect" name="year" class="form-control" onchange="document.getElementById('yearForm').submit();">
+                        @foreach (var y in years)
+                        {
+                            <option value="@y" @(y == selectedYear ? "selected" : "")>@y</option>
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Monthly Revenue Chart for @selectedYear</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('revenueChart').getContext('2d');
+    var revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(monthNames)),
+            datasets: [{
+                label: 'Revenue (VND)',
+                data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(revenues)),
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return Math.floor(value).toLocaleString('en-US') + ' VND';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.parsed.y;
+                            return 'Revenue: ' + Math.floor(value).toLocaleString('en-US') + ' VND';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
