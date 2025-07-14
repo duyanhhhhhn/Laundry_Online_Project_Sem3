@@ -32,8 +32,8 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 SecretKey = _secretKey,
                 Content = content,
                 Phone = phone,
-                SmsType = "8", 
-                Brandname = "", 
+                SmsType = "2", 
+                Brandname = "Baotrixemay", 
                 IsUnicode = "0" 
             };
 
