@@ -490,7 +490,7 @@
             <div class="content row">
                 <div class="col-lg-3 ant-title-tab">
                     <div class="titlecp clearfix" style="color : blue">
-                        <h3>Us Package</h3>
+                        <h3>Us Service</h3>
                     </div>
 
                     <a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc phục hồi giày" class="d-none d-lg-block ant-banner-index-product">
@@ -518,7 +518,7 @@
                                             <h6 class="card-title mb-0 text-truncate" title="@service.Title">@service.Title</h6>
                                         </div>
                                         <div style="height: 180px; overflow: hidden;">
-                                            <img src="@service.Image"
+                                            <img src="@Url.Content("~/content/client/")images/@service.Image"
                                                  alt="@service.Title"
                                                  class="w-100 h-100"
                                                  style="object-fit: cover;" />
@@ -623,10 +623,10 @@
                                             <h6 class="card-title mb-0 text-truncate" title="@package.Package_Name">@package.Package_Name</h6>
                                         </div>
                                         <div style="height: 180px; overflow: hidden;">
-                                            @*<img src="@package.Image"
-                                                 alt="@package.Title"
+                                            <img src="@Url.Content("~/content/client/")images/@package.Image"
+                                                 alt="@package.Package_Name"
                                                  class="w-100 h-100"
-                                                 style="object-fit: cover;" />*@
+                                                 style="object-fit: cover;" />
                                         </div>
                                         <div class="card-body text-center mt-auto">
                                             <p class="text-danger fw-bold mb-0">@string.Format("{0:N0} $", package.Price)</p>
