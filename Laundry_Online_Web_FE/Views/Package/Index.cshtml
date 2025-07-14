@@ -45,6 +45,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>ID</th>
+                                    <th>Image</th>
                                     <th>Tên gói</th>
                                     <th>Mô tả</th>
                                     <th>Giá</th>
@@ -61,6 +62,9 @@
                                     {
                                         <tr>
                                             <td>@item.Id</td>
+                                            <td>
+                                                <img src="@Url.Content("~/content/client/")images/@item.Image" alt="No image">
+                                            </td>
                                             <td>@item.Package_Name</td>
                                             <td>@item.Description</td>
                                             <td>@item.Price.ToString("C0")</td>

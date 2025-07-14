@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="card-body row">
                                     <div class="col-md-5 text-center">
-                                        <img src="~/content/client/images/@service.Image" alt="@service.Title" class="img-fluid rounded shadow" />
+                                        <img src="@Url.Content("~/content/client/")images/@service.Image" alt="@service.Title" class="img-fluid rounded shadow" />
                                     </div>
                                     <div class="col-md-7">
                                         <h4 class="text-success fw-bold mb-3">@string.Format("{0:N0} $", service.Price ?? 0) / @service.Unit</h4>

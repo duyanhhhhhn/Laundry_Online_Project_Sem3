@@ -148,5 +148,32 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error deleting invoice item: " + ex.Message);
             }
         }
+        public InvoiceItemView GetItemByBarCode(string barcode) 
+        {
+            try
+            {
+                var item = _context.InvoiceItems.FirstOrDefault(i => i.barcode.Contains(barcode));
+                if (item != null)
+                {
+                    return new InvoiceItemView
+                    {
+                        Id = item.item_id,
+                        InvoiceId = item.invoice_id,
+                        ItemName = item.item_name,
+                        Quantity = item.quantity,
+                        UnitPrice = item.unit_price,
+                        SubTotal = item.sub_total,
+                        BarCode = item.barcode,
+                        ItemStatus = item.item_status ?? 0,
+                        ServiceId = item.s_id ?? 0
+                    };
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error found invoice item: " + ex.Message);
+            }
+        }
     }
 }

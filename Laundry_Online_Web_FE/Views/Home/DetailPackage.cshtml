@@ -47,9 +47,9 @@
                                     <h2 class="mb-0">@package.Package_Name</h2>
                                 </div>
                                 <div class="card-body row">
-                                    @*<div class="col-md-5 text-center">
-                                        <img src="~/content/client/images/@package.Image" alt="@package.Title" class="img-fluid rounded shadow" />
-                                    </div>*@
+                                    <div class="col-md-5 text-center">
+                                        <img src="@Url.Content("~/content/client/")images/@package.Image" alt="@package.Package_Name" class="img-fluid rounded shadow" />
+                                    </div>
                                     <div class="col-md-7">
                                         <h4 class="text-success fw-bold mb-3">@string.Format("{0:N0} $", package.Price)</h4>
                                         <p><strong>Description:</strong></p>

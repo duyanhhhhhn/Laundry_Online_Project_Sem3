@@ -197,7 +197,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             CustomerRepo.Instance.Update(isCus);
             return RedirectToAction("CustomerList");
         }
-        
+
         [HttpPost]
         public JsonResult ChangeCustomerActiveStatus(int id)
         {
@@ -231,7 +231,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
         public JsonResult ChangeServiceActiveStatus(int id)
         {
-            var success = ServiceRepository.Instance.Delete(id); 
+            var success = ServiceRepository.Instance.Delete(id);
 
             return Json(new
             {
@@ -297,7 +297,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             if (ModelState.IsValid)
             {
-                var existingService = ServiceRepository.Instance.GetById(model.Id); 
+                var existingService = ServiceRepository.Instance.GetById(model.Id);
 
                 if (existingService == null)
                 {
@@ -353,5 +353,5 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View("Admin_edit_service", model);
         }
-}
+    }
 }

@@ -44,6 +44,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                         Package_Name = p.package_name,
                         Description = p.description,
                         Price = p.price,
+                        Image = p.image,
                         Value = p.value ?? 0,
                         Unit = p.unit,
                         Validity_Day = p.validity_days ?? 30
@@ -68,6 +69,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 Package_Name = p.package_name,
                 Description = p.description,
                 Price = p.price,
+                Image = p.image,
                 Value = p.value ?? 0,
                 Unit = p.unit,
                 Validity_Day = p.validity_days ?? 30
@@ -83,6 +85,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                     package_name = model.Package_Name,
                     description = model.Description,
                     price = model.Price,
+                    image = model.Image,
                     value = model.Value,
                     unit = model.Unit,
                     validity_days = model.Validity_Day
@@ -109,6 +112,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 entity.package_name = model.Package_Name;
                 entity.description = model.Description;
                 entity.price = model.Price;
+                entity.image = model.Image;
                 entity.value = model.Value;
                 entity.unit = model.Unit;
                 entity.validity_days = model.Validity_Day;
