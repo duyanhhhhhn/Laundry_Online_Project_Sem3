@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Laundry_Online_Web_BE.Models.Repositories;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.Repositories;
+using Laundry_Online_Web_BE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -12,7 +15,17 @@ namespace Laundry_Online_Web_FE.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
+            return View(model);
         }
         public ActionResult BookService()
         {
@@ -153,7 +166,7 @@ namespace Laundry_Online_Web_FE.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create_Customer()
+        public async Task<ActionResult> Create_Customer()
         {
             string firstName = Request.Form["FirstName"];
             string lastName = Request.Form["LastName"];
@@ -174,6 +187,27 @@ namespace Laundry_Online_Web_FE.Controllers
             if (result)
             {
                 TempData["Message"] = "Register success!";
+
+                try
+                {
+                    string formattedPhone = phone;
+                    if (formattedPhone != null && formattedPhone.StartsWith("0"))
+                    {
+                        formattedPhone = "84" + formattedPhone.Substring(1);
+                    }
+
+                    var smsService = new eSmsService();
+                    string welcomeMessage = "Thank you for successfully registering for an online laundry service account.";
+
+                    string smsResult = await smsService.SendAsync(formattedPhone, welcomeMessage);
+
+                    System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("LOI GUI SMS: " + ex.Message);
+                }
+
                 return RedirectToAction("Login");
             }
             else
@@ -183,5 +217,47 @@ namespace Laundry_Online_Web_FE.Controllers
             }
         }
 
+        public ActionResult DetailService(int id)
+        {
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
+            var service = ServiceRepository.Instance.GetById(id);
+            if (service == null)
+            {
+                TempData["ErrorMessage"] = "Not found service!";
+                return RedirectToAction("Index");
+            }
+            ViewBag.Service = service;
+            return View(model);
+        }
+        public ActionResult DetailPackage(int id)
+        {
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
+            var package = PackageRepository.Instance.GetById(id);
+            if (package == null)
+            {
+                TempData["ErrorMessage"] = "Not found package!";
+                return RedirectToAction("Index");
+            }
+            ViewBag.Package = package;
+            return View(model);
+        }
     }
 }

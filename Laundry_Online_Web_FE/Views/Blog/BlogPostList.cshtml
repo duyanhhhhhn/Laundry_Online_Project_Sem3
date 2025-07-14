@@ -1,18 +1,19 @@
 ﻿
 @{
-    ViewBag.Title = "ServiceList";
+    ViewBag.Title = "BlogPostList";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
+
 @if (ViewBag.Data != null)
 {
-    HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView> ls =
-ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
+    HashSet<Laundry_Online_Web_FE.Models.ModelViews.BlogPostView> ls =
+ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.BlogPostView>;
     var i = 1;
     <div class="container-fluid px-4 mt-2">
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-table me-1"></i>
-                Service List  <a href="@Url.Action("createService")" class="btn btn-success m-0" style="float: right;">New Service</a>
+                Blog Post List  <a href="@Url.Action("createBlogPost")" class="btn btn-success m-0" style="float: right;">New Service</a>
             </div>
 
             <div class="card-body">
@@ -20,43 +21,32 @@ ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
                     <thead>
                         <tr>
                             <th>Stt</th>
-                            <th>Name Service</th>
+                            <th>Title</th>
                             <th>Description</th>
-                            <th>Unit</th>
+                            <th>Content</th>
+                            <th>Create Date</th>
                             <th>Image</th>
-                            <th>Price</th>
-                            <th>Actice</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.ServiceView ser in ls)
+                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.BlogPostView blog in ls)
                         {
                             <tr>
                                 <td>@i</td>
-                                <td>@ser.Title</td>
-                                <td>@ser.Description</td>
-                                <td>@ser.Unit</td>
+                                <td>@blog.Title</td>
+                                <td>@Html.Raw(blog.Description)</td>
+                                <td>@Html.Raw(blog.Content)</td>
+                                <td>@blog.CreateDate</td>
                                 <td>
-                                 <img src="@Url.Content("~/content/client/")images/@ser.Image" alt="No image" >
-                                </td>
-                                <td>@ser.Price</td>
-                                <td>
-                                    @if (ser.Active == 1)
-                                    {
-                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i></span>
-                                    }
+                                    <img src="@Url.Content("~/content/client/")images/@blog.Image" alt="No image">
                                 </td>
                                 <td>
-                                    <a href="@Url.Action("Admin_edit_service", new { id = ser.Id })">
+                                    <a href="@Url.Action("Admin_edit_BlogPost", "Admin", new { id = blog.ID })">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <a href="javascript:void(0);" class="btn-toggle-active"
-                                       data-id="@ser.Id" data-name="@ser.Title">
+                                       data-id="@blog.ID" data-name="@blog.Title">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -77,13 +67,13 @@ ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
 
             if (confirm("Bạn có chắc muốn xoá dịch vụ '" + name + "'?")) {
                 $.ajax({
-                    url: '@Url.Action("ChangeServiceActiveStatus", "Admin")',
+                    url: '@Url.Action("DeleteBlog", "Blog")',
                     type: 'POST',
                     data: { id: id },
                     success: function (response) {
                         if (response.status === "success") {
                             alert(response.message);
-                            location.reload(); 
+                            location.reload();
                         } else {
                             alert("Có lỗi xảy ra: " + response.message);
                         }
@@ -101,7 +91,7 @@ ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
 
 <style>
     table#datatablesSimple img {
-        max-width: 80px; 
+        max-width: 80px;
         max-height: 80px;
         object-fit: cover;
     }

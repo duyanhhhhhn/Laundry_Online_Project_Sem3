@@ -148,6 +148,7 @@
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\Admin\CustomerController.cs" />
     <Compile Include="Controllers\Auth\AuthController.cs" />
+    <Compile Include="Controllers\BlogController.cs" />
     <Compile Include="Controllers\CustomerPackageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PackageController.cs" />
@@ -157,9 +158,14 @@
     <Compile Include="Models\Auth\AdminAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
+    <Compile Include="Models\Dao\BlogPostDao.cs" />
     <Compile Include="Models\Dao\CustomerDAO.cs" />
     <Compile Include="Models\Dao\EmployeeDAO.cs" />
+    <Compile Include="Models\Dao\eSmsService.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
+    <Compile Include="Models\Entities\BlogPost.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Entities\Customer.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
@@ -196,10 +202,16 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelViews\BlogPostView.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\DTO\HeaderModel.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
+    <Compile Include="Models\Repositories\BlogPostRepository.cs" />
     <Compile Include="Models\Repositories\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\InvoiceItemRepo.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
@@ -554,6 +566,13 @@
     <Content Include="Views\Admin\Admin_edit_service.cshtml" />
     <Content Include="Views\Customer\Index.cshtml" />
     <Content Include="Views\Home\BookService.cshtml" />
+    <Content Include="Views\Home\DetailService.cshtml" />
+    <Content Include="Views\Home\DetailPackage.cshtml" />
+    <Content Include="Views\Blog\Index.cshtml" />
+    <Content Include="Views\Blog\BlogDetail.cshtml" />
+    <Content Include="Views\Blog\BlogPostList.cshtml" />
+    <Content Include="Views\Blog\createBlogPost.cshtml" />
+    <Content Include="Views\Admin\Admin_edit_BlogPost.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />

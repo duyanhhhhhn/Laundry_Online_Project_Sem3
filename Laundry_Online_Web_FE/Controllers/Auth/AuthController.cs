@@ -27,21 +27,16 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
         [HttpPost]
         public ActionResult CheckEmployee()
         {
-            // Lấy thông tin đăng nhập từ form
             string phone = Request.Form["PhoneNumber"];
             string password = Request.Form["Password"];
-            // Kiểm tra thông tin đăng nhập
             var employee = EmployeeRepo.Instance.LoginEmployee(phone, password);
             if (employee != null)
             {
-                // Lưu thông tin đăng nhập vào session
                 Session["employee"] = employee;
-                // Chuyển hướng đến trang chính của admin
                 return RedirectToAction("Index", "Admin");
             }
             else
             {
-                // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
                 ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
                 return View("Login_Employee");
             }
@@ -49,10 +44,8 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
         [HttpPost]
         public ActionResult CheckCustomer()
         {
-            // Lấy thông tin đăng nhập từ form
             string phone = Request.Form["PhoneNumber"];
             string password = Request.Form["Password"];
-            // Kiểm tra thông tin đăng nhập
             var customer = CustomerRepo.Instance.LoginCustomer(phone, password);
             if (customer != null)
             {

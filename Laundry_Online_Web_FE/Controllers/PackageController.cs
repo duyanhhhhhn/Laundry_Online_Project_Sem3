@@ -75,7 +75,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             else
                 TempData["ErrorMessage"] = "Tạo thất bại!";
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Package");
         }
 
 
@@ -91,8 +91,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View(package);
         }
-
-
         // POST: Package/Edit/5
         [HttpPost]
         public ActionResult EditPackage(int id)
@@ -124,8 +122,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return RedirectToAction("Index");
         }
-
-
         [HttpPost]
         public ActionResult Delete(int id)
         {
