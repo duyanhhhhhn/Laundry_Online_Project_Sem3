@@ -132,11 +132,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
         // POST: Package/Edit/5
         [HttpPost]
-        public ActionResult EditPackage(HttpPostedFileBase Image, ServiceView model)
+        public ActionResult EditPackage(HttpPostedFileBase Image, PackageView model)
         {
             if (ModelState.IsValid)
             {
-                var existingPackage = ServiceRepository.Instance.GetById(model.Id);
+                var existingPackage = PackageRepository.Instance.GetById(model.Id);
 
                 if (existingPackage == null)
                 {
@@ -177,9 +177,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         model.Image = existingPackage.Image;
                     }
 
-                    model.Active = existingPackage.Active;
 
-                    ServiceRepository.Instance.Update(model);
+                    PackageRepository.Instance.Update(model);
 
                     return RedirectToAction("Index");
                 }

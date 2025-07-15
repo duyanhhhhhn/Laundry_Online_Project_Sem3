@@ -15,7 +15,7 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    @using (Html.BeginForm("EditPackage", "Package", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    @using (Html.BeginForm("EditPackage", "Package", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
                     {
                         @Html.HiddenFor(m => m.Id)
 
