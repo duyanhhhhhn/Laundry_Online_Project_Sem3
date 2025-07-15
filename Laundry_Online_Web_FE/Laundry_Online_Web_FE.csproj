@@ -179,43 +179,43 @@
     <Compile Include="Models\Dao\eSmsService.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
     <Compile Include="Models\Entities\BlogPost.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Customer.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Customer_package.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Employee.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Invoice.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\InvoiceItem.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\OnlineLaundryEntities.Context.cs">
+    <Compile Include="Models\Entities\OnlineLaundryModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>OnlineLaundryEntities.Context.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\OnlineLaundryEntities.cs">
+    <Compile Include="Models\Entities\OnlineLaundryModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\OnlineLaundryEntities.Designer.cs">
+    <Compile Include="Models\Entities\OnlineLaundryModel.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>OnlineLaundryEntities.edmx</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Package.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Service.cs">
-      <DependentUpon>OnlineLaundryEntities.tt</DependentUpon>
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ModelViews\BlogPostView.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
@@ -500,15 +500,15 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\Entities\OnlineLaundryEntities.Context.tt">
+    <Content Include="Models\Entities\OnlineLaundryModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>OnlineLaundryEntities.edmx</DependentUpon>
-      <LastGenOutput>OnlineLaundryEntities.Context.cs</LastGenOutput>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+      <LastGenOutput>OnlineLaundryModel.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="Models\Entities\OnlineLaundryEntities.tt">
+    <Content Include="Models\Entities\OnlineLaundryModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>OnlineLaundryEntities.edmx</DependentUpon>
-      <LastGenOutput>OnlineLaundryEntities.cs</LastGenOutput>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
+      <LastGenOutput>OnlineLaundryModel.cs</LastGenOutput>
     </Content>
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -523,12 +523,12 @@
     <Content Include="Content\Admin\css\style.css.map" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulard907.ttf" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\mulishregulare59e.ttf" />
-    <EntityDeploy Include="Models\Entities\OnlineLaundryEntities.edmx">
+    <EntityDeploy Include="Models\Entities\OnlineLaundryModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>OnlineLaundryEntities.Designer.cs</LastGenOutput>
+      <LastGenOutput>OnlineLaundryModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Models\Entities\OnlineLaundryEntities.edmx.diagram">
-      <DependentUpon>OnlineLaundryEntities.edmx</DependentUpon>
+    <Content Include="Models\Entities\OnlineLaundryModel.edmx.diagram">
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />

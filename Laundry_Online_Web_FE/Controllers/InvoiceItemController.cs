@@ -14,9 +14,34 @@ namespace Laundry_Online_Web_FE.Controllers
         public ActionResult Index()
         {
             return View();
-        }   
-    // Xử lý tạo barcode và lưu vào BarCode field (1 hoặc nhiều)
-    public void GenerateBarcodesForItem(InvoiceItemView item, ServiceView service)
+        }
+        public ActionResult InVoiceItemList()
+        {
+            var items = InvoiceItemRepo.Instance.GetAll(); //list<>
+            return View(items);
+        }
+        public ActionResult Details(int id)
+        {
+            var item = InvoiceItemRepo.Instance.GetInvoiceItemById(id);
+            if (item == null)
+                return HttpNotFound();
+            return View(item);
+        }
+        public ActionResult CreateBarcodeByInvoiceItem(int invoiceItemId) // tạo mã vạch cho item
+        {
+            var item = InvoiceItemRepo.Instance.GetInvoiceItemById(invoiceItemId);
+            if (item == null)
+                return HttpNotFound();
+            // Lấy thông tin dịch vụ để tạo mã vạch
+            var service = ServiceRepository.Instance.GetById(item.ServiceId);
+            if (service == null)
+                return HttpNotFound();
+            GenerateBarcodesForItem(item, service);
+            InvoiceItemRepo.Instance.UpdateInvoiceItem(item);
+            return RedirectToAction("Details", new { id = item.Id });
+        }
+        // Xử lý tạo barcode và lưu vào BarCode field (1 hoặc nhiều)
+        public void GenerateBarcodesForItem(InvoiceItemView item, ServiceView service)
         {
             List<string> barcodeList = new List<string>();
 
@@ -42,7 +67,7 @@ namespace Laundry_Online_Web_FE.Controllers
         }
 
         // Xuất PDF chứa tất cả barcode của một item
-        public ActionResult PrintBarcodes(int InvoiceItemId)
+        public ActionResult PrintBarcodes(int InvoiceItemId) // xuất ra file PDF
         {
             var item = InvoiceItemRepo.Instance.GetInvoiceItemById(InvoiceItemId);
             if (item == null || string.IsNullOrEmpty(item.BarCode))
