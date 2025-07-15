@@ -48,18 +48,9 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            var services = ServiceRepository.Instance.All();
-            ViewBag.Services = services;
-            var backages = PackageRepository.Instance.GetAll();
-            ViewBag.Packages = backages;
-            var model = new HeaderModel
-            {
-                Services = services,
-                Packages = backages
-            };
-            ViewBag.Model = model;
+            
             ViewBag.Message = TempData["Message"];
-            return View(model);
+            return View();
         }
         public ActionResult Logout()
         {
@@ -74,17 +65,8 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            var services = ServiceRepository.Instance.All();
-            ViewBag.Services = services;
-            var backages = PackageRepository.Instance.GetAll();
-            ViewBag.Packages = backages;
-            var model = new HeaderModel
-            {
-                Services = services,
-                Packages = backages
-            };
-            ViewBag.Model = model;
-            return View(model);
+            
+            return View();
         }
         [HttpPost]
         public async Task<ActionResult> Create_Customer()
@@ -135,27 +117,13 @@ namespace Laundry_Online_Web_FE.Controllers
 
         public ActionResult DetailService(int id)
         {
-            var services = ServiceRepository.Instance.All();
-            ViewBag.Services = services;
-            var backages = PackageRepository.Instance.GetAll();
-            ViewBag.Packages = backages;
-            var model = new HeaderModel
-            {
-                Services = services,
-                Packages = backages
-            };
-            ViewBag.Model = model;
+            
             var service = ServiceRepository.Instance.GetById(id);
             if (service == null)
             {
                 TempData["ErrorMessage"] = "Not found service!";
                 return RedirectToAction("Index");
             }
-            ViewBag.Service = service;
-            return View(model);
-        }
-        public ActionResult DetailPackage(int id)
-        {
             var services = ServiceRepository.Instance.All();
             ViewBag.Services = services;
             var backages = PackageRepository.Instance.GetAll();
@@ -166,6 +134,12 @@ namespace Laundry_Online_Web_FE.Controllers
                 Packages = backages
             };
             ViewBag.Model = model;
+            ViewBag.Service = service;
+            return View(model);
+        }
+        public ActionResult DetailPackage(int id)
+        {
+            
             var package = PackageRepository.Instance.GetById(id);
             if (package == null)
             {
@@ -173,7 +147,29 @@ namespace Laundry_Online_Web_FE.Controllers
                 return RedirectToAction("Index");
             }
             ViewBag.Package = package;
+            var services = ServiceRepository.Instance.All();
+            ViewBag.Services = services;
+            var backages = PackageRepository.Instance.GetAll();
+            ViewBag.Packages = backages;
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = backages
+            };
+            ViewBag.Model = model;
             return View(model);
+        }
+        [ChildActionOnly]
+        public PartialViewResult HeaderPartial()
+        {
+            var services = ServiceRepository.Instance.All();
+            var packages = PackageRepository.Instance.GetAll();
+            var model = new HeaderModel
+            {
+                Services = services,
+                Packages = packages
+            };
+            return PartialView("~/Views/Shared/Client/_PartialHeader.cshtml", model);
         }
     }
 }
