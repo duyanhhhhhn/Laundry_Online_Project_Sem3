@@ -212,147 +212,145 @@
     </div>
 </div>
 
-@section scripts {
-    <script>
-        let bookingToCancel = 0;
+<!-- Inline Styles -->
+<style>
+    .booking-card {
+        transition: transform 0.2s;
+        border: 1px solid #e0e0e0;
+    }
 
-        function filterBookings(status) {
-            const bookingItems = document.querySelectorAll('.booking-item');
-            const buttons = document.querySelectorAll('.btn-group .btn');
-
-            // Reset active state
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            bookingItems.forEach(item => {
-                const itemStatus = item.getAttribute('data-status');
-                let show = false;
-
-                switch(status) {
-                    case 'all':
-                        show = true;
-                        buttons[0].classList.add('active');
-                        break;
-                    case 'pending':
-                        show = itemStatus === '0';
-                        buttons[1].classList.add('active');
-                        break;
-                    case 'confirmed':
-                        show = itemStatus === '1';
-                        buttons[2].classList.add('active');
-                        break;
-                    case 'completed':
-                        show = itemStatus === '3';
-                        buttons[3].classList.add('active');
-                        break;
-                    case 'cancelled':
-                        show = itemStatus === '99';
-                        buttons[4].classList.add('active');
-                        break;
-                }
-
-                item.style.display = show ? 'block' : 'none';
-            });
+        .booking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        function viewDetails(bookingId) {
-            // TODO: Implement view details modal or redirect
-            alert('Chi tiết booking #' + bookingId);
+    .border-warning {
+        border-color: #ffc107 !important;
+        border-width: 2px !important;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+        .info-row i {
+            width: 20px;
+            margin-right: 8px;
         }
 
-        function cancelBooking(bookingId) {
-            bookingToCancel = bookingId;
-            $('#cancelModal').modal('show');
-        }
+    .notes {
+        background: #f8f9fa;
+        padding: 8px;
+        border-radius: 4px;
+        border-left: 3px solid #007bff;
+        max-height: 100px;
+        overflow-y: auto;
+    }
 
-        function confirmCancel() {
-            const reason = document.getElementById('cancelReason').value;
+    .btn-group .btn {
+        font-size: 0.875rem;
+    }
 
-            fetch('@Url.Action("Cancel", "Booking")', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                },
-                body: `id=${bookingToCancel}&cancelReason=${encodeURIComponent(reason)}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    $('#cancelModal').modal('hide');
-                    location.reload(); // Reload page to show updated status
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi khi hủy lịch đặt.');
-            });
-        }
+    .badge {
+        font-size: 0.75rem;
+    }
 
-        // Auto hide alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-    </script>
-}
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+    }
 
-@section styles {
-    <style>
-        .booking-card {
-            transition: transform 0.2s;
-            border: 1px solid #e0e0e0;
-        }
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+    }
+</style>
 
-            .booking-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+<!-- Inline Scripts -->
+<script>
+    let bookingToCancel = 0;
+
+    function filterBookings(status) {
+        const bookingItems = document.querySelectorAll('.booking-item');
+        const buttons = document.querySelectorAll('.btn-group .btn');
+
+        // Reset active state
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        bookingItems.forEach(item => {
+            const itemStatus = item.getAttribute('data-status');
+            let show = false;
+
+            switch(status) {
+                case 'all':
+                    show = true;
+                    buttons[0].classList.add('active');
+                    break;
+                case 'pending':
+                    show = itemStatus === '0';
+                    buttons[1].classList.add('active');
+                    break;
+                case 'confirmed':
+                    show = itemStatus === '1';
+                    buttons[2].classList.add('active');
+                    break;
+                case 'completed':
+                    show = itemStatus === '3';
+                    buttons[3].classList.add('active');
+                    break;
+                case 'cancelled':
+                    show = itemStatus === '99';
+                    buttons[4].classList.add('active');
+                    break;
             }
 
-        .border-warning {
-            border-color: #ffc107 !important;
-            border-width: 2px !important;
-        }
+            item.style.display = show ? 'block' : 'none';
+        });
+    }
 
-        .info-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+    function viewDetails(bookingId) {
+        // TODO: Implement view details modal or redirect
+        alert('Chi tiết booking #' + bookingId);
+    }
 
-            .info-row i {
-                width: 20px;
-                margin-right: 8px;
+    function cancelBooking(bookingId) {
+        bookingToCancel = bookingId;
+        $('#cancelModal').modal('show');
+    }
+
+    function confirmCancel() {
+        const reason = document.getElementById('cancelReason').value;
+
+        fetch('@Url.Action("Cancel", "Booking")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            body: `id=${bookingToCancel}&cancelReason=${encodeURIComponent(reason)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#cancelModal').modal('hide');
+                location.reload(); // Reload page to show updated status
+            } else {
+                alert('Lỗi: ' + data.message);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Đã xảy ra lỗi khi hủy lịch đặt.');
+        });
+    }
 
-        .notes {
-            background: #f8f9fa;
-            padding: 8px;
-            border-radius: 4px;
-            border-left: 3px solid #007bff;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-
-        .btn-group .btn {
-            font-size: 0.875rem;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-        }
-
-        .btn-group .btn:first-child {
-            border-top-left-radius: 0.375rem;
-            border-bottom-left-radius: 0.375rem;
-        }
-
-        .btn-group .btn:last-child {
-            border-top-right-radius: 0.375rem;
-            border-bottom-right-radius: 0.375rem;
-        }
-    </style>
-}
+    // Auto hide alerts after 5 seconds
+    setTimeout(function() {
+        $('.alert').fadeOut('slow');
+    }, 5000);
+</script>
 
 @functions {
     private bool CanEditBooking(Laundry_Online_Web_FE.Models.ModelViews.InvoiceView booking)

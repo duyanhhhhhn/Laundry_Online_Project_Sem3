@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
@@ -26,6 +27,16 @@ namespace Laundry_Online_Web_FE.Controllers
 
             // Sắp xếp theo ngày tạo mới nhất
             var sortedBookings = allBookings.OrderByDescending(b => b.Invoice_Date).ToList();
+
+            // Add HeaderModel for layout
+            var services = ServiceRepository.Instance.All().ToHashSet();
+            var packages = PackageRepository.Instance.GetAll().ToHashSet();
+            var headerModel = new HeaderModel
+            {
+                Services = services,
+                Packages = packages
+            };
+            ViewBag.Model = headerModel;
 
             return View(sortedBookings);
         }
