@@ -81,10 +81,12 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                return _context.Invoices
+                var invoices = _context.Invoices
                     .Where(i => i.customer_id == customerId)
-                    .Select(i => MapToView(i))
-                    .ToHashSet();
+                    .OrderByDescending(i => i.invoice_date) // Sắp xếp theo ngày đặt mới nhất
+                    .ToList();
+
+                return invoices.Select(i => MapToView(i)).ToHashSet();
             }
             catch (Exception ex)
             {

@@ -1,0 +1,323 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.InvoiceView
+@{
+    ViewBag.Title = "Chỉnh sửa lịch đặt";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4><i class="fas fa-edit"></i> Chỉnh sửa lịch đặt #@Model.Id</h4>
+                    <small>Trạng thái: <span class="badge bg-warning">Chờ xác nhận</span></small>
+                </div>
+                <div class="card-body">
+                    <!-- Alert thông tin quan trọng -->
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Lưu ý quan trọng:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Chỉ có thể chỉnh sửa lịch đặt <strong>đang chờ xác nhận</strong></li>
+                            <li>Thời gian mới phải <strong>sau ít nhất 24 giờ</strong> so với hiện tại</li>
+                            <li>Mọi thay đổi sẽ được ghi lại vào lịch sử</li>
+                        </ul>
+                    </div>
+
+                    <form id="editBookingForm">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Current Info -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Thông tin hiện tại:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Ngày:</strong> @((Model.Delivery_Date ?? DateTime.MinValue).ToString("dd/MM/yyyy"))</p>
+                                    <p class="mb-1"><strong>Giờ:</strong> @((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm"))</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Ngày đặt:</strong> @Model.Invoice_Date.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <p class="mb-1"><strong>Tổng tiền:</strong> @Model.Total_Amount.ToString("N0") VNĐ</p>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Notes))
+                            {
+                                <hr class="my-2">
+                                <p class="mb-0"><strong>Ghi chú hiện tại:</strong></p>
+                                <div class="mt-1 p-2 bg-light rounded">
+                                    <small>@Html.Raw(Model.Notes.Replace("\n", "<br />"))</small>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- New Date & Time Selection -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="serviceDate" class="form-label">
+                                        <i class="fas fa-calendar"></i> Ngày mới <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" id="serviceDate" name="ServiceDate" class="form-control"
+                                           value="@((Model.Delivery_Date ?? DateTime.Now.AddDays(1)).ToString("yyyy-MM-dd"))"
+                                           min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")"
+                                           max="@DateTime.Now.AddYears(1).ToString("yyyy-MM-dd")"
+                                           required>
+                                    <div class="form-text">Chọn ngày từ ngày mai trở đi</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="serviceTime" class="form-label">
+                                        <i class="fas fa-clock"></i> Giờ mới <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="serviceTime" name="ServiceTime" class="form-control" required>
+                                        <option value="">-- Chọn thời gian --</option>
+                                        <option value="08:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "08:00") ? "selected" : "")>8:00 sáng</option>
+                                        <option value="08:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "08:30") ? "selected" : "")>8:30 sáng</option>
+                                        <option value="09:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "09:00") ? "selected" : "")>9:00 sáng</option>
+                                        <option value="09:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "09:30") ? "selected" : "")>9:30 sáng</option>
+                                        <option value="10:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "10:00") ? "selected" : "")>10:00 sáng</option>
+                                        <option value="10:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "10:30") ? "selected" : "")>10:30 sáng</option>
+                                        <option value="11:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "11:00") ? "selected" : "")>11:00 sáng</option>
+                                        <option value="11:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "11:30") ? "selected" : "")>11:30 sáng</option>
+                                        <option value="12:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "12:00") ? "selected" : "")>12:00 trưa</option>
+                                        <option value="12:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "12:30") ? "selected" : "")>12:30 trưa</option>
+                                        <option value="13:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "13:00") ? "selected" : "")>1:00 chiều</option>
+                                        <option value="13:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "13:30") ? "selected" : "")>1:30 chiều</option>
+                                        <option value="14:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "14:00") ? "selected" : "")>2:00 chiều</option>
+                                        <option value="14:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "14:30") ? "selected" : "")>2:30 chiều</option>
+                                        <option value="15:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "15:00") ? "selected" : "")>3:00 chiều</option>
+                                        <option value="15:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "15:30") ? "selected" : "")>3:30 chiều</option>
+                                        <option value="16:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "16:00") ? "selected" : "")>4:00 chiều</option>
+                                        <option value="16:30" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "16:30") ? "selected" : "")>4:30 chiều</option>
+                                        <option value="17:00" @(((Model.Delivery_Date ?? DateTime.MinValue).ToString("HH:mm") == "17:00") ? "selected" : "")>5:00 chiều</option>
+                                    </select>
+                                    <div class="form-text">Giờ làm việc từ 8:00 - 17:00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview thay đổi -->
+                        <div class="alert alert-light border" id="changePreview" style="display: none;">
+                            <h6><i class="fas fa-eye"></i> Xem trước thay đổi:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Từ:</small>
+                                    <div id="currentDateTime">@((Model.Delivery_Date ?? DateTime.MinValue).ToString("dd/MM/yyyy HH:mm"))</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Thành:</small>
+                                    <div id="newDateTime" class="text-primary fw-bold">--</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group mb-4">
+                            <label for="notes" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Ghi chú thêm
+                            </label>
+                            <textarea id="notes" name="Notes" class="form-control" rows="4"
+                                      placeholder="Thêm ghi chú cho việc thay đổi lịch này (tùy chọn)..."></textarea>
+                            <div class="form-text">Ghi chú này sẽ được thêm vào lịch sử thay đổi</div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("MyBookings")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                            </a>
+                            <button type="submit" class="btn btn-warning" id="submitBtn">
+                                <i class="fas fa-save"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Xem trước thay đổi khi user chọn ngày/giờ
+        function updatePreview() {
+            const dateInput = document.getElementById('serviceDate');
+            const timeSelect = document.getElementById('serviceTime');
+            const preview = document.getElementById('changePreview');
+            const newDateTimeDiv = document.getElementById('newDateTime');
+
+            if (dateInput.value && timeSelect.value) {
+                const selectedDate = new Date(dateInput.value);
+                const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+
+                const formattedDate = selectedDate.toLocaleDateString('vi-VN');
+                newDateTimeDiv.textContent = formattedDate + ' ' + timeText;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Gắn sự kiện thay đổi
+        document.getElementById('serviceDate').addEventListener('change', updatePreview);
+        document.getElementById('serviceTime').addEventListener('change', updatePreview);
+
+        // Xử lý submit form
+        document.getElementById('editBookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+
+            // Validation client-side
+            const dateInput = document.getElementById('serviceDate');
+            const timeSelect = document.getElementById('serviceTime');
+
+            if (!dateInput.value || !timeSelect.value) {
+                alert('Vui lòng chọn đầy đủ ngày và giờ!');
+                return;
+            }
+
+            // Kiểm tra ngày phải sau 24h
+            const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
+            const now = new Date();
+            const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+
+            if (hoursDiff < 24) {
+                alert('Thời gian đặt lịch phải sau ít nhất 24 giờ so với hiện tại!');
+                return;
+            }
+
+            // Disable submit button và hiển thị loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+            fetch('@Url.Action("Edit", new { id = Model.Id })', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Hiển thị thông báo thành công
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'alert alert-success mt-3';
+                    successAlert.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                    document.querySelector('.card').appendChild(successAlert);
+
+                    // Chuyển về trang danh sách sau 2 giây
+                    setTimeout(() => {
+                        window.location.href = '@Url.Action("MyBookings")';
+                    }, 2000);
+                } else {
+                    alert('Lỗi: ' + data.message);
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại.');
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+
+        // Khởi tạo preview khi load trang
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePreview();
+        });
+    </script>
+}
+
+@section styles {
+    <style>
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border: none;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            transition: all 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: #ffc107;
+                box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+            }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        #changePreview {
+            border-left: 4px solid #17a2b8 !important;
+        }
+
+        .fw-bold {
+            font-weight: 600 !important;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+            .btn-warning:hover {
+                background-color: #e0a800;
+                border-color: #d39e00;
+                color: #000;
+            }
+
+        .alert ul {
+            padding-left: 1.2rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+    </style>
+}
