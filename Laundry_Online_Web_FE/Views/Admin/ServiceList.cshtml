@@ -24,6 +24,7 @@ ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
                             <th>Description</th>
                             <th>Unit</th>
                             <th>Image</th>
+                            <th>Price</th>
                             <th>Actice</th>
                             <th>Action</th>
                         </tr>
@@ -39,6 +40,7 @@ ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.ServiceView>;
                                 <td>
                                  <img src="@Url.Content("~/content/client/")images/@ser.Image" alt="No image" >
                                 </td>
+                                <td>@ser.Price</td>
                                 <td>
                                     @if (ser.Active == 1)
                                     {

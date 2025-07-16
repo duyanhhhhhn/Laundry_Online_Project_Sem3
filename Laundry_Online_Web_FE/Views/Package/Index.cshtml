@@ -45,12 +45,13 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>ID</th>
-                                    <th>Package Name</th>
-                                    <th>Description</th>
-                                    <th>Price</th>
-                                    <th>Value</th>
-                                    <th>Unit</th>
-                                    <th>Validity Day</th>
+                                    <th>Image</th>
+                                    <th>Tên gói</th>
+                                    <th>Mô tả</th>
+                                    <th>Giá</th>
+                                    <th>Giá trị</th>
+                                    <th>Đơn vị</th>
+                                    <th>Số ngày hiệu lực</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -61,6 +62,9 @@
                                     {
                                         <tr>
                                             <td>@item.Id</td>
+                                            <td>
+                                                <img src="@Url.Content("~/content/client/")images/@item.Image" alt="No image" style= "height: 100px">
+                                            </td>
                                             <td>@item.Package_Name</td>
                                             <td>@item.Description</td>
                                             <td>@item.Price.ToString("C0")</td>

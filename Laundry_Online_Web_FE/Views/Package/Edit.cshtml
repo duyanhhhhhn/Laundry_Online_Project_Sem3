@@ -15,7 +15,7 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    @using (Html.BeginForm("EditPackage", "Package", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    @using (Html.BeginForm("EditPackage", "Package", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
                     {
                         @Html.HiddenFor(m => m.Id)
 
@@ -60,6 +60,20 @@
                                 <input type="number" name="Validity_Day" class="form-control" value="@Model.Validity_Day" min="1" required />
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <label for="Image" class="col-md-3 col-form-label">Image Upload</label>
+                            <div class="custom-file-input-wrapper col-md-9">
+                                <input type="file" class="custom-file-input" name="Image" id="Image" onchange="updateFileName(this)">
+                                <label class="custom-file-label" for="Image" id="ImageLabel">Choose new file (or keep existing)</label>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Image))
+                            {
+                                <div class="current-image-preview mt-2 text-center">
+                                    <p>Current Image:</p>
+                                    <img src="@Url.Content("~/content/client/images/" + Model.Image)" alt="Current Service Image" class="img-thumbnail" style="max-width: 150px; height: auto;" />
+                                </div>
+                            }
+                        </div>
 
                         <div class="form-group row">
                             <div class="col-md-9 offset-md-3">
@@ -75,7 +89,18 @@
         </div>
     </div>
 </div>
-
+<script>
+    function updateFileName(input) {
+        var fileName = "Choose new file (or keep existing)";
+        if (input.files && input.files.length > 0) {
+            fileName = input.files[0].name;
+            document.getElementById('ImageLabel').classList.add('selected');
+        } else {
+            document.getElementById('ImageLabel').classList.remove('selected');
+        }
+        document.getElementById('ImageLabel').textContent = fileName;
+    }
+</script>
 <style>
     .card {
         margin-bottom: 20px;

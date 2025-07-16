@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "DetailPackage";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+@model Laundry_Online_Web_FE.Models.ModelViews.DTO.HeaderModel
+@if (ViewBag.Package != null)
+{
+    Laundry_Online_Web_FE.Models.ModelViews.PackageView package =
+(Laundry_Online_Web_FE.Models.ModelViews.PackageView)ViewBag.Package;
+    <section class="awe-section-6">
+        <div class="container evo_block-product">
+            <div class="e-tabs not-dqtab ajax-tab-1" data-section="ajax-tab-1" data-view="grid_4">
+                <div class="content row">
+                    <div class="col-lg-3 ant-title-tab">
+                        <div class="titlecp clearfix" style="color : blue">
+                            <h3>Us Package</h3>
+                        </div>
+                        <ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
+                            @foreach (var pak in Model.Packages)
+                            {
+                                <li class="tab-link has-content" data-tab="tab-1">
+                                    <a href="@Url.Action("DetailPackage", "Home", new { id = pak.Id })" title="@pak.Package_Name">
+                                        @pak.Package_Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        <a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc phục hồi giày" class="d-none d-lg-block ant-banner-index-product">
+                            <picture>
+                                <source media="(min-width: 1200px)"
+                                        srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                                <source media="(min-width: 992px)"
+                                        srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                                <source media="(min-width: 569px)"
+                                        srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                                <source media="(max-width: 480px)"
+                                        srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_banner_1.jpg?1751540074929" alt="Chăm sóc phục hồi giày" class="lazy img-responsive center-block d-block mx-auto" />
+                            </picture>
+                        </a>
+                    </div>
+                    <div class="col-lg-9">
+                        <div class="container my-5" style="max-width: 700px;">
+                            <div class="card service-detail-card">
+                                <div class="card-header text-center bg-info text-white">
+                                    <h2 class="mb-0">@package.Package_Name</h2>
+                                </div>
+                                <div class="card-body row">
+                                    <div class="col-md-5 text-center">
+                                        <img src="@Url.Content("~/content/client/")images/@package.Image" alt="@package.Package_Name" class="img-fluid rounded shadow" />
+                                    </div>
+                                    <div class="col-md-7">
+                                        <h4 class="text-success fw-bold mb-3">@string.Format("{0:N0} $", package.Price)</h4>
+                                        <p><strong>Description:</strong></p>
+                                        <p class="text-muted">@package.Description</p>
+                                        <a href="" class="btn btn-primary mt-3">
+                                            <i class="fas fa-shopping-cart"></i> Buy Now
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}
+<style>
+    .service-detail-card {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+
+        .service-detail-card img {
+            max-height: 300px;
+            object-fit: cover;
+            border: 5px solid #eee;
+        }
+
+        .service-detail-card .card-body {
+            padding: 30px;
+        }
+</style>
+

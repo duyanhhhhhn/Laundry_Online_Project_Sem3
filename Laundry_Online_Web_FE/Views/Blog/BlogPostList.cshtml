@@ -1,0 +1,98 @@
+﻿
+@{
+    ViewBag.Title = "BlogPostList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@if (ViewBag.Data != null)
+{
+    HashSet<Laundry_Online_Web_FE.Models.ModelViews.BlogPostView> ls =
+ViewBag.Data as HashSet<Laundry_Online_Web_FE.Models.ModelViews.BlogPostView>;
+    var i = 1;
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Blog Post List  <a href="@Url.Action("createBlogPost")" class="btn btn-success m-0" style="float: right;">New Service</a>
+            </div>
+
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Content</th>
+                            <th>Create Date</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Laundry_Online_Web_FE.Models.ModelViews.BlogPostView blog in ls)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@blog.Title</td>
+                                <td>@Html.Raw(blog.Description)</td>
+                                <td>@Html.Raw(blog.Content)</td>
+                                <td>@blog.CreateDate</td>
+                                <td>
+                                    <img src="@Url.Content("~/content/client/")images/@blog.Image" alt="No image">
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("Admin_edit_BlogPost", "Admin", new { id = blog.ID })">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn-toggle-active"
+                                       data-id="@blog.ID" data-name="@blog.Title">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        $(".btn-toggle-active").click(function () {
+            var id = $(this).data("id");
+            var name = $(this).data("name");
+
+
+            if (confirm("Bạn có chắc muốn xoá dịch vụ '" + name + "'?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteBlog", "Blog")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert("Có lỗi xảy ra: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể kết nối đến server.");
+                    }
+                });
+            }
+        });
+    });
+    </script>
+
+}
+
+<style>
+    table#datatablesSimple img {
+        max-width: 80px;
+        max-height: 80px;
+        object-fit: cover;
+    }
+</style>

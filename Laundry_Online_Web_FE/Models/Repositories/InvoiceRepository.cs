@@ -199,6 +199,47 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
+        public List<decimal> GetMonthlyRevenueByYear(int year)
+        {
+            try
+            {
+                var revenues = new List<decimal>();
+                for (int month = 1; month <= 12; month++)
+                {
+                    var start = new DateTime(year, month, 1);
+                    var end = start.AddMonths(1);
+                    var total = _context.Invoices
+                        .Where(inv => inv.invoice_date >= start && inv.invoice_date < end)
+                        .Sum(inv => (decimal?)inv.total_amount) ?? 0;
+                    revenues.Add(Math.Floor(total)); // Không có số thập phân cho VNĐ
+                }
+                return revenues;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetMonthlyRevenueByYear Error: " + ex.Message);
+                return new List<decimal>(new decimal[12]); // Trả về 12 tháng với giá trị 0
+            }
+        }
+
+        public List<int> GetAvailableYears()
+        {
+            try
+            {
+                return _context.Invoices
+                    .Where(inv => inv.invoice_date.HasValue)
+                    .Select(inv => inv.invoice_date.Value.Year)
+                    .Distinct()
+                    .OrderByDescending(y => y)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetAvailableYears Error: " + ex.Message);
+                return new List<int> { DateTime.Now.Year }; // Trả về năm hiện tại nếu có lỗi
+            }
+        }
+
         private InvoiceView MapToView(Invoice i)
         {
             return new InvoiceView

@@ -52,7 +52,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public List<InvoiceItemView> InvoiceItems { get; set; } = new List<InvoiceItemView>();
 
         [Display(Name = "Total Amount")]
-        public decimal Total_Amount => InvoiceItems.Sum(x => x.Sub_Price) + Ship_Cost;
+        public decimal Total_Amount => InvoiceItems.Sum(x => x.SubTotal) + Ship_Cost;
 
         // Display properties for views
         public string Customer_Name { get; set; } = "";

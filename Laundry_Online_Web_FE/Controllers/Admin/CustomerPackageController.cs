@@ -24,6 +24,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
 
         // GET: CustomerPackage
+        [Route("admin/customerpackage")]
         public ActionResult Index()
         {
             var customerPackageList = _customerPackageRepository.GetAll();
@@ -61,6 +62,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View();
         }
         // GET: CustomerPackage/Detail/5
+        [Route("admin/customerpackage/detail")]
+
         public ActionResult Detail(int id)
         {
             var customerPackage = _customerPackageRepository.GetById(id);
@@ -91,6 +94,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
 
         // GET: CustomerPackage/Create
+        [Route("admin/customerpackage/Create")]
+
         public ActionResult Create()
         {
             var customerList = _customerRepository.GetActiveCustomer();
@@ -134,6 +139,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
 
         // GET: CustomerPackage/Edit/5
+        [Route("admin/customerpackage/edit/{id}")]
+
         public ActionResult Edit(int id)
         {
             var customerPackage = _customerPackageRepository.GetById(id);

@@ -1,11 +1,5 @@
 ﻿
 @{
-    ViewBag.Title = "AllEmployeeList";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-}
-
-
-@{
     ViewBag.Title = "EmployeeList";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
@@ -44,8 +38,7 @@
                                 <td>@emp.LastName</td>
                                 <td>@emp.Phone</td>
                                 <td>@emp.HireDate.ToString("dd/MM/yyyy")</td>
-                                <td>@emp.Salary</td>
-                                <td>
+                                <td>@emp.Salary</td>                               
                                 <td>
                                     @if (emp.Active == 1)
                                     {
@@ -57,7 +50,7 @@
                                     }
                                 </td>
                                 <td>
-                                    <a href="@Url.Action("EditEmployee",new { EmpId = emp.Id } )">
+                                    <a href="@Url.Action("Admin_edit_employee", new {Id = emp.Id } )">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <a href="javascript:void(0);" class="btn-toggle-active"

@@ -7,15 +7,16 @@ namespace Laundry_Online_Web_FE.Models.ModelViews
 {
     public class InvoiceItemView
     {
-        public int Item_Id { get; set; } = 0;
-        public int Invoice_Id { get; set; } = 0;
-        public string Package_Name { get; set; } = "";
+        public int Id { get; set; } = 0;
+        public int InvoiceId { get; set; } = 0;
+        public string ItemName { get; set; } = "";
         public decimal Quantity { get; set; } = 0;
-        public decimal Unit_Price { get; set; } = 0;
-        public decimal Sub_Price { get; set; } = 0;
-        public string barcode { get; set; } = "";
-        public int Status { get; set; } = 0;
-        public int Service_Id { get; set; } = 0;
+        public decimal UnitPrice { get; set; } = 0;
+        public decimal SubTotal { get; set; } = 0;
+        public string BarCode { get; set; } = "";
+        public int ItemStatus { get; set; } = 0;
+        public int ServiceId { get; set; } = 0;
+
     }
     
 }

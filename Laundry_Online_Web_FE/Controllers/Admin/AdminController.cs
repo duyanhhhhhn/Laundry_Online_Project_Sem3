@@ -5,16 +5,28 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
-
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
     public class AdminController : Controller
     {
         // GET: Admin
-        public ActionResult Index()
+        public ActionResult Index(int? year)
         {
+            var years = InvoiceRepository.Instance.GetAvailableYears();
+            int selectedYear = year ?? (years.Count > 0 ? years[0] : DateTime.Now.Year);
+
+            var revenues = InvoiceRepository.Instance.GetMonthlyRevenueByYear(selectedYear);
+            var months = Enumerable.Range(1, 12)
+                .Select(m => m.ToString("D2") + "/" + selectedYear)
+                .ToList();
+
+            ViewBag.Months = months;
+            ViewBag.Revenues = revenues;
+            ViewBag.Years = years;
+            ViewBag.SelectedYear = selectedYear;
             return View();
         }
 
@@ -145,6 +157,40 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.Customer = customer;
             return View();
         }
+        [HttpGet]
+        public ActionResult Admin_edit_employee()
+        {
+            int id = 0;
+            if (RouteData.Values["id"] != null)
+            {
+                int.TryParse(RouteData.Values["id"].ToString(), out id);
+            }
+            else
+            {
+                return RedirectToAction("EmployeeList");
+            }
+            var employee = EmployeeRepo.Instance.GetEmployeeById(id);
+            if (employee == null)
+            {
+                return HttpNotFound();
+            }
+            ViewBag.Employee = employee;
+            return View();
+        }
+        [HttpPost]
+        public ActionResult EditEmployee()
+        {
+            int id = int.Parse(Request.Form["EmployeeId"]);
+            string firstName = Request.Form["FirstName"];
+            string lastName = Request.Form["LastName"];
+            string salary = Request.Form["Salary"];
+            var isEmp = EmployeeRepo.Instance.GetEmployeeById(id);
+            isEmp.FirstName = firstName;
+            isEmp.LastName = lastName;
+            isEmp.Salary = salary != null ? int.Parse(salary) : 0;
+            EmployeeRepo.Instance.Update(isEmp);
+            return RedirectToAction("EmployeeList");
+        }
         [HttpPost]
         public ActionResult EditCustomer()
         {
@@ -163,6 +209,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             CustomerRepo.Instance.Update(isCus);
             return RedirectToAction("CustomerList");
         }
+
         [HttpPost]
         public JsonResult ChangeCustomerActiveStatus(int id)
         {
@@ -196,7 +243,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
         public JsonResult ChangeServiceActiveStatus(int id)
         {
-            var success = ServiceRepository.Instance.Delete(id); 
+            var success = ServiceRepository.Instance.Delete(id);
 
             return Json(new
             {
@@ -262,7 +309,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             if (ModelState.IsValid)
             {
-                var existingService = ServiceRepository.Instance.GetById(model.Id); 
+                var existingService = ServiceRepository.Instance.GetById(model.Id);
 
                 if (existingService == null)
                 {
@@ -318,5 +365,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View("Admin_edit_service", model);
         }
-}
+        [HttpGet]
+        public ActionResult Admin_edit_BlogPost(int id)
+        {
+            var blog = BlogPostRepository.Instance.GetById(id);
+
+            if (blog == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(blog);
+        }
+    }
 }

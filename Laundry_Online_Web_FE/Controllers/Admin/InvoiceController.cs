@@ -7,7 +7,6 @@ using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
 using Newtonsoft.Json;
-using Laundry_Online_Web_FE.Models.Repositories.Laundry_Online_Web_FE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
@@ -19,7 +18,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         private readonly EmployeeRepo _employeeRepository;
         private readonly CustomerPackageRepository _customerPackageRepository;
         private readonly PackageRepository _packageRepository;
-        private readonly InvoiceItemRepository _invoiceItemRepository; // Assuming you have this
+        private readonly InvoiceItemRepo _invoiceItemRepository; // Assuming you have this
         private readonly ServiceRepository _serviceRepository; // Assuming you have this
        // private readonly VnPayPaymentService _paymentService = new VnPayPaymentService();
 
@@ -31,7 +30,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             _customerPackageRepository = CustomerPackageRepository.Instance;
             _packageRepository = PackageRepository.Instance;
             // Initialize other repositories as needed
-            _invoiceItemRepository = InvoiceItemRepository.Instance;
+            _invoiceItemRepository = InvoiceItemRepo.Instance;
             _serviceRepository = ServiceRepository.Instance;
         }
 
@@ -61,12 +60,12 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     {
                         Id = invoice.Id,
                         Customer_Id = invoice.Customer_Id,
-                        Employee_Id = invoice.Employee_Id,
+                        Employee_Id = (int)invoice.Employee_Id,
                         Customer_Name = customer != null ? $"{customer.FirstName} {customer.LastName}" : "Not Found",
                         Employee_Name = employee != null ? $"{employee.FirstName} {employee.LastName}" : "Not Found",
                         Invoice_Date = invoice.Invoice_Date,
-                        Delivery_Date = invoice.Delivery_Date,
-                        Pickup_Date = invoice.Pickup_Date,
+                        Delivery_Date = (DateTime)invoice.Delivery_Date,
+                        Pickup_Date = (DateTime)invoice.Pickup_Date,
                         //Total_
                         Payment_Type = invoice.Payment_Type,
                         Order_Status = invoice.Order_Status,
@@ -100,18 +99,18 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
 
             var customer = _customerRepository.GetCustomerById(invoice.Customer_Id);
-            var employee = _employeeRepository.GetEmployeeById(invoice.Employee_Id);
+            var employee = _employeeRepository.GetEmployeeById((int)invoice.Employee_Id);
 
             var invoiceDetail = new InvoiceForm
             {
                 Id = invoice.Id,
                 Customer_Id = invoice.Customer_Id,
-                Employee_Id = invoice.Employee_Id,
+                Employee_Id = (int)invoice.Employee_Id,
                 Customer_Name = customer != null ? $"{customer.FirstName} {customer.LastName}" : "Not Found",
                 Employee_Name = employee != null ? $"{employee.FirstName} {employee.LastName}" : "Not Found",
                 Invoice_Date = invoice.Invoice_Date,
-                Delivery_Date = invoice.Delivery_Date,
-                Pickup_Date = invoice.Pickup_Date,
+                Delivery_Date = (DateTime)invoice.Delivery_Date,
+                Pickup_Date = (DateTime)invoice.Pickup_Date,
 
                 Payment_Type = invoice.Payment_Type,
                 Order_Status = invoice.Order_Status,
@@ -205,10 +204,10 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             {
                 Id = invoice.Id,
                 Customer_Id = invoice.Customer_Id,
-                Employee_Id = invoice.Employee_Id,
+                Employee_Id = (int)invoice.Employee_Id,
                 Invoice_Date = invoice.Invoice_Date,
-                Delivery_Date = invoice.Delivery_Date,
-                Pickup_Date = invoice.Pickup_Date,
+                Delivery_Date = (DateTime)invoice.Delivery_Date,
+                Pickup_Date = (DateTime)invoice.Pickup_Date,
 
                 Payment_Type = invoice.Payment_Type,
                 Order_Status = invoice.Order_Status,
@@ -487,21 +486,21 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 var invoiceItems = JsonConvert.DeserializeObject<List<dynamic>>(invoiceItemsJson);
 
                 // Delete existing items first
-                _invoiceItemRepository.Delete(invoiceId);
+                _invoiceItemRepository.DeleteInvoiceItem(invoiceId);
 
                 // Add new items
                 foreach (var item in invoiceItems)
                 {
                     var invoiceItem = new InvoiceItemView
                     {
-                        Invoice_Id = invoiceId,
-                        Service_Id = (int)item.serviceId,
+                        InvoiceId = invoiceId,
+                        ServiceId = (int)item.serviceId,
                         Quantity = (int)item.quantity,
-                        Unit_Price = (decimal)item.unitPrice,
-                        Status = 1
+                        UnitPrice = (decimal)item.unitPrice,
+                        ItemStatus = 1
                     };
 
-                    _invoiceItemRepository.Add(invoiceItem);
+                    _invoiceItemRepository.AddInvoiceItem(invoiceItem);
                 }
             }
             catch (Exception ex)
