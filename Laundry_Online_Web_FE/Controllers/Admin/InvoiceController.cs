@@ -11,6 +11,7 @@ using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
+    [RoutePrefix("Admin/Invoice")]
     public class InvoiceController : Controller
     {
         private readonly InvoiceRepository _invoiceRepository;
@@ -34,6 +35,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             _serviceRepository = ServiceRepository.Instance;
         }
 
+        [HttpGet]
+        [Route("")]
         // GET: Invoice
         public ActionResult Index(int? status)
         {
@@ -87,7 +90,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return View();
         }
-
+        [HttpGet]
+        [Route("Details/{id:int}")]
         // GET: Invoice/Details/5
         public ActionResult Details(int id)
         {
@@ -125,7 +129,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return View(invoiceDetail);
         }
-
+        [HttpGet]
+        [Route("Create")]
         // GET: Invoice/Create
         public ActionResult Create()
         {
@@ -140,8 +145,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View();
         }
 
-        // POST: Invoice/Create
         [HttpPost]
+        [Route("Create")]
         public ActionResult CreateInvoice()
         {
             string customerId = Request.Form["Customer_Id"];
@@ -182,6 +187,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return RedirectToAction("Index");
         }
+        [HttpGet]
+        [Route("Edit/{id:int}")]
 
         // GET: Invoice/Edit/5
         public ActionResult Edit(int id)
@@ -225,6 +232,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
         // POST: Invoice/Edit/5
         [HttpPost]
+        [Route("Edit/{id:int}")]
         public ActionResult EditInvoice(int id)
         {
             try
@@ -315,6 +323,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
         // POST: Invoice/Delete/5
         [HttpPost]
+        [Route("Delete")]   
         public ActionResult Delete()
         {
             int id = Convert.ToInt32(Request.Form["id"]);
@@ -331,6 +340,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        [Route("Search")]
         // GET: Invoice/Search
         public ActionResult Search(string keyword)
         {
