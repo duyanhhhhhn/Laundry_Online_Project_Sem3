@@ -34,19 +34,19 @@
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input name="PhoneNumber" class="form-control" value="@customer.PhoneNumber" id="PhoneNumber" type="text" placeholder="phone number" />
-                                            <label for="PhoneNumber">Phone Number</label>
-                                        </div>
+                                            <input name="Address" class="form-control" value="@customer.Address" id="Address" type="text" placeholder="Address" />
+                                            <label for="Address">Address</label>
+                                        </div>                                        
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <div class="form-floating mb-3 mb-md-0">
-                                                    <input name="Address" class="form-control" value="@customer.Address" id="Address" type="text" placeholder="Address" />
-                                                    <label for="Address">Address</label>
+                                                <div class="form-floating mb-3">
+                                                    <input readonly name="PhoneNumber" class="form-control" value="@customer.PhoneNumber" id="PhoneNumber" type="text" placeholder="phone number" />
+                                                    <label for="PhoneNumber">Phone Number</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-floating mb-3 mb-md-0">
-                                                    <input name="RegistrationDate" class="form-control" value="@customer.RegistrationDate" id="RegistrationDate" type="datetime" placeholder="Create a password" />
+                                                    <input readonly name="RegistrationDate" class="form-control" value="@customer.RegistrationDate" id="RegistrationDate" type="datetime" placeholder="Create a password" />
                                                     <label for="RegistrationDate">Registration Date</label>
                                                 </div>
                                             </div>

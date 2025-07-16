@@ -43,7 +43,7 @@ namespace Laundry_Online_Web_FE
         //    {
         //        if (context.Session["customer"] == null)
         //        {
-        //            context.Response.RedirectToRoute(new { controller = "Customer", action = "Login" });
+        //            context.Response.RedirectToRoute(new { controller = "Home", action = "Login" });
         //            return;
         //        }
         //    }
@@ -55,7 +55,7 @@ namespace Laundry_Online_Web_FE
         //    {
         //        if (context.Session["employee"] == null)
         //        {
-        //            context.Response.RedirectToRoute(new { controller = "Admin", action = "Login" });
+        //            context.Response.RedirectToRoute(new { controller = "Auth", action = "Login" });
         //            return;
         //        }
 

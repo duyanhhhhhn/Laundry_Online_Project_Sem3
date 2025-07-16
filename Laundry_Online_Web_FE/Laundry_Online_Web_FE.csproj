@@ -352,6 +352,19 @@
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_31f0e.png" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_41f0e.png" />
     <Content Include="Content\Client\images\638877624178554009_images.jpg" />
+    <Content Include="Content\Client\images\chatluong.png" />
+    <Content Include="Content\Client\images\feature_search_image_1.svg" />
+    <Content Include="Content\Client\images\feature_search_image_2.svg" />
+    <Content Include="Content\Client\images\feature_search_image_3.svg" />
+    <Content Include="Content\Client\images\feature_search_image_4.svg" />
+    <Content Include="Content\Client\images\giaoh.png" />
+    <Content Include="Content\Client\images\hoantien.jpg" />
+    <Content Include="Content\Client\images\logo811e.png" />
+    <Content Include="Content\Client\images\step_11f0e.png" />
+    <Content Include="Content\Client\images\step_21f0e.png" />
+    <Content Include="Content\Client\images\step_31f0e.png" />
+    <Content Include="Content\Client\images\step_41f0e.png" />
+    <Content Include="Content\Client\images\thanhtoan.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-19b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-29b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-39b10.jpg" />
@@ -582,6 +595,7 @@
     <Content Include="Views\Blog\BlogPostList.cshtml" />
     <Content Include="Views\Blog\createBlogPost.cshtml" />
     <Content Include="Views\Admin\Admin_edit_BlogPost.cshtml" />
+    <Content Include="Views\Admin\Admin_edit_employee.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />

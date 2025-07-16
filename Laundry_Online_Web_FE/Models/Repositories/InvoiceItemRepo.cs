@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews;
 
@@ -26,6 +27,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
         {
             _context = new OnlineLaundryEntities();
         }
+
         public List<InvoiceItemView> GetAll()
         {
             try
@@ -49,7 +51,34 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error retrieving invoice items: " + ex.Message);
 
             }
+
         }
+        public List<InvoiceItem> GetListItemHasInvoiceOrderStatus()
+        {
+            try
+            {
+                var itemsList = _context.InvoiceItems.ToList();
+                var listInvoice = InvoiceRepository.Instance.GetAll();
+
+                var result = itemsList
+                    .Where(item =>
+                        listInvoice.Any(inv => inv.Id == item.invoice_id && inv.Order_Status > 0))
+                    .ToList();
+
+                return result;
+                // var result = itemsList // nếu muốn thêm điêu kiện item_status == 0
+                //.Where(item =>
+                //    item.item_status == 0 &&
+                //    listInvoice.Any(inv => inv.Id == item.invoice_id && inv.Order_Status > 0))
+                //.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving invoice items with order status: " + ex.Message);
+            }
+        }
+
+
         public InvoiceItemView GetInvoiceItemById(int id)
         {
             try
@@ -148,7 +177,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error deleting invoice item: " + ex.Message);
             }
         }
-        public InvoiceItemView GetItemByBarCode(string barcode) 
+        public InvoiceItemView GetItemByBarCode(string barcode)
         {
             try
             {

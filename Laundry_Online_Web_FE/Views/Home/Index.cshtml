@@ -3,22 +3,22 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
+@{ var i = 0;}
 <section class="awe-section-1">
     <div class="section_slider home-slider swiper-container evo-width-slider">
-        <div class="swiper-wrapper">
-
+        <div class="swiper-wrapper">    
             <div class="swiper-slide">
                 <a href="@Url.Action("Index")" class="clearfix" title="Bảng giá các dịch vụ Washintown">
                     <picture>
                         <source media="(min-width: 1200px)"
-                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929">
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_1811e.jpg">
                         <source media="(min-width: 992px)"
-                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929">
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_2811e.jpg">
                         <source media="(min-width: 569px)"
-                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929">
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/slider_3811e.jpg">
                         <source media="(max-width: 480px)"
-                                srcset="@Url.Content("~/content/client/")thumb/large/100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929">
-                        <img width="1808" height="600" src="@Url.Content("~/content/client/")thumb/large/100/431/113/themes/826533/assets/slider_1811e.jpg?1751540074929"
+                                srcset="@Url.Content("~/content/client/")thumb/large/100/431/113/themes/826533/assets/slider_4811e.jpg">
+                        <img width="1808" height="600" src="@Url.Content("~/content/client/")thumb/large/100/431/113/themes/826533/assets/slider_5811e.jpg"
                              alt="Bảng giá các dịch vụ Washintown" />
                     </picture>
                 </a>
@@ -97,52 +97,44 @@
     <div class="section_search_feature container">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-6 item item-1">
-                <div class="img">
-                    <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_1.svg?1751540074929" alt="Miễn phí vận chuyển" />
+                <div class="icon-wrapper">
+                    <img class="lazy" width="100" height="100" src="@Url.Content("~/Content/Client/Images/feature_search_image_1.svg")" alt="Logo">
                 </div>
                 <div class="detail">
-                    <a href="chinh-sach-giao-nhan.html" title="Miễn phí vận chuyển">Miễn phí vận chuyển</a>
-                    <p>Miễn phí vận chuyển với đơn hàng trên 200.000đ (*) Áp dụng khu vực Quận 7</p>
+                    <a href="" title="Miễn phí vận chuyển">Free Shipping</a>
+                    <p>Free shipping for orders over 200,000 VND (*) Applicable in District 1 only</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-3 col-6 item item-2">
-                <div class="img">
-                    <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_2.svg?1751540074929" alt="Trả 0đ khi không hài lòng" />
+                <div class="icon-wrapper">
+                    <img class="lazy" width="100" height="100" src="@Url.Content("~/Content/Client/Images/feature_search_image_2.svg")" alt="Trả 0đ khi không hài lòng" />
                 </div>
                 <div class="detail">
-                    <a href="#" title="Trả 0đ khi không hài lòng">Trả 0đ khi không hài lòng</a>
-                    <p>Nếu không hài lòng về dịch vụ và chất lượng chúng tôi sẽ không tính phí.</p>
+                    <a href="#" title="Trả 0đ khi không hài lòng">No charge if you're not satisfied</a>
+                    <p>No charge if you're not satisfied with our service and quality.</p>
                 </div>
+
             </div>
-
-
-
-
-
             <div class="col-lg-3 col-md-3 col-6 item item-3">
-                <div class="img">
-                    <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_3.svg?1751540074929" alt="Bảo hành chất lượng" />
+                <div class="icon-wrapper">
+                    <img class="lazy" width="100" height="100" src="@Url.Content("~/Content/Client/Images/feature_search_image_3.svg")" alt="Bảo hành chất lượng" />
                 </div>
                 <div class="detail">
-                    <a href="#" title="Bảo hành chất lượng">Bảo hành chất lượng</a>
-                    <p>Cam kết bảo hành chất lượng sản phẩm sau khi chăm sóc, phục hồi.</p>
+                    <a href="#" title="Bảo hành chất lượng">Quality Guarantee</a>
+                    <p>We guarantee the quality of the product after care and restoration.</p>
                 </div>
+
             </div>
-
-
-
-
-
             <div class="col-lg-3 col-md-3 col-6 item item-4">
-                <div class="img">
-                    <img class="lazy" width="100" height="100" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_search_image_4.svg?1751540074929" alt="Phương thức thanh toán" />
+                <div class="icon-wrapper">
+                    <img class="lazy" width="100" height="100" src="@Url.Content("~/Content/Client/Images/feature_search_image_4.svg")" alt="Phương thức thanh toán" />
                 </div>
                 <div class="detail">
-                    <a href="#" title="Phương thức thanh toán">Phương thức thanh toán</a>
-                    <p>Hỗ trợ thanh toán qua Momo, Ngân hàng và các cổng thanh toán khác ...</p>
+                    <a href="#" title="Phương thức thanh toán">Payment Methods</a>
+                    <p>Payment is supported via Momo, bank accounts, and various other payment gateways.</p>
+
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -152,49 +144,69 @@
 
 <section class="awe-section-3">
     <div class="container section_banner">
-        <div class="hotdeal-title">Các dịch vụ nổi bật</div>
+        <div class="hotdeal-title">Featured Services</div>
         <div class="e-tabs not-dqtab ajax-tab-0" data-section="ajax-tab-0">
             <ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
+                @foreach (var service in Model.Services)
+                {
+                    if (i <= 3)
+                    {
+                        <li class="tab-link has-content" data-tab="tab-1" data-url="/ve-sinh-sneaker" title="Vệ sinh Sneaker">
+                            <a href="@Url.Action("DetailService", "Home", new { id = service.Id })" />
+                            <span class="imgss">
+
+                                <img class="lazy" src="@Url.Content("~/content/client/")images/@service.Image" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/ve-sinh-giay-sneaker.png?v=1675762173643" alt="Vệ sinh Sneaker" />
+
+                            </span>
+                            @service.Title
+                        </li>
+
+                        i++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                @*<li class="tab-link has-content" data-tab="tab-1" data-url="/ve-sinh-sneaker" title="Vệ sinh Sneaker">
+                        <span class="imgss">
+
+                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/ve-sinh-giay-sneaker.png?v=1675762173643" alt="Vệ sinh Sneaker" />
+
+                        </span>
+                        Vệ sinh Sneaker
+                    </li>
 
 
-                <li class="tab-link has-content" data-tab="tab-1" data-url="/ve-sinh-sneaker" title="Vệ sinh Sneaker">
-                    <span class="imgss">
+                    <li class="tab-link " data-tab="tab-2" data-url="/cham-soc-giay-da" title="Vệ sinh giày da">
+                        <span class="imgss">
 
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/ve-sinh-giay-sneaker.png?v=1675762173643" alt="Vệ sinh Sneaker" />
+                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/cham-soc-giay-da.png?v=1675762145853" alt="Vệ sinh giày da" />
 
-                    </span>
-                    Vệ sinh Sneaker
-                </li>
-
-
-                <li class="tab-link " data-tab="tab-2" data-url="/cham-soc-giay-da" title="Vệ sinh giày da">
-                    <span class="imgss">
-
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/cham-soc-giay-da.png?v=1675762145853" alt="Vệ sinh giày da" />
-
-                    </span>
-                    Vệ sinh giày da
-                </li>
+                        </span>
+                        Vệ sinh giày da
+                    </li>
 
 
-                <li class="tab-link " data-tab="tab-3" data-url="/phuc-hoi-giay" title="Phục hồi giày">
-                    <span class="imgss">
+                    <li class="tab-link " data-tab="tab-3" data-url="/phuc-hoi-giay" title="Phục hồi giày">
+                        <span class="imgss">
 
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/phuc-hoi-giay-copy.png?v=1675762114800" alt="Phục hồi giày" />
+                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/phuc-hoi-giay-copy.png?v=1675762114800" alt="Phục hồi giày" />
 
-                    </span>
-                    Phục hồi giày
-                </li>
+                        </span>
+                        Phục hồi giày
+                    </li>
 
 
-                <li class="tab-link " data-tab="tab-4" data-url="/sua-giay" title="Sửa chữa">
-                    <span class="imgss">
+                    <li class="tab-link " data-tab="tab-4" data-url="/sua-giay" title="Sửa chữa">
+                        <span class="imgss">
 
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/sua-chua-giay-copy.png?v=1675762130743" alt="Sửa chữa" />
+                            <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/thumb/large/100/431/113/collections/sua-chua-giay-copy.png?v=1675762130743" alt="Sửa chữa" />
 
-                    </span>
-                    Sửa chữa
-                </li>
+                        </span>
+                        Sửa chữa
+                    </li>*@
 
             </ul>
 
@@ -366,105 +378,83 @@
     </div>
 </section>
 
-
-
-
 <section class="awe-section-4">
     <section class="section_why">
         <div class="container">
-            <div class="hotdeal-title">Vì sao chọn Washintown</div>
+            <div class="hotdeal-title">Why Us</div>
             <div class="row">
-
-
-
-
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 col-12 col-step">
                     <div class="image_step">
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/step_1.png?1751540074929" alt="Tận tâm" />
+                        <img class="lazy" src="@Url.Content("~/Content/Client/Images/step_11f0e.png")" alt="Tận tâm" />
                     </div>
                     <h3 class="title_step">
-                        Tận tâm
+                        Dedicated
                     </h3>
                     <p>
-                        Đội ngũ tận tâm, nhiệt tình luôn mong muốn mang đến trải nghiệm hài lòng nhất cho khách hàng.
+                        Our dedicated and enthusiastic team is always committed to delivering the most satisfying experience to our customers.
                     </p>
                 </div>
-
-
-
-
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 col-12 col-step">
                     <div class="image_step">
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/step_2.png?1751540074929" alt="Tiện lợi" />
+                        <img class="lazy" src="@Url.Content("~/Content/Client/Images/step_21f0e.png")" alt="Tiện lợi" />
                     </div>
                     <h3 class="title_step">
-                        Tiện lợi
+                        Convenient
                     </h3>
                     <p>
-                        Ngoài yếu tố chất lượng, Washintown luôn đặt tính tiện lợi - linh hoạt trong mọi tình huống.
+                        In addition to quality, we consistently emphasize convenience and flexibility in all situations.
                     </p>
                 </div>
-
-
-
-
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 col-12 col-step">
                     <div class="image_step">
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/step_3.png?1751540074929" alt="Chất lượng" />
+                        <img class="lazy" src="@Url.Content("~/Content/Client/Images/step_31f0e.png")" />
+                        <h3 class="title_step">
+                            Quality
+                        </h3>
+                        <p>
+                            With modern equipment and professional tools, we constantly strive to improve our quality
+                        </p>
                     </div>
-                    <h3 class="title_step">
-                        Chất lượng
-                    </h3>
-                    <p>
-                        Trang thiết bị hiện đại, đồ dùng chuyên nghiệp, chúng tôi luôn không ngừng cải thiện chất lượng tốt hơn.
-                    </p>
                 </div>
-
-
-
-
                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 col-12 col-step">
                     <div class="image_step">
-                        <img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/step_4.png?1751540074929" alt="Đa dạng" />
+                        <img class="lazy" src="@Url.Content("~/Content/Client/Images/step_41f0e.png")" alt="Đa dạng" />
                     </div>
                     <h3 class="title_step">
-                        Đa dạng
+                        Diverse
                     </h3>
                     <p>
-                        Tìm tòi sáng tạo, nâng cấp sản phẩm và tạo ra nhiều sản phẩm mới phục vụ những nhu cầu đa dạng hơn.
+                        We continuously explore and innovate, upgrading our services and creating new ones to meet increasingly diverse customer needs
                     </p>
                 </div>
-
             </div>
-
             <div class="div_about">
                 <div class="row">
-
                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                         <div class="content_dis">
-                            <h2 class="title_module">Trạm chăm sóc giày của Bạn</h2>
+                            <h2 class="title_module">Your Garment Care Station</h2>
                             <div class="about_desc">
                                 <span>
-                                    "Bạn đang tìm một chỗ chuyên vệ sinh - chăm sóc - phục hồi nâng niu giày bạn, với tiêu chí nghề nghiệp trung thực - uy tín - tận tâm phục vụ thì bạn tìm đúng chỗ rồi đó."
+                                    "Looking for a place that specializes in cleaning, caring for, and restoring your beloved clothes — with honesty, professionalism, and heartfelt service as core values? Then you've come to the right place."
                                 </span><br>
-                                Mỗi đôi giày mang đến Town đều có một câu chuyện riêng, sứ mệnh của nó là phục vụ cho đôi chân và quan trọng nhất là kỷ niệm với chủ nhân.<br>
+                                Every piece of clothing brought to us tells its own story. Its mission is not only to cover and protect, but more importantly, to carry your memories and personal moments.<br>
 
-                                Do đó khi giày bạn càng trở nên cũ kỹ xuống cấp, hư hại thì đừng vội thất vọng và xa lánh nó.  Trạm giày Washintown có mặt ở đây sẽ giúp chúng trở về với bạn bằng diện mạo không thể mới hơn, tiếp tục đồng hành và trên hết để lưu giữ những kỷ niệm.
+                                So when your clothes become old, worn out, or damaged — don’t rush to throw them away or forget about them. **We** are here to help bring them back to life with a refreshed appearance, ready to stay by your side — and most importantly, to preserve the memories they hold.
                                 <br>
-                                Với đội ngũ những bạn trẻ yêu thích đam mê giày, luôn tìm tòi phát triển và hoàn thiện những kỹ năng Chúng mình tin chắc sẽ là nơi đến đáng tin cậy cho giày của bạn.
+                                With a team of passionate young people who love garment care and are constantly learning and improving their skills, **we are confident that we’ll be a trusted destination for your clothing.
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                         <div class="section content_video">
                             <div class=" section banner_video">
-                                <img class="lazy img-responsive" src="data:image/png;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/about_video.jpg?1751540074929" alt="Washintown" />
+                                <img class="lazy img-responsive" src="@Url.Content("~/Content/Client/Images/about.jpg")" alt="Washintown" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
+        </div>
         </div>
     </section>
 </section>
@@ -492,19 +482,19 @@
                         <h3>Us Service</h3>
                     </div>
 
-                    <a href="ve-sinh-cham-soc-giay.html" title="Chăm sóc phục hồi giày" class="d-none d-lg-block ant-banner-index-product">
-                        <picture>
-                            <source media="(min-width: 1200px)"
-                                    srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
-                            <source media="(min-width: 992px)"
-                                    srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
-                            <source media="(min-width: 569px)"
-                                    srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
-                            <source media="(max-width: 480px)"
-                                    srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_banner_1.jpg?1751540074929" alt="Chăm sóc phục hồi giày" class="lazy img-responsive center-block d-block mx-auto" />
-                        </picture>
-                    </a>
+
+                    <picture>
+                        <source media="(min-width: 1200px)"
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                        <source media="(min-width: 992px)"
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                        <source media="(min-width: 569px)"
+                                srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                        <source media="(max-width: 480px)"
+                                srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_1811e.jpg?1751540074929">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_banner_1.jpg?1751540074929" alt="Chăm sóc phục hồi giày" class="lazy img-responsive center-block d-block mx-auto" />
+                    </picture>
+
                 </div>
                 <div class="col-lg-9">
                     <div class="row">
@@ -533,7 +523,7 @@
                     </div>
 
 
-                        
+
                     <div class="tab-2 tab-content row">
 
                     </div>
@@ -557,9 +547,9 @@
 
 <section class="awe-section-7">
     <div class="container section_banner_evo">
-        <a href="goi-giat-thang-30-kg.html" title="Wsahintown - Giặt Ủi & Giặt Hấp" class="banner-img">
-            <img width="1400" height="392" class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_banner_4.jpg?1751540074929" alt="Wsahintown - Giặt Ủi & Giặt Hấp" />
-        </a>
+
+        <img width="1400" height="392" class="lazy" src="@Url.Content("~/Content/Client/Images/feature_banner.jpg")" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/feature_banner_4.jpg?1751540074929" alt="Wsahintown - Giặt Ủi & Giặt Hấp" />
+
     </div>
 </section>
 
@@ -574,42 +564,19 @@
                     <div class="titlecp clearfix" style="color : blue">
                         <h3>Us Package</h3>
                     </div>
-                    @*<ul class="tabs tabs-title tab-desktop ajax clearfix evo-close">
 
-                        <li class="tab-link has-content" data-tab="tab-1" data-url="/giat-say">
-                            <span title="Giặt sấy nhanh">Giặt sấy nhanh</span>
-                        </li>
+                    <picture>
+                        <source media="(min-width: 1200px)"
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_2811e.png?1751540074929">
+                        <source media="(min-width: 992px)"
+                                srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_2811e.png?1751540074929">
+                        <source media="(min-width: 569px)"
+                                srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_2811e.jpg?1751540074929">
+                        <source media="(max-width: 480px)"
+                                srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_2811e.jpg?1751540074929">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_banner_2.jpg?1751540074929" alt="giat-ui-giat-hap" class="lazy img-responsive center-block d-block mx-auto" />
+                    </picture>
 
-                        <li class="tab-link " data-tab="tab-2" data-url="/combo-goi-giat">
-                            <span title="Combo gói giặt">Combo gói giặt</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-3" data-url="/giat-hap-cao-cap">
-                            <span title="Giặt hấp cao cấp">Giặt hấp cao cấp</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-4" data-url="/giat-chan-men-lon">
-                            <span title="Giặt chăn mền lớn">Giặt chăn mền lớn</span>
-                        </li>
-
-                        <li class="tab-link " data-tab="tab-5" data-url="/ve-sinh-nha-cua">
-                            <span title="Vệ sinh nhà cửa">Vệ sinh nhà cửa</span>
-                        </li>
-
-                    </ul>*@
-                    <a href="giat-ui-giat-hap.html" title="giat-ui-giat-hap" class="d-none d-lg-block ant-banner-index-product">
-                        <picture>
-                            <source media="(min-width: 1200px)"
-                                    srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_2811e.png?1751540074929">
-                            <source media="(min-width: 992px)"
-                                    srcset="@Url.Content("~/content/client/")100/431/113/themes/826533/assets/evo_block_product_banner_2811e.png?1751540074929">
-                            <source media="(min-width: 569px)"
-                                    srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_2811e.jpg?1751540074929">
-                            <source media="(max-width: 480px)"
-                                    srcset="@Url.Content("~/content/client/")thumb/pico/100/431/113/themes/826533/assets/evo_block_product_banner_2811e.jpg?1751540074929">
-                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-src="//bizweb.dktcdn.net/100/431/113/themes/826533/assets/evo_block_product_banner_2.jpg?1751540074929" alt="giat-ui-giat-hap" class="lazy img-responsive center-block d-block mx-auto" />
-                        </picture>
-                    </a>
                 </div>
                 <div class="col-lg-9">
                     <div class="row">
@@ -1027,7 +994,38 @@
         </div>
     </div>
 </section>
+<style>
+    .icon-wrapper {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin: 0 auto;
+    }
 
+        .icon-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px dashed #87CEFA; /* nét gạch đứt, xanh dương nhạt */
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .icon-wrapper img {
+            width: 100px;
+            height: 100px;
+            z-index: 1;
+        }
+</style>
 
 @Html.Partial("Client/_PartialFooter")
 

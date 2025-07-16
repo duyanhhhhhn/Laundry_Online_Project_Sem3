@@ -14,7 +14,7 @@ namespace Laundry_Online_Web_FE.Controllers
         public ActionResult Index()
         {
             return View();
-        }
+        }        
         public ActionResult InVoiceItemList()
         {
             var items = InvoiceItemRepo.Instance.GetAll(); //list<>

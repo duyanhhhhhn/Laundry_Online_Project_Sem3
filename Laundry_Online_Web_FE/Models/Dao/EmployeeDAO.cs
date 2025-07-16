@@ -14,7 +14,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
         private static readonly object _lock = new object();
         private static EmployeeDAO _instance = null;
         private EmployeeDAO() { }
-
         public static EmployeeDAO Instance
         {
             get
@@ -226,7 +225,13 @@ namespace Laundry_Online_Web_FE.Models.Dao
             {
                 using (var en = new Entities.OnlineLaundryEntities())
                 {
-                    var emp = en.Employees.Find(id);
+                    var emp = en.Employees.FirstOrDefault(e => e.employee_id == id);
+                    var isAdmin = en.Employees.FirstOrDefault(e => e.employee_id == id && e.role == 1);
+                    if (isAdmin != null && emp != null && emp.active == 0)
+                    {
+                        Debug.WriteLine("Cannot deactivate admin account!");
+                        return false;
+                    }
                     if (emp != null)
                     {
                         emp.active = emp.active == 1 ? 0 : 1;

@@ -82,7 +82,6 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 {
                     var service = db.Services.FirstOrDefault(s => s.s_id == id);
                     if (service == null) return false;
-
                     service.s_active = 0;
                     db.SaveChanges();
                     return true;
