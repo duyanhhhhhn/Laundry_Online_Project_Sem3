@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
 
@@ -14,11 +15,29 @@ namespace Laundry_Online_Web_FE.Controllers
         public ActionResult Index()
         {
             return View();
-        }        
+        }
+        [Route("Admin/InvoiceItemList")]
+
         public ActionResult InVoiceItemList()
         {
-            var items = InvoiceItemRepo.Instance.GetAll(); //list<>
-            return View(items);
+            // Lấy danh sách tất cả các InvoiceItem từ kho dữ liệu
+            var model = InvoiceItemRepo.Instance.GetAll(); //list<>
+            var serviceList = ServiceRepository.Instance.All(); // lấy danh sách dịch vụ
+            // Kết hợp thông tin dịch vụ vào từng InvoiceItem
+            foreach (var item in model)
+            {
+                var service = serviceList.FirstOrDefault(s => s.Id == item.ServiceId);
+                if (service != null)
+                {
+                    item.ItemName = service.Title; // Gán tên dịch vụ vào ItemName
+                    item.UnitPrice = service.Price ?? 0; // Gán giá dịch vụ vào UnitPrice
+                }
+            }
+            // Trả về view với danh sách InvoiceItem đã kết hợp thông tin dịch vụ
+            ViewBag.ServiceList = serviceList; // Lưu danh sách dịch vụ vào ViewBag để sử dụng trong view
+            var invoiceList = InvoiceRepository.Instance.GetAll();
+            ViewBag.InvoiceList = invoiceList; // Lưu danh sách hóa đơn vào ViewBag
+            return View(model);
         }
         public ActionResult Details(int id)
         {

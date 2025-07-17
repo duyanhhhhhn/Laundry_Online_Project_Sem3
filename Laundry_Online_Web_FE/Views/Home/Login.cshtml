@@ -14,9 +14,7 @@
 @Html.Partial("Client/_PartialBreadCrumb")
 
 <div class="container margin-bottom-20 margin-top-30">
-    <div class="d-none">
-        <h1 class="title-head">Đăng nhập tài khoản</h1>
-    </div>
+    <h1 class="d-none">Login</h1>
     <div class="row justify-content-md-center">
         <div class="col-lg-5 col-md-12">
             <div class="page-login account-box-shadow">
@@ -24,15 +22,15 @@
                     <div class="evo-account-content">
                         <ul class="auth-block__menu-list">
                             <li class="active">
-                                <a href="#" title="Đăng nhập">Login</a>
+                                <a href="" title="Đăng nhập">Login</a>
                             </li>
                             <li>
                                 <a href="@Url.Action("Register", "Home")" title="Đăng ký">Register</a>
                             </li>
                         </ul>
                         <div id="evo-login">
-                            <form method="post" action="@Url.Action("CheckCustomer","Auth")" accept-charset="UTF-8">
-                                <input name="FormType" type="hidden" value="customer_login" /><input name="utf8" type="hidden" value="true" />
+                            <form method="post" action="@Url.Action("CheckCustomer","Auth")" id="login" accept-charset="UTF-8">
+                                <input name="FormType" type="hidden" value="customer_login" />
                                 <div class="form-signup">
 
                                 </div>
@@ -74,11 +72,7 @@
         document.getElementById('recover-password').style.display = 'none';
         document.getElementById('evo-login').style.display = 'block';
     }
-
-
 </script>
-
-
 
 @Html.Partial("Client/_PartialFooter")
 

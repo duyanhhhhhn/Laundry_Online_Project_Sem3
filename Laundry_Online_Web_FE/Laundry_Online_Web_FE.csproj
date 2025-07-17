@@ -596,6 +596,7 @@
     <Content Include="Views\Blog\createBlogPost.cshtml" />
     <Content Include="Views\Admin\Admin_edit_BlogPost.cshtml" />
     <Content Include="Views\Admin\Admin_edit_employee.cshtml" />
+    <Content Include="Views\InvoiceItem\InVoiceItemList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />
@@ -612,7 +613,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Barcodes\" />
-    <Folder Include="Views\InvoiceItem\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

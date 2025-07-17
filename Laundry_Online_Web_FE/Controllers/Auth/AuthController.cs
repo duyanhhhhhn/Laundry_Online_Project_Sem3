@@ -37,7 +37,7 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
             }
             else
             {
-                ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
+                TempData["ErrorMessage"] = "Phone number or password is wrong!.";
                 return View("Login_Employee");
             }
         }
@@ -57,8 +57,8 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
             else
             {
                 // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
-                ViewBag.ErrorMessage = "Số điện thoại hoặc mật khẩu không đúng.";
-                return View("Login","Home");
+                ViewBag.ErrorMessage = "Phone number or password is wrong!";
+                return RedirectToAction("Login","Home");
             }
         }
         public ActionResult AdminLogout()

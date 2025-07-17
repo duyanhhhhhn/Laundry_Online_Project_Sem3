@@ -78,7 +78,6 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             }
         }
 
-
         public InvoiceItemView GetInvoiceItemById(int id)
         {
             try
