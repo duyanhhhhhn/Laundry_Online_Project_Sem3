@@ -170,7 +170,6 @@
     <Compile Include="Controllers\Auth\AuthController.cs" />
     <Compile Include="Controllers\BlogController.cs" />
     <Compile Include="Controllers\BookingController.cs" />
-    <Compile Include="Controllers\CustomerPackageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InvoiceItemController.cs" />
     <Compile Include="Global.asax.cs">
@@ -221,6 +220,9 @@
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Service.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
