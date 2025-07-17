@@ -228,6 +228,7 @@
     <Compile Include="Models\Libraries\VnPayLibrary_backup.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceForm.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceItemForm.cs" />
+    <Compile Include="Models\ModelViews\DTO\PayPackageInfor.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\Payments\PaymentInformation.cs" />
     <Compile Include="Models\ModelViews\Payments\PaymentResponseModel.cs" />
@@ -589,6 +590,7 @@
     <Content Include="Views\Checkout\PaymentSuccessAdmin.cshtml" />
     <Content Include="Views\Checkout\PayInvoice.cshtml" />
     <Content Include="Views\Checkout\PaymentFailedAdmin.cshtml" />
+    <Content Include="Views\Checkout\PayPackage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />

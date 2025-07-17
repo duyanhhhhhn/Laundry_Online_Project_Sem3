@@ -519,5 +519,21 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 System.Diagnostics.Debug.WriteLine("Error saving invoice items: " + ex.Message);
             }
         }
+        [HttpGet]
+        [Route("SearchCustomer")]
+        public ActionResult SearchCustomer(string term)
+        {
+            var customers = _customerRepository.GetAll()
+                .Where(c => (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())
+                         || c.PhoneNumber.Contains(term))
+                .Select(c => new
+                {
+                    id = c.Id,
+                    text = $"{c.FirstName} {c.LastName} - {c.PhoneNumber}"
+                }).ToList();
+
+            return Json(customers, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

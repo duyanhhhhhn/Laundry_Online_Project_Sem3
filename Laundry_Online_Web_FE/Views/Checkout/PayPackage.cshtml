@@ -1,0 +1,30 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.DTO.PayPackageInfor
+@{
+    ViewBag.Title = "PayPackage";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2 class="mb-4">Thanh toán gói dịch vụ</h2>
+
+<div class="card p-4">
+    <h4>@Model.Package_Name</h4>
+    <p><strong>Mô tả:</strong> @Model.Description</p>
+    <p><strong>Giá:</strong> @Model.Price.ToString("N0") VND</p>
+    <p><strong>Giá trị:</strong> @Model.Value @Model.Unit</p>
+    <p><strong>Thời hạn:</strong> @Model.Validity_Day ngày</p>
+
+    <hr />
+
+    <h5>Thông tin khách hàng</h5>
+    <p><strong>Họ tên:</strong> @Model.Customer_Name</p>
+    <p><strong>SĐT:</strong> @Model.Customer_Phone</p>
+
+    <form action="/Payment/CreatePaymentUrlVnpay">
+        <input type="hidden" name="Name" value="@Model.Package_Name"/>
+        <input type="hidden" name="Amount" value="@Model.Price" />
+        <input type="hidden" name="OrderDescription" value="" />
+        <input type="hidden" name="OrderType" value="other" />
+        <button type="submit" class="btn btn-primary mt-3">Thanh toán ngay</button>
+        <a href="@Url.Action("Index", "CustomerPackage")" class="btn btn-secondary mt-3">Quay lại</a>
+    </form>
+</div>
