@@ -35,8 +35,9 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                return _context.Invoices
-                    .Select(i => new InvoiceView 
+                var data = _context.Invoices
+                    .OrderByDescending(i => i.invoice_id) // 👉 Sắp xếp theo ID mới nhất
+                    .Select(i => new InvoiceView
                     {
                         Id = i.invoice_id,
                         Customer_Id = i.customer_id,
@@ -54,7 +55,10 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                         Notes = i.notes ?? "",
                         Ship_Cost = i.ship_cost ?? 0,
                         Delivery_Status = i.delivery_status ?? 0
-                    }).ToHashSet();
+                    })
+                    .ToHashSet();
+
+                return data;
             }
             catch (Exception ex)
             {
@@ -62,6 +66,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return new HashSet<InvoiceView>();
             }
         }
+
 
         public InvoiceView GetById(int id)
         {
