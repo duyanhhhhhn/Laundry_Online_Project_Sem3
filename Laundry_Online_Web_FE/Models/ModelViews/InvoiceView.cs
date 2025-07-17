@@ -24,6 +24,8 @@ namespace Laundry_Online_Web_FE.Models.ModelViews
         public string Notes { get; set; } = "";
         public decimal Ship_Cost { get; set; } = 0m;
         public int Delivery_Status { get; set; } = 0;
+        public string CustomerName { get; set; } = "";
+        public string CustomerPhone { get; set; } = "";
     }
 
 }
