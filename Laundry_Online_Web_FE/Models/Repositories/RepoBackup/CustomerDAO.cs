@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 
 namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
 {
@@ -480,6 +482,45 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                 Debug.WriteLine("Login Customer Error: " + ex.Message);
             }
             return null;
+        }
+        public CustomerDetailModel GetCustomerDetail(int customerId)
+        {
+            var customer = GetCustomerById(customerId);
+
+            // Lấy danh sách hóa đơn theo Customer_Id
+            var invoices = InvoiceRepository.Instance.GetAll()
+                .Where(i => i.Customer_Id == customerId)
+                .ToList();
+
+            // Lấy danh sách gói dịch vụ theo Customer_Id
+            var customerPackages = CustomerPackageRepository.Instance.GetAll()
+                .Where(cp => cp.Customer_Id == customerId)
+                .ToList();
+
+            // Gộp thêm tên gói từ PackageRepo
+            var customerPackageDetails = customerPackages.Select(cp =>
+            {
+                var package = PackageRepository.Instance.GetById(cp.Package_Id);
+                return new CustomerPackageDetailView
+                {
+                    Id = cp.Id,
+                    Customer_Id = cp.Customer_Id,
+                    Package_Id = cp.Package_Id,
+                    Package_Name = package?.Package_Name ?? "",
+                    Date_Start = cp.Date_Start,
+                    Date_End = cp.Date_End,
+                    Value = cp.Value,
+                    Unite = package.Unit,
+                    Payment_Id = cp.Payment_Id,
+                };
+            }).ToList();
+
+            return new CustomerDetailModel
+            {
+                Customer = customer,
+                Invoices = invoices,
+                CustomerPackages = customerPackageDetails
+            };
         }
 
     }

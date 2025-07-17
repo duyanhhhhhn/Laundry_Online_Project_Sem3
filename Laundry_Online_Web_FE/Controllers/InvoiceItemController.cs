@@ -85,6 +85,22 @@ namespace Laundry_Online_Web_FE.Controllers
             item.BarCode = string.Join("|", barcodeList);
         }
 
+        //chuyển đổi mã vạch sang ảnh PNG và lưu vào thư mục
+        public ActionResult GenerateBarcodeImage(int invoiceItemId)
+        {
+            var item = InvoiceItemRepo.Instance.GetInvoiceItemById(invoiceItemId);
+            if (item == null || string.IsNullOrEmpty(item.BarCode))
+                return HttpNotFound();
+            // Tách các mã vạch từ chuỗi
+            var barcodeList = item.BarCode.Split('|').ToList();
+            foreach (var code in barcodeList)
+            {
+                var barcodeData = BarcodeHelper.GenerateBarcode(code);
+                BarcodeHelper.SaveBarcodeToFile(code, barcodeData);
+            }
+            return RedirectToAction("Details", new { id = item.Id });
+        }
+
         // Xuất PDF chứa tất cả barcode của một item
         public ActionResult PrintBarcodes(int InvoiceItemId) // xuất ra file PDF
         {
@@ -102,7 +118,6 @@ namespace Laundry_Online_Web_FE.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public ActionResult ScanBarcodeForm(string scannedCode)
         {
@@ -114,6 +129,51 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             return RedirectToAction("Details", new { id = item.Id });
         }
+        [Route("Admin/ItemDetail/{invoiceId:int}", Name = "Admin_ItemDetail")]
+        public ActionResult ItemDetail(int invoiceId)
+        {
+            // Lấy danh sách InvoiceItem theo InvoiceId
+            var model = InvoiceItemRepo.Instance.GetItemsByInvoiceId(invoiceId);
+            if (model == null)
+            {
+                return HttpNotFound("Not found Item.");
+            }
+            return View(model);
+        }
+        // Hiển thị danh sách mã vạch của một Invoice
+        [Route("Admin/BarcodeList/{invoiceId:int}", Name = "Admin_BarcodeList")]
+        public ActionResult BarcodeList(int invoiceId) 
+        {
+            // Lấy danh sách InvoiceItem theo InvoiceId
+            var model = InvoiceItemRepo.Instance.GetItemsByInvoiceId(invoiceId);
+            if (model == null || !model.Any())
+            {
+                return HttpNotFound("No found item by this invoice.");
+            }
+            // Tạo danh sách mã vạch từ các InvoiceItem
+            var barcodeList = new List<string>();
+            foreach (var item in model)
+            {
+                if (!string.IsNullOrEmpty(item.BarCode))
+                {
+                    barcodeList.AddRange(item.BarCode.Split('|'));
+                }
+            }
+            if (!barcodeList.Any())
+            {
+                return HttpNotFound("No Barcode for this invoice Item.");
+            }
+            //lấy list ảnh barcode
+            foreach (var code in barcodeList)
+            {
+                var barcodeData = BarcodeHelper.GenerateBarcode(code);
+                BarcodeHelper.SaveBarcodeToFile(code, barcodeData);
+            }
+            var Invoice = InvoiceRepository.Instance.GetById(invoiceId);
+            ViewBag.Invoice = Invoice; // Lưu thông tin hóa đơn vào ViewBag
+            ViewBag.InvoiceItem = model; // Lưu danh sách InvoiceItem vào ViewBag
+            ViewBag.ImageBC = barcodeList.Select(code => Url.Content($"~/Content/Barcodes/{code}.png")).ToList(); // Lưu đường dẫn ảnh mã vạch vào ViewBag
+            return View(barcodeList);
+        }
     }
-
 }

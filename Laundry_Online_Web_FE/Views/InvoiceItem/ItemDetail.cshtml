@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "ItemDetail";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@model IEnumerable<Laundry_Online_Web_FE.Models.ModelViews.InvoiceItemView>
+@if (Model != null)
+{
+    var i = 1;
+    var invoiceId = 0;
+    <h2>InvoiceId_item</h2>
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>Name Item</th>
+                            <th>Unit Price</th>
+                            <th>Barcode</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.ItemName</td>
+                                <td>@item.UnitPrice.ToString("C")</td>
+                                <td>@item.BarCode</td>
+                                <td>
+                                    @if (item.ItemStatus == 1)
+                                    {
+                                        <span class="text-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">Inactive</span>
+                                    }
+                                </td>
+                            </tr>
+                            invoiceId = item.InvoiceId;
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a href="@Url.RouteUrl("Admin_BarcodeList", new { invoiceId })" class="btn btn-secondary">Go to Barcode List</a>
+    </div>
+
+    
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        No data available.
+    </div>
+}

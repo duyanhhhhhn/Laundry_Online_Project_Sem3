@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.ModelViews;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.Repositories.RepoBackup;
+using CustomerDAO = Laundry_Online_Web_FE.Models.Repositories.RepoBackup.CustomerDAO;
 
 namespace Laundry_Online_Web_FE.Models.Repositories
 {
@@ -88,6 +92,10 @@ namespace Laundry_Online_Web_FE.Models.Repositories
         public CustomerView LoginCustomer(string phoneNumber, string password)
         {
             return CustomerDAO.Instance.LoginCustomer(phoneNumber, password);
+        }
+        public CustomerDetailModel GetCustomerDetailById(int id)
+        {
+            return CustomerDAO.Instance.GetCustomerDetail(id);
         }
     }
 }

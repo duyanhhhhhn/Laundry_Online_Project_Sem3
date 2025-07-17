@@ -203,5 +203,29 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error found invoice item: " + ex.Message);
             }
         }
+        public List<InvoiceItemView> GetItemsByInvoiceId(int invoiceId)
+        {
+            try
+            {
+                return _context.InvoiceItems
+                    .Where(ii => ii.invoice_id == invoiceId)
+                    .Select(ii => new InvoiceItemView
+                    {
+                        Id = ii.item_id,
+                        InvoiceId = ii.invoice_id,
+                        ItemName = ii.item_name,
+                        Quantity = ii.quantity,
+                        UnitPrice = ii.unit_price,
+                        SubTotal = ii.sub_total,
+                        BarCode = ii.barcode,
+                        ItemStatus = ii.item_status ?? 0,
+                        ServiceId = ii.s_id ?? 0
+                    }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving items by invoice ID: " + ex.Message);
+            }
+        }
     }
 }

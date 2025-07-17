@@ -377,5 +377,14 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return View(blog);
         }
+        public ActionResult CustomerDetail(int id)
+        {
+            var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            return View(customer);
+        }
     }
 }

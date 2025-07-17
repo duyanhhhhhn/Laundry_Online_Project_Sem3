@@ -1,0 +1,170 @@
+﻿
+@{
+    ViewBag.Title = "CustomerDetail";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@model Laundry_Online_Web_FE.Models.ModelViews.DTO.CustomerDetailModel
+@if (Model != null)
+{
+    var i = 1;
+    var j = 1;
+    <div class="container bootstrap snippets bootdey">
+        <div class="row ng-scope">
+            <div class="col-md-3">
+                <div class="panel panel-default">
+                    <div class="panel-body text-center">
+
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">@Model.Customer.FirstName @Model.Customer.LastName</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-md-5 font-weight-bold">Phone</div>
+                                    <div class="col-md-7">@Model.Customer.PhoneNumber</div>
+                                </div>
+                                <div class="border-top pt-2 mt-2 row">
+                                    <div class="col-md-5 font-weight-bold">Address</div>
+                                    <div class="col-md-7">@Model.Customer.Address</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="panel panel-default hidden-xs hidden-sm">
+                    <div class="panel-heading">
+                        <div class="panel-title text-center"><h3>@Model.Customer.LastName's Package</h3></div>
+                    </div>
+                    <div class="panel-body">
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Stt</th>
+                                    <th>Name Package</th>
+                                    <th>Date_Start</th>
+                                    <th>Date_End</th>
+                                    <th>Value</th>
+                                    <th>Unit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var cp in Model.CustomerPackages)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>
+                                            @cp.Package_Name <a href="@Url.Action("AdminDetail", new {Id = cp.Package_Id } )">
+                                                <i class="bi-pencil"></i>
+                                            </a>
+                                        </td>
+                                        <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
+                                        <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
+                                        <td>@cp.Value</td>
+                                        <td>@cp.Unite</td>
+                                        <td>
+                                            <a href="@Url.Action("", new { Id = cp.Id })">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid px-4 mt-2">
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="h4 text-center">Customer's Ivoice</div>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <a href="@Url.Action("createService")" class="btn btn-success m-0" style="float: right;">New Invoice</a>
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple">
+                            <thead>
+                                <tr>
+                                    <th>Stt</th>
+                                    <th>Order Date</th>
+                                    <th>Confirmation Date</th>
+                                    <th>Total Amount</th>
+                                    <th>Package Name</th>
+                                    <th>Status</th>
+                                    <th>Delivery Date</th>
+                                    <th>Item</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var iv in Model.Invoices)
+                                {
+                                    <tr>
+                                        <td>@j</td>
+                                        <td>@iv.Invoice_Date.ToString("dd/MM/yyyy")</td>
+                                        <td>@iv.Pickup_Date</td>
+                                        <td>@iv.Total_Amount</td>
+                                        <td>
+                                            @foreach (var cp in Model.CustomerPackages)
+                                            {
+                                                if (cp.Id == iv.CustomerPackage_Id)
+                                                {
+                                                    @cp.Package_Name
+                                                    break;
+                                                }
+                                            }
+                                        </td>
+                                        <td>@iv.Status</td>
+                                        <td>
+                                            @iv.Delivery_Date
+                                        </td>
+                                        <th>
+                                            <a href="@Url.RouteUrl("Admin_ItemDetail", new { invoiceId = iv.Id })">
+                                                <i class="bi bi-eye"></i> Item
+                                            </a>
+                                        </th>
+                                    </tr>
+                                    j++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        body {
+            margin-top: 20px;
+            background: #ffffff;
+        }
+
+        .panel.panel-default {
+            border-top-width: 3px;
+        }
+
+        .panel {
+            box-shadow: 0 3px 1px -2px rgba(0,0,0,.14), 0 2px 2px 0 rgba(0,0,0,.098), 0 1px 5px 0 rgba(0,0,0,.084);
+            border: 0;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .thumb96 {
+            width: 96px !important;
+            height: 96px !important;
+        }
+
+        .thumb48 {
+            width: 48px !important;
+            height: 48px !important;
+        }
+    </style>
+}
+
