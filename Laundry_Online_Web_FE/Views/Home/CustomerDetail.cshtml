@@ -39,45 +39,56 @@
                         <div class="panel-title text-center "><h3>@Model.Customer.LastName's Package</h3></div>
                     </div>
                     <div class="panel-body">
-
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Stt</th>
-                                    <th>Image</th>
-                                    <th>Name Package</th>
-                                    <th>Date_Start</th>
-                                    <th>Date_End</th>
-                                    <th>Value</th>
-                                    <th>Unit</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var cp in Model.CustomerPackages)
-                                {
+                        @if (Model.CustomerPackages != null && Model.CustomerPackages.Any())
+                        {
+                            <table class="table table-bordered mt-0">
+                                <thead>
                                     <tr>
-                                        <td>@i</td>
-                                        <td><img src="@Url.Content("~/content/client/")images/@cp.Image" width="50"/><td>
-                                            @cp.Package_Name <a href="@Url.Action("AdminDetail", new {Id = cp.Package_Id } )">
-                                                <i class="bi-pencil"></i>
-                                            </a>
-                                        </td>
-                                        <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
-                                        <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
-                                        <td>@cp.Value</td>
-                                        <td>@cp.Unite</td>
-                                        <td>
-                                            <a href="@Url.Action("", new { Id = cp.Id })">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                        </td>
+                                        <th>Stt</th>
+                                        <th>Image</th>
+                                        <th>Name Package</th>
+                                        <th>Date_Start</th>
+                                        <th>Date_End</th>
+                                        <th>Value</th>
+                                        <th>Unit</th>
+                                        <th>Action</th>
                                     </tr>
-                                    i++;
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>                                 
+                                    @foreach (var cp in Model.CustomerPackages)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>
+                                                <img src="@Url.Content("~/content/client/images/" + cp.Image)" width="50" />
+                                            </td>
+                                            <td>
+                                                @cp.Package_Name
+                                                <a href="@Url.Action("AdminDetail", new { Id = cp.Package_Id })">
+                                                    <i class="bi-pencil"></i>
+                                                </a>
+                                            </td>
+                                            <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
+                                            <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
+                                            <td>@cp.Value</td>
+                                            <td>@cp.Unite</td>
+                                            <td>
+                                                <a href="@Url.Action("", new { Id = cp.Id })">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="text-center ">You haven't subscribed to any package yet.</p>
+                        }
                     </div>
+
                 </div>
             </div>
         </div>
@@ -90,7 +101,7 @@
                     <div class="card-header">
                         
                     </div>
-                    <div class="card-body">
+                    <div class="card-body mt-0">
                         <table id="datatablesSimple">
                             <thead>
                                 <tr>

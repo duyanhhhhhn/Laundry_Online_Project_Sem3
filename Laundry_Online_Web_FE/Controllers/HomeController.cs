@@ -14,6 +14,7 @@ namespace Laundry_Online_Web_FE.Controllers
 {
     public class HomeController : Controller
     {
+        
         public ActionResult Index()
         {
             var services = ServiceRepository.Instance.All();
