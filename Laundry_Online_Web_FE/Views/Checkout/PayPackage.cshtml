@@ -1,0 +1,53 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.DTO.PayPackageInfor
+
+@{
+    ViewBag.Title = "Thanh toán gói dịch vụ";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Thông tin gói dịch vụ</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <!-- Hình ảnh gói -->
+                <div class="col-md-5 text-center">
+                    <img src="@Model.Image" alt="Hình gói" class="img-fluid rounded shadow-sm" style="max-height: 250px;" />
+                </div>
+
+                <!-- Thông tin gói -->
+                <div class="col-md-7">
+                    <h5 class="fw-bold">@Model.Package_Name</h5>
+                    <p><strong>Mô tả:</strong> @Model.Description</p>
+                    <p><strong>Giá:</strong> <span class="text-danger fw-bold">@Model.Price.ToString("N0")</span> VND</p>
+                    <p><strong>Giá trị sử dụng:</strong> @Model.Value @Model.Unit</p>
+                    <p><strong>Thời hạn hiệu lực:</strong> @Model.Validity_Day ngày</p>
+                    <p><strong>Ngày bắt đầu:</strong> @Model.StartDate.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Ngày kết thúc:</strong> @Model.EndDate.ToString("dd/MM/yyyy")</p>
+
+                    <hr />
+                    <h6 class="text-primary">Thông tin khách hàng</h6>
+                    <p><strong>Tên:</strong> @Model.Customer_Name</p>
+                    <p><strong>SĐT:</strong> @Model.Customer_Phone</p>
+
+                    <!-- Form thanh toán -->
+                    <form action="/Payment/CreatePaymentUrlVnpay" method="post" class="mt-4">
+                        <input type="hidden" name="Name" value="@Model.Package_Name" />
+                        <input type="hidden" name="Amount" value="@Model.Price" />
+                        <input type="hidden" name="OrderDescription" value="@Model.Description" />
+                        <input type="hidden" name="OrderType" value="Buy Package" />
+
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="bi bi-credit-card"></i> Thanh toán VNPay
+                        </button>
+                        <a href="@Url.Action("Index", "CustomerPackage")" class="btn btn-secondary">
+                            Quay lại
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

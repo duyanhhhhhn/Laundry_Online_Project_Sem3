@@ -224,9 +224,6 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
@@ -235,6 +232,7 @@
     <Compile Include="Models\Libraries\VnPayLibrary_backup.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceForm.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceItemForm.cs" />
+    <Compile Include="Models\ModelViews\DTO\PayPackageInfor.cs" />
     <Compile Include="Models\ModelViews\GarmentCollectionView.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\Payments\PaymentInformation.cs" />
@@ -609,12 +607,13 @@
     <Content Include="Views\Invoice\Index.cshtml" />
     <Content Include="Views\Invoice\Create.cshtml" />
     <Content Include="Views\Invoice\Edit.cshtml" />
-    <Content Include="Views\Checkout\PaymentSuccessAdmin.cshtml" />
     <Content Include="Views\Checkout\PayInvoice.cshtml" />
-    <Content Include="Views\Checkout\PaymentFailedAdmin.cshtml" />
     <Content Include="Views\Report\DailyCollection.cshtml" />
     <Content Include="Views\Report\GarmentCollection.cshtml" />
     <Content Include="Views\Report\PaymentTypeTotals.cshtml" />
+    <Content Include="Views\Checkout\PayPackage.cshtml" />
+    <Content Include="Views\Checkout\PaymentSuccess.cshtml" />
+    <Content Include="Views\Checkout\PaymentFailed.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
@@ -672,6 +671,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Barcodes\" />
+    <Folder Include="Views\Default\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

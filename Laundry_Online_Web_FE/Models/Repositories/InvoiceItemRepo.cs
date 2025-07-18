@@ -77,7 +77,31 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error retrieving invoice items with order status: " + ex.Message);
             }
         }
-
+        public List<InvoiceItemView> GetInvoiceItemsByInvoiceId(int invoiceId)
+        {
+            try
+            {
+                return _context.InvoiceItems
+                    .Where(ii => ii.invoice_id == invoiceId)
+                    .Select(item => new InvoiceItemView
+                    {
+                        Id = item.item_id,
+                        InvoiceId = item.invoice_id,
+                        ItemName = item.item_name,
+                        Quantity = item.quantity,
+                        UnitPrice = item.unit_price,
+                        SubTotal = item.sub_total,
+                        BarCode = item.barcode,
+                        ItemStatus = item.item_status ?? 0,
+                        ServiceId = item.s_id ?? 0
+                    })
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving invoice items by invoice ID: " + ex.Message);
+            }
+        }
         public InvoiceItemView GetInvoiceItemById(int id)
         {
             try
