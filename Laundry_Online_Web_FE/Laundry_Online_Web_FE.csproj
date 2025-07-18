@@ -655,6 +655,7 @@
     <Content Include="Views\Admin\CustomerDetail.cshtml" />
     <Content Include="Views\InvoiceItem\ItemDetail.cshtml" />
     <Content Include="Views\InvoiceItem\BarcodeList.cshtml" />
+    <Content Include="Views\Home\CustomerDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />

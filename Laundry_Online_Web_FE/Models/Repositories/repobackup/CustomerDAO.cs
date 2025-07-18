@@ -56,8 +56,8 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                         last_name = customer.LastName,
                         phone_number = customer.PhoneNumber,
                         address = customer.Address,
+                        password = BCrypt.Net.BCrypt.HashPassword(customer.Password), // Hash the password before saving
                         registration_date = DateTime.Now,
-
                         active = 1
                     };
                     en.Customers.Add(newCustomer);
@@ -511,6 +511,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                     Value = cp.Value,
                     Unite = package.Unit,
                     Payment_Id = cp.Payment_Id,
+                    Image = package?.Image ?? ""
                 };
             }).ToList();
 
