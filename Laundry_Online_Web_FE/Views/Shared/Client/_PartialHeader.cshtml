@@ -70,7 +70,7 @@
                     <a class="nav-link" href="#" title="Promotions">Promotions</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" title="Shoe Care Tips">Shoe Care Tips</a>
+                    <a class="nav-link" href="@Url.Action("Index","Blog")" title="Shoe Care Tips">Shoe Care Tips</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" title="Contact Us">Contact Us</a>
@@ -88,16 +88,22 @@
                         </a>
                     </li>
                 }
+                <li>
+
+                </li>
 
                 <li class="nav-item evo-header-account ml-auto">
-                    <a href="#" class="nav-link" aria-label="Account" title="Account">
+                    <a href="@(customer != null? Url.Action("CustomerDetail", new { id = customer.Id }): Url.Action("Login", "Home")
+                                )" class="nav-link" aria-label="Account" title="Account">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                         @if (!string.IsNullOrEmpty(name))
                         {
+
                             <span style="margin-left: 5px; color: white;">@name</span>
+
                         }
                     </a>
                     <ul class="account-dropdown">
@@ -121,6 +127,7 @@
                                     Logout
                                 </a>
                             </li>
+
                         }
                         else
                         {
@@ -214,12 +221,14 @@
         .account-dropdown a:hover {
             background-color: #555; /* Màu khi di chuột qua */
         }
+
     .section_banner .ajax-tab-0 .tabs-title .tab-link .imgss img:not(.loaded) {
         opacity: 1 !important;
+        .account-dropdown a svg
 
-        .account-dropdown a svg {
-            margin-right: 8px;
-        }
+    {
+        margin-right: 8px;
+    }
 
     /* CSS cho booking history item */
     .booking-history-item .nav-link {

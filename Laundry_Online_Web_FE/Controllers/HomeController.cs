@@ -14,6 +14,7 @@ namespace Laundry_Online_Web_FE.Controllers
 {
     public class HomeController : Controller
     {
+        
         public ActionResult Index()
         {
             var services = ServiceRepository.Instance.All();
@@ -606,6 +607,21 @@ namespace Laundry_Online_Web_FE.Controllers
                 Packages = packages
             };
             return PartialView("~/Views/Shared/Client/_PartialHeader.cshtml", model);
+        }
+
+        public ActionResult CustomerDetail(int id)
+        {
+            if (Session["customer"] == null)
+            {
+                TempData["Message"] = "Bạn cần đăng nhập để xem thông tin khách hàng.";
+                return RedirectToAction("Login");
+            }
+            var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            return View(customer);
         }
     }
 }

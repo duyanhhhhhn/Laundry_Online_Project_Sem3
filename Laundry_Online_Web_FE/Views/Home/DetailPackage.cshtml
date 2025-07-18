@@ -54,7 +54,7 @@
                                         <h4 class="text-success fw-bold mb-3">@string.Format("{0:N0} $", package.Price)</h4>
                                         <p><strong>Description:</strong></p>
                                         <p class="text-muted">@package.Description</p>
-                                        <a href="" class="btn btn-primary mt-3">
+                                        <a href="@Url.Action("PayPackage","Checkout", new { packageId = package.Id })" class="btn btn-primary mt-3">
                                             <i class="fas fa-shopping-cart"></i> Buy Now
                                         </a>
                                     </div>

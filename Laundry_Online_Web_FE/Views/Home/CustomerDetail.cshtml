@@ -1,8 +1,9 @@
 ﻿
 @{
     ViewBag.Title = "CustomerDetail";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
+
 @model Laundry_Online_Web_FE.Models.ModelViews.DTO.CustomerDetailModel
 @if (Model != null)
 {
@@ -34,48 +35,60 @@
             </div>
             <div class="col-md-9">
                 <div class="panel panel-default hidden-xs hidden-sm">
-                    <div class="panel-heading bg-info">
-                        <div class="panel-title text-center" style="color:white"><h3>@Model.Customer.LastName's Package</h3></div>
+                    <div class="panel-heading bg-warning">
+                        <div class="panel-title text-center "><h3>@Model.Customer.LastName's Package</h3></div>
                     </div>
                     <div class="panel-body">
-                       
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Stt</th>
-                                    <th>Name Package</th>
-                                    <th>Date_Start</th>
-                                    <th>Date_End</th>
-                                    <th>Value</th>
-                                    <th>Unit</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var cp in Model.CustomerPackages)
-                                {
+                        @if (Model.CustomerPackages != null && Model.CustomerPackages.Any())
+                        {
+                            <table class="table table-bordered mt-0">
+                                <thead>
                                     <tr>
-                                        <td>@i</td>
-                                        <td>
-                                            @cp.Package_Name <a href="@Url.Action("AdminDetail", new {Id = cp.Package_Id } )">
-                                                <i class="bi-pencil"></i>
-                                            </a>
-                                        </td>
-                                        <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
-                                        <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
-                                        <td>@cp.Value</td>
-                                        <td>@cp.Unite</td>
-                                        <td>
-                                            <a href="@Url.Action("", new { Id = cp.Id })">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                        </td>
+                                        <th>Stt</th>
+                                        <th>Image</th>
+                                        <th>Name Package</th>
+                                        <th>Date_Start</th>
+                                        <th>Date_End</th>
+                                        <th>Value</th>
+                                        <th>Unit</th>
+                                        <th>Action</th>
                                     </tr>
-                                    i++;
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>                                 
+                                    @foreach (var cp in Model.CustomerPackages)
+                                    {
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>
+                                                <img src="@Url.Content("~/content/client/images/" + cp.Image)" width="50" />
+                                            </td>
+                                            <td>
+                                                @cp.Package_Name
+                                                <a href="@Url.Action("AdminDetail", new { Id = cp.Package_Id })">
+                                                    <i class="bi-pencil"></i>
+                                                </a>
+                                            </td>
+                                            <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
+                                            <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
+                                            <td>@cp.Value</td>
+                                            <td>@cp.Unite</td>
+                                            <td>
+                                                <a href="@Url.Action("", new { Id = cp.Id })">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="text-center ">You haven't subscribed to any package yet.</p>
+                        }
                     </div>
+
                 </div>
             </div>
         </div>
@@ -83,12 +96,12 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-body">
-                <div class="h4 text-center" style="color:blue">Customer's Ivoice</div>
+                <div class="h3 text-center bg-success" style="color:white">@Model.Customer.LastName's Ivoice</div>
                 <div class="card mb-4">
                     <div class="card-header">
-                        <a href="@Url.Action("createService")" class="btn btn-success m-0" style="float: right;">New Invoice</a>
+                        
                     </div>
-                    <div class="card-body">
+                    <div class="card-body mt-0">
                         <table id="datatablesSimple">
                             <thead>
                                 <tr>
@@ -99,7 +112,6 @@
                                     <th>Package Name</th>
                                     <th>Status</th>
                                     <th>Delivery Date</th>
-                                    <th>Item</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,11 +136,6 @@
                                         <td>
                                             @iv.Delivery_Date
                                         </td>
-                                        <th>
-                                            <a href="@Url.RouteUrl("Admin_ItemDetail", new { invoiceId = iv.Id })">
-                                                <i class="bi bi-eye"></i> Item
-                                            </a>
-                                        </th>
                                     </tr>
                                     j++;
                                 }

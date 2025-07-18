@@ -171,6 +171,7 @@
     <Compile Include="Controllers\BlogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InvoiceItemController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -179,8 +180,10 @@
     <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
     <Compile Include="Models\Dao\BlogPostDao.cs" />
+    <Compile Include="Models\Dao\CustomerDAO.cs" />
     <Compile Include="Models\Dao\EmployeeDAO.cs" />
     <Compile Include="Models\Dao\eSmsService.cs" />
+    <Compile Include="Models\Dao\ReportServiceDao.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
     <Compile Include="Models\Entities\BlogPost.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
@@ -221,19 +224,20 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\DailyCollectionView.cs" />
     <Compile Include="Models\ModelViews\DTO\CustomerPackageForm.cs" />
     <Compile Include="Models\Libraries\VnPayLibrary_backup.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceForm.cs" />
     <Compile Include="Models\ModelViews\DTO\InvoiceItemForm.cs" />
+    <Compile Include="Models\ModelViews\DTO\PayPackageInfor.cs" />
+    <Compile Include="Models\ModelViews\GarmentCollectionView.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\Payments\PaymentInformation.cs" />
     <Compile Include="Models\ModelViews\Payments\PaymentResponseModel.cs" />
+    <Compile Include="Models\ModelViews\PaymentTypeCollectionView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\ModelViews\BlogPostView.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
@@ -603,9 +607,13 @@
     <Content Include="Views\Invoice\Index.cshtml" />
     <Content Include="Views\Invoice\Create.cshtml" />
     <Content Include="Views\Invoice\Edit.cshtml" />
-    <Content Include="Views\Checkout\PaymentSuccessAdmin.cshtml" />
     <Content Include="Views\Checkout\PayInvoice.cshtml" />
-    <Content Include="Views\Checkout\PaymentFailedAdmin.cshtml" />
+    <Content Include="Views\Report\DailyCollection.cshtml" />
+    <Content Include="Views\Report\GarmentCollection.cshtml" />
+    <Content Include="Views\Report\PaymentTypeTotals.cshtml" />
+    <Content Include="Views\Checkout\PayPackage.cshtml" />
+    <Content Include="Views\Checkout\PaymentSuccess.cshtml" />
+    <Content Include="Views\Checkout\PaymentFailed.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
@@ -646,6 +654,7 @@
     <Content Include="Views\Admin\CustomerDetail.cshtml" />
     <Content Include="Views\InvoiceItem\ItemDetail.cshtml" />
     <Content Include="Views\InvoiceItem\BarcodeList.cshtml" />
+    <Content Include="Views\Home\CustomerDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />
@@ -662,6 +671,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Barcodes\" />
+    <Folder Include="Views\Default\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
