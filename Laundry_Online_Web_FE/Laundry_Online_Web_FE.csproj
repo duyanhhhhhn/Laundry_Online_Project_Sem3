@@ -169,8 +169,6 @@
     <Compile Include="Controllers\Admin\CustomerController.cs" />
     <Compile Include="Controllers\Auth\AuthController.cs" />
     <Compile Include="Controllers\BlogController.cs" />
-    <Compile Include="Controllers\CustomerPackageController.cs" />
-    <Compile Include="Controllers\BookingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InvoiceItemController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
