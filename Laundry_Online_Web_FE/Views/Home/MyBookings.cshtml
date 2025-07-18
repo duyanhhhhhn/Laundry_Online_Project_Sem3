@@ -29,6 +29,51 @@
                 </div>
             }
 
+            <!-- THÊM: Thông báo quy tắc chỉnh sửa -->
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>Booking Rules:</strong>
+                <ul class="mb-0 mt-2">
+                    <li><strong>New bookings:</strong> Must be scheduled at least <strong>2 hours</strong> in advance</li>
+                    <li><strong>Edit bookings:</strong> Can only be modified up to <strong>12 hours</strong> before appointment time</li>
+                    <li><strong>Auto-cancellation:</strong> Pending bookings will be automatically cancelled <strong>1 hour</strong> after appointment time if not confirmed</li>
+                </ul>
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <!-- Booking Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5><i class="fas fa-chart-bar"></i> Booking Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
+                                    <small class="text-muted">Confirmed</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
+                                    <small class="text-muted">Paid</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
+                                    <small class="text-muted">Cancelled</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if (Model.Count > 0)
             {
                 <div class="table-responsive">
@@ -106,7 +151,7 @@
                                         @if (ViewBag.CanEdit(booking))
                                         {
                                             <a href="@Url.Action("EditBooking", "Home", new { id = booking.Id })"
-                                               class="btn btn-sm btn-primary">
+                                               class="btn btn-sm btn-primary" title="Edit booking (available until 12 hours before appointment)">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
                                         }
@@ -127,7 +172,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <i class="fas fa-clock text-muted"></i> <em>Cannot edit</em>
+                                                    <i class="fas fa-clock text-muted"></i> <em>Cannot edit (less than 12h remaining)</em>
                                                 }
                                             </span>
                                         }
@@ -138,36 +183,7 @@
                     </table>
                 </div>
 
-                <!-- Booking Statistics -->
-                <div class="row mt-4">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header bg-info text-white">
-                                <h5><i class="fas fa-chart-bar"></i> Booking Summary</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row text-center">
-                                    <div class="col-md-3">
-                                        <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
-                                        <small class="text-muted">Pending</small>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
-                                        <small class="text-muted">Confirmed</small>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
-                                        <small class="text-muted">Paid</small>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
-                                        <small class="text-muted">Cancelled</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             }
             else
             {
@@ -183,7 +199,7 @@
                 <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
                     <i class="fas fa-home"></i> Back to Home
                 </a>
-                <a href="@Url.Action("BookService", "Home")" class="btn btn-primary">
+                <a href="@Url.Action("BookService", "Home")" class="btn btn-primary" title="New bookings must be at least 2 hours in advance">
                     <i class="fas fa-calendar-plus"></i> Book New Service
                 </a>
             </div>
@@ -240,5 +256,13 @@
     .badge-danger {
         background-color: #dc3545;
         color: white;
+    }
+
+    .alert-info ul {
+        padding-left: 1.2rem;
+    }
+
+    .alert-info li {
+        margin-bottom: 0.25rem;
     }
 </style>

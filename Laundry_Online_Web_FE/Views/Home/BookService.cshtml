@@ -50,12 +50,32 @@
                 </div>
             </div>
 
+            <!-- THÊM: Thông báo quy tắc đặt lịch -->
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <h5><i class="fas fa-exclamation-triangle"></i> Booking Rules & Important Information</h5>
+                <ul class="mb-0">
+                    <li><strong>Advance booking:</strong> Appointments must be scheduled at least <strong>2 hours</strong> in advance</li>
+                    <li><strong>Editing time:</strong> You can modify your booking up to <strong>12 hours</strong> before the appointment</li>
+                    <li><strong>Auto-cancellation:</strong> Unconfirmed bookings will be automatically cancelled <strong>1 hour</strong> after the scheduled time</li>
+                    <li><strong>Confirmation required:</strong> Please visit our store to confirm your appointment</li>
+                </ul>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
             <form role="form" method="post" id="ant-booking-form" action="@Url.Action("SubmitBooking", "Home")">
                 <!-- STEP 1: Date and Time Selection -->
                 <div class="row setup-content" id="step-1">
                     <div class="col-md-6 col-sm-12 col-12">
                         <div class="time-selection-panel">
                             <h3>Select Time</h3>
+
+                            <!-- THÊM: Reminder về quy tắc 2 tiếng -->
+                            <div class="alert alert-info alert-sm mb-3">
+                                <i class="fas fa-clock"></i>
+                                <small><strong>Reminder:</strong> Please select a time at least 2 hours from now</small>
+                            </div>
 
                             <!-- Time Selection -->
                             <div class="form-group">
@@ -89,6 +109,8 @@
                                 <div class="info-box">
                                     <p><strong>Date:</strong> <span id="selected-date">Not selected</span></p>
                                     <p><strong>Time:</strong> <span id="selected-time">Not selected</span></p>
+                                    <!-- THÊM: Hiển thị thời gian còn lại -->
+                                    <p id="time-remaining" style="display: none;"><strong>Time until appointment:</strong> <span id="time-diff" class="text-info"></span></p>
                                 </div>
                             </div>
                         </div>
@@ -98,6 +120,13 @@
                         <!-- Custom Calendar -->
                         <div class="calendar-panel">
                             <h3>Select Date</h3>
+
+                            <!-- THÊM: Thông báo về ngày -->
+                            <div class="alert alert-info alert-sm mb-3">
+                                <i class="fas fa-calendar-alt"></i>
+                                <small><strong>Note:</strong> You can only select dates from today onwards</small>
+                            </div>
+
                             <div class="custom-calendar">
                                 <div class="calendar-header">
                                     <button type="button" class="calendar-nav prev" onclick="changeMonth(-1)">‹</button>
@@ -135,6 +164,8 @@
                             <div class="summary-content">
                                 <p><strong>Date:</strong> <span id="summary-date"></span></p>
                                 <p><strong>Time:</strong> <span id="summary-time"></span></p>
+                                <!-- THÊM: Hiển thị thời gian còn lại trong summary -->
+                                <p id="summary-time-remaining"><strong>Time until appointment:</strong> <span id="summary-time-diff" class="text-info"></span></p>
                             </div>
                         </div>
 
@@ -156,6 +187,12 @@
                             <div class="form-group">
                                 <label>Notes for booking</label>
                                 <textarea name="Notes" id="notes" class="form-control" rows="6" placeholder="Enter notes if any (optional)"></textarea>
+                            </div>
+
+                            <!-- THÊM: Reminder trong step 2 -->
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Important:</strong> Please visit our store to confirm your booking. Unconfirmed appointments will be automatically cancelled 1 hour after the scheduled time.
                             </div>
 
                             <div class="step-buttons">
@@ -271,6 +308,12 @@
         font-size: 12px;
         line-height: 1.428571429;
         border-radius: 15px;
+    }
+
+    /* THÊM: Style cho alert nhỏ */
+    .alert-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
     }
 
     /* Calendar Styles */
@@ -459,6 +502,16 @@
         border-left: 4px solid #17a2b8;
     }
 
+    /* THÊM: Style cho danh sách trong alert */
+    .alert ul {
+        padding-left: 1.2rem;
+        margin-bottom: 0;
+    }
+
+    .alert li {
+        margin-bottom: 0.25rem;
+    }
+
     /* Responsive Design */
     @@media (max-width: 768px) {
         .stepwizard-step p {
@@ -476,7 +529,7 @@
         }
 
         .alert {
-            text-align: center;
+            text-align: left;
         }
 
         .store-info .alert {
@@ -566,6 +619,59 @@
         updateSelectedInfo();
     }
 
+    // THÊM: Function để tính toán và hiển thị thời gian còn lại
+    function calculateTimeRemaining() {
+        const serviceTime = document.getElementById('serviceTime').value;
+        const serviceDate = document.getElementById('serviceDate').value;
+
+        if (serviceTime && serviceDate) {
+            const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
+            const now = new Date();
+            const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+
+            if (hoursDiff > 0) {
+                const hours = Math.floor(hoursDiff);
+                const minutes = Math.floor((hoursDiff - hours) * 60);
+                let timeText = '';
+
+                if (hours > 24) {
+                    const days = Math.floor(hours / 24);
+                    const remainingHours = hours % 24;
+                    timeText = `${days} day${days > 1 ? 's' : ''} ${remainingHours} hour${remainingHours !== 1 ? 's' : ''}`;
+                } else if (hours > 0) {
+                    timeText = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                } else {
+                    timeText = `${Math.floor(hoursDiff * 60)} minute${Math.floor(hoursDiff * 60) !== 1 ? 's' : ''}`;
+                }
+
+                // Update all time remaining displays
+                document.getElementById('time-diff').textContent = timeText;
+                document.getElementById('time-remaining').style.display = 'block';
+
+                if (document.getElementById('summary-time-diff')) {
+                    document.getElementById('summary-time-diff').textContent = timeText;
+                }
+
+                // Add warning if less than 2 hours
+                if (hoursDiff < 2) {
+                    document.getElementById('time-diff').className = 'text-danger';
+                    if (document.getElementById('summary-time-diff')) {
+                        document.getElementById('summary-time-diff').className = 'text-danger';
+                    }
+                } else {
+                    document.getElementById('time-diff').className = 'text-info';
+                    if (document.getElementById('summary-time-diff')) {
+                        document.getElementById('summary-time-diff').className = 'text-info';
+                    }
+                }
+            } else {
+                document.getElementById('time-remaining').style.display = 'none';
+            }
+        } else {
+            document.getElementById('time-remaining').style.display = 'none';
+        }
+    }
+
     // Update selected info display
     function updateSelectedInfo() {
         const timeValue = document.getElementById('serviceTime').value;
@@ -576,6 +682,9 @@
             selectedDate ? selectedDate.toLocaleDateString('en-US') : 'Not selected';
         document.getElementById('selected-time').textContent =
             timeValue ? timeText : 'Not selected';
+
+        // CẬP NHẬT: Tính toán thời gian còn lại
+        calculateTimeRemaining();
     }
 
     // Step navigation function
@@ -628,7 +737,9 @@
         const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
 
         if (hoursDiff < 2) {
-            alert('Please select a time at least 2 hours from now!');
+            alert('Please select a time at least 2 hours from now!\n\nCurrent time: ' + now.toLocaleString() +
+                  '\nSelected time: ' + selectedDateTime.toLocaleString() +
+                  '\nTime difference: ' + hoursDiff.toFixed(1) + ' hours');
             return false;
         }
 
@@ -661,6 +772,9 @@
         document.getElementById('summary-date').textContent =
             selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
         document.getElementById('summary-time').textContent = timeText;
+
+        // CẬP NHẬT: Update time remaining in summary
+        calculateTimeRemaining();
     }
 
     // Submit booking
