@@ -512,6 +512,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                     Value = cp.Value,
                     Unite = package.Unit,
                     Payment_Id = cp.Payment_Id,
+                    Image = package?.Image ?? ""
                 };
             }).ToList();
 

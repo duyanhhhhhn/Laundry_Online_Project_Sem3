@@ -268,5 +268,20 @@ namespace Laundry_Online_Web_FE.Controllers
             };
             return PartialView("~/Views/Shared/Client/_PartialHeader.cshtml", model);
         }
+
+        public ActionResult CustomerDetail(int id)
+        {
+            if (Session["customer"] == null)
+            {
+                TempData["Message"] = "Bạn cần đăng nhập để xem thông tin khách hàng.";
+                return RedirectToAction("Login");
+            }
+            var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            return View(customer);
+        }
     }
 }

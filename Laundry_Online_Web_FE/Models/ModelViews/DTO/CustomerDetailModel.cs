@@ -26,5 +26,6 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public int Value { get; set; } = 0;
         public string Unite { get; set; } = ""; // Lấy từ PackageView
         public string Payment_Id { get; set; } = "";
+        public string Image { get; set; } = ""; // Lấy từ PackageView
     }
 }
