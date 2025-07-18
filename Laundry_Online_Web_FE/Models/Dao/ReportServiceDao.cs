@@ -26,7 +26,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 viewModel.Summary = (from inv in context.Invoices
                                      where inv.pickup_date.HasValue &&
                                            System.Data.Entity.DbFunctions.TruncateTime(inv.pickup_date.Value) == System.Data.Entity.DbFunctions.TruncateTime(reportDate) &&
-                                           inv.order_status == 1 
+                                           inv.order_status == 2
                                      group inv by System.Data.Entity.DbFunctions.TruncateTime(inv.pickup_date.Value) into g
                                      select new DailyCollectionSummaryModel
                                      {
@@ -43,11 +43,11 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 viewModel.Summary.PaymentTypeBreakdown = (from inv in context.Invoices
                                                           where inv.pickup_date.HasValue &&
                                                                 System.Data.Entity.DbFunctions.TruncateTime(inv.pickup_date.Value) == System.Data.Entity.DbFunctions.TruncateTime(reportDate) &&
-                                                                inv.order_status == 1
+                                                                inv.order_status == 2
                                                           group inv by inv.payment_type into g
                                                           select new PaymentTypeCollectionView
                                                           {
-                                                              PaymentType = (g.Key == 0 ? "Cash" : (g.Key == 1 ? "Vn-Pay" : "Other")),
+                                                              PaymentType = (g.Key == 1 ? "Cash" : (g.Key == 2 ? "Vn-Pay" : "Other")),
                                                               TotalAmount = g.Sum(inv => inv.total_amount),
                                                               Count = g.Count()
                                                           }).ToList();
@@ -56,14 +56,14 @@ namespace Laundry_Online_Web_FE.Models.Dao
                                      join cust in context.Customers on inv.customer_id equals cust.customer_id
                                      where inv.pickup_date.HasValue &&
                                            System.Data.Entity.DbFunctions.TruncateTime(inv.pickup_date.Value) == System.Data.Entity.DbFunctions.TruncateTime(reportDate) &&
-                                           inv.order_status == 1
+                                           inv.order_status == 2
                                      select new DailyCollectionItemModel
                                      {
                                          InvoiceId = inv.invoice_id,
                                          CustomerName = cust.first_name + " " + cust.last_name,
                                          PickupDate = inv.pickup_date.Value,
                                          TotalAmount = inv.total_amount,
-                                         PaymentType = (inv.payment_type == 0 ? "Cash" : (inv.payment_type == 1 ? "Vn-Pay" : "Other")),
+                                         PaymentType = (inv.payment_type == 1 ? "Cash" : (inv.payment_type == 2 ? "Vn-Pay" : "Other")),
                                          Notes = inv.notes
                                      }).ToList();
 
@@ -85,7 +85,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             var details = (from item in context.InvoiceItems
                            join service in context.Services on item.s_id equals service.s_id
                            join invoice in context.Invoices on item.invoice_id equals invoice.invoice_id
-                           where invoice.order_status == 1 &&
+                           where invoice.order_status == 2 &&
                                  invoice.pickup_date.HasValue &&
                                  DbFunctions.TruncateTime(invoice.pickup_date.Value) >= DbFunctions.TruncateTime(startDate) &&
                                  DbFunctions.TruncateTime(invoice.pickup_date.Value) <= DbFunctions.TruncateTime(endDate)
@@ -116,12 +116,12 @@ namespace Laundry_Online_Web_FE.Models.Dao
                                  where inv.pickup_date.HasValue && 
                                        DbFunctions.TruncateTime(inv.pickup_date.Value) >= DbFunctions.TruncateTime(startDate) &&
                                        DbFunctions.TruncateTime(inv.pickup_date.Value) <= DbFunctions.TruncateTime(endDate) &&
-                                       inv.order_status == 1 &&
-                                       (inv.payment_type == 0 || inv.payment_type == 1)
+                                       inv.order_status == 2 &&
+                                       (inv.payment_type == 1 || inv.payment_type == 2)
                                  group inv by inv.payment_type into g
                                  select new PaymentTypeCollectionView
                                  {
-                                     PaymentType = (g.Key == 0 ? "Cash" : (g.Key == 1 ? "VN-Pay" : "Other")), 
+                                     PaymentType = (g.Key == 1 ? "Cash" : (g.Key == 2 ? "VN-Pay" : "Other")), 
                                      TotalAmount = g.Sum(inv => inv.total_amount),
                                      Count = g.Count()
                                  }).ToList();
@@ -138,7 +138,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
                 }
 
                 viewModel.PaymentSummaries = viewModel.PaymentSummaries
-                                                .OrderBy(s => s.PaymentType == "Cash" ? 0 : 1)
+                                                .OrderBy(s => s.PaymentType == "Cash" ? 1 : 2)
                                                 .ToList();
 
                 if (!viewModel.PaymentSummaries.Any())
