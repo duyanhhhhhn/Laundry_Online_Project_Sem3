@@ -36,7 +36,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             try
             {
                 var data = _context.Invoices
-                    .OrderByDescending(i => i.invoice_id) // 👉 Sắp xếp theo ID mới nhất
+                    .OrderByDescending(i => i.invoice_id)
                     .Select(i => new InvoiceView
                     {
                         Id = i.invoice_id,
@@ -67,7 +67,6 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
-
         public InvoiceView GetById(int id)
         {
             try
@@ -88,7 +87,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             {
                 var invoices = _context.Invoices
                     .Where(i => i.customer_id == customerId)
-                    .OrderByDescending(i => i.invoice_date) // Sắp xếp theo ngày đặt mới nhất
+                    .OrderByDescending(i => i.invoice_date)
                     .ToList();
 
                 return invoices.Select(i => MapToView(i)).ToHashSet();
@@ -166,12 +165,14 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 // Ensure total_amount is never null or zero for existing invoices
                 invoice.total_amount = model.Total_Amount <= 0 ? invoice.total_amount : model.Total_Amount;
 
+                // CẬP NHẬT: Xử lý Order_Status và Status đúng theo logic mới
+                invoice.order_status = model.Order_Status;  // Không set null nữa vì cần chính xác
+                invoice.status = model.Status;  // Không set null nữa vì cần chính xác
+
                 invoice.payment_type = model.Payment_Type == 0 ? null : (int?)model.Payment_Type;
                 invoice.payment_id = string.IsNullOrEmpty(model.Payment_Id) ? null : model.Payment_Id;
-                invoice.order_status = model.Order_Status == 0 ? null : (int?)model.Order_Status;
                 invoice.invoice_type = model.Invoice_Type == 0 ? null : (int?)model.Invoice_Type;
                 invoice.cp_id = model.CustomerPackage_Id == 0 ? null : model.CustomerPackage_Id;
-                invoice.status = model.Status == 0 ? null : (int?)model.Status;
 
                 // Truncate notes to fit database constraint (200 characters max)
                 if (!string.IsNullOrEmpty(model.Notes))
@@ -238,14 +239,14 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                     var total = _context.Invoices
                         .Where(inv => inv.invoice_date >= start && inv.invoice_date < end)
                         .Sum(inv => (decimal?)inv.total_amount) ?? 0;
-                    revenues.Add(Math.Floor(total)); // Không có số thập phân cho VNĐ
+                    revenues.Add(Math.Floor(total));
                 }
                 return revenues;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("GetMonthlyRevenueByYear Error: " + ex.Message);
-                return new List<decimal>(new decimal[12]); // Trả về 12 tháng với giá trị 0
+                return new List<decimal>(new decimal[12]);
             }
         }
 
@@ -263,7 +264,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             catch (Exception ex)
             {
                 Debug.WriteLine("GetAvailableYears Error: " + ex.Message);
-                return new List<int> { DateTime.Now.Year }; // Trả về năm hiện tại nếu có lỗi
+                return new List<int> { DateTime.Now.Year };
             }
         }
 
@@ -296,10 +297,12 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             {
                 var oneHourAgo = DateTime.Now.AddHours(-1);
 
+                // CẬP NHẬT: Chỉ lấy orders với Status = 1 (active) và Order_Status = 0 (pending)
                 var expiredOrders = _context.Invoices
                     .Where(i => i.invoice_date.HasValue &&
                                i.invoice_date.Value <= oneHourAgo &&
-                               (i.order_status == null || i.order_status != 2))
+                               (i.status == 1 || i.status == null) &&  // Active bookings
+                               (i.order_status == 0 || i.order_status == null))  // Pending orders
                     .ToList();
 
                 return expiredOrders.Select(i => MapToView(i)).ToList();
@@ -312,7 +315,8 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         }
 
         /// <summary>
-        /// Automatically update order_status to 2 (cancelled) for orders expired over 1 hour
+        /// Automatically update order_status to 3 (cancelled) for orders expired over 1 hour
+        /// CẬP NHẬT: Thay đổi từ status 2 thành status 3 cho cancelled
         /// </summary>
         /// <returns>Number of updated orders</returns>
         public int AutoUpdateExpiredOrders()
@@ -322,11 +326,12 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 var currentTime = DateTime.Now;
                 var oneHourAgo = currentTime.AddHours(-1);
 
-                // Get all orders with order_status != 2 (not cancelled) and expired over 1 hour
+                // CẬP NHẬT: Chỉ lấy active bookings (status = 1) với pending orders (order_status = 0)
                 var expiredOrders = _context.Invoices
                     .Where(i => i.invoice_date.HasValue &&
                                i.invoice_date.Value <= oneHourAgo &&
-                               (i.order_status == null || i.order_status != 2))
+                               (i.status == 1 || i.status == null) &&  // Active bookings
+                               (i.order_status == 0 || i.order_status == null))  // Pending orders
                     .ToList();
 
                 int updatedCount = 0;
@@ -334,8 +339,8 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 {
                     try
                     {
-                        // Update status to 2 (cancelled)
-                        order.order_status = 2;
+                        // CẬP NHẬT: Update status to 3 (cancelled) thay vì 2
+                        order.order_status = 3;
 
                         // Add auto-cancel note
                         var cancelNote = $"\n[AUTO CANCELLED] {currentTime.ToString("dd/MM/yyyy HH:mm")}: Order automatically cancelled due to 1 hour past expiration";
@@ -380,9 +385,10 @@ namespace Laundry_Online_Web_BE.Models.Repositories
 
         /// <summary>
         /// Cập nhật trạng thái đơn hàng - chỉ update order_status và notes
+        /// CẬP NHẬT: Phù hợp với logic trạng thái mới
         /// </summary>
         /// <param name="invoiceId">ID của invoice</param>
-        /// <param name="newStatus">Trạng thái mới</param>
+        /// <param name="newStatus">Trạng thái mới (0=Pending, 1=Confirmed, 2=Paid, 3=Cancelled)</param>
         /// <param name="additionalNotes">Ghi chú thêm (optional)</param>
         /// <returns>True nếu thành công</returns>
         public bool UpdateOrderStatus(int invoiceId, int newStatus, string additionalNotes = null)
@@ -393,6 +399,13 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 if (invoice == null)
                 {
                     Debug.WriteLine($"UpdateOrderStatus Error: Invoice with ID {invoiceId} not found");
+                    return false;
+                }
+
+                // CẬP NHẬT: Validate trạng thái mới theo logic mới
+                if (newStatus < 0 || newStatus > 3)
+                {
+                    Debug.WriteLine($"UpdateOrderStatus Error: Invalid status {newStatus}. Valid range is 0-3");
                     return false;
                 }
 
@@ -423,6 +436,38 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 Debug.WriteLine($"UpdateOrderStatus Error: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// CẬP NHẬT: Thêm method để lấy bookings theo trạng thái
+        /// </summary>
+        /// <param name="status">Status (0=Inactive, 1=Active)</param>
+        /// <param name="orderStatus">Order Status (0=Pending, 1=Confirmed, 2=Paid, 3=Cancelled)</param>
+        /// <returns>List of matching invoices</returns>
+        public HashSet<InvoiceView> GetByStatus(int? status = null, int? orderStatus = null)
+        {
+            try
+            {
+                var query = _context.Invoices.AsQueryable();
+
+                if (status.HasValue)
+                {
+                    query = query.Where(i => i.status == status.Value);
+                }
+
+                if (orderStatus.HasValue)
+                {
+                    query = query.Where(i => i.order_status == orderStatus.Value);
+                }
+
+                var invoices = query.OrderByDescending(i => i.invoice_date).ToList();
+                return invoices.Select(i => MapToView(i)).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GetByStatus Error: {ex.Message}");
+                return new HashSet<InvoiceView>();
             }
         }
     }

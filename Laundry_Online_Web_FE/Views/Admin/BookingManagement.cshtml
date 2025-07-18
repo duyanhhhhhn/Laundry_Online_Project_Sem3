@@ -7,74 +7,144 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <h2>Order Management</h2>
+            <h2><i class="fas fa-tasks"></i> Order Management</h2>
 
-            <!-- Filter buttons -->
+            <!-- Filter buttons - CẬP NHẬT: Thêm Paid button và sửa Cancelled từ 2→3 -->
             <div class="mb-3">
-                <a href="@Url.Action("BookingManagement")" class="btn btn-primary">All</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 0 })" class="btn btn-warning">Pending</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 1 })" class="btn btn-success">Confirmed</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 2 })" class="btn btn-danger">Cancelled</a>
-                <button class="btn btn-info" onclick="runAutoUpdate()">Auto Update</button>
+                <a href="@Url.Action("BookingManagement")" class="btn btn-primary">
+                    <i class="fas fa-list"></i> All
+                </a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 0 })" class="btn btn-warning">
+                    <i class="fas fa-hourglass-half"></i> Pending
+                </a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 1 })" class="btn btn-info">
+                    <i class="fas fa-check-circle"></i> Confirmed
+                </a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 2 })" class="btn btn-success">
+                    <i class="fas fa-money-bill-wave"></i> Paid
+                </a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 3 })" class="btn btn-danger">
+                    <i class="fas fa-times-circle"></i> Cancelled
+                </a>
+                <button class="btn btn-secondary" onclick="runAutoUpdate()">
+                    <i class="fas fa-sync"></i> Auto Update
+                </button>
             </div>
 
             <!-- Bookings table -->
             <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
                         <tr>
-                            <th>Customer</th>
-                            <th>Phone Number</th>
-                            <th>Appointment Date</th>
-                            <th>Appointment Time</th>
-                            <th>Status</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Customer</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-clock"></i> Time</th>
+                            <th><i class="fas fa-info-circle"></i> Status</th>
+                            <th><i class="fas fa-sticky-note"></i> Notes</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var booking in Model)
                         {
                             <tr>
+                                <td class="text-primary font-weight-bold">#@booking.Id</td>
                                 <td>@(booking.CustomerName ?? $"ID: {booking.Customer_Id}")</td>
                                 <td>@(booking.CustomerPhone ?? "N/A")</td>
                                 <td>@booking.Invoice_Date.ToString("dd/MM/yyyy")</td>
                                 <td>@booking.Invoice_Date.ToString("HH:mm")</td>
                                 <td>
-                                    @if (booking.Order_Status == 0)
-                                    {
-                                        <span class="badge" style="background-color: #ffc107; color: #000;">Pending</span>
+                                    @{
+                                        // CẬP NHẬT: Định nghĩa trạng thái mới
+                                        string statusText = "";
+                                        string statusClass = "";
+                                        string statusIcon = "";
+                                        switch (booking.Order_Status)
+                                        {
+                                            case 0:
+                                                statusText = "Pending";
+                                                statusClass = "warning";
+                                                statusIcon = "fa-hourglass-half";
+                                                break;
+                                            case 1:
+                                                statusText = "Confirmed";
+                                                statusClass = "info";
+                                                statusIcon = "fa-check-circle";
+                                                break;
+                                            case 2:
+                                                statusText = "Paid";
+                                                statusClass = "success";
+                                                statusIcon = "fa-money-bill-wave";
+                                                break;
+                                            case 3:
+                                                statusText = "Cancelled";
+                                                statusClass = "danger";
+                                                statusIcon = "fa-times-circle";
+                                                break;
+                                            default:
+                                                statusText = "Unknown";
+                                                statusClass = "secondary";
+                                                statusIcon = "fa-question-circle";
+                                                break;
+                                        }
                                     }
-                                    else if (booking.Order_Status == 1)
-                                    {
-                                        <span class="badge" style="background-color: #28a745; color: #fff;">Confirmed</span>
-                                    }
-                                    else if (booking.Order_Status == 2)
-                                    {
-                                        <span class="badge" style="background-color: #dc3545; color: #fff;">Cancelled</span>
-                                    }
+                                    <span class="badge badge-@statusClass" id="status-@booking.Id">
+                                        <i class="fas @statusIcon"></i> @statusText
+                                    </span>
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(booking.Notes))
                                     {
-                                        <span title="@booking.Notes">
+                                        <span title="@booking.Notes" class="notes-tooltip">
                                             @(booking.Notes.Length > 30 ? booking.Notes.Substring(0, 30) + "..." : booking.Notes)
                                         </span>
+                                    }
+                                    else
+                                    {
+                                        <em class="text-muted">No notes</em>
                                     }
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="@Url.Action("BookingDetails", new { id = booking.Id })" class="btn btn-sm btn-info">Details</a>
+                                        <a href="@Url.Action("BookingDetails", new { id = booking.Id })"
+                                           class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
 
-                                        @if (booking.Order_Status == 0)
+                                        @if (booking.Order_Status == 0) // Pending
                                         {
-                                            <button class="btn btn-sm btn-success" onclick="updateStatus(@booking.Id, 1)">Confirm</button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
+                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Confirm">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 3)" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         }
-                                        else if (booking.Order_Status == 1)
+                                        else if (booking.Order_Status == 1) // Confirmed
                                         {
-                                            <button class="btn btn-sm btn-warning" onclick="updateStatus(@booking.Id, 0)">Set Pending</button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
+                                            <button class="btn btn-sm btn-success" onclick="updateStatus(@booking.Id, 2)" title="Mark as Paid">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning" onclick="updateStatus(@booking.Id, 0)" title="Set Pending">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 3)" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        }
+                                        else if (booking.Order_Status == 2) // Paid
+                                        {
+                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Set Confirmed">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        }
+                                        else if (booking.Order_Status == 3) // Cancelled
+                                        {
+                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Reactivate">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
                                         }
                                     </div>
                                 </td>
@@ -86,40 +156,109 @@
 
             @if (Model.Count == 0)
             {
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No orders found.
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h4>No Orders Found</h4>
+                    <p>There are no orders matching your current filter.</p>
                 </div>
             }
+
+            <!-- Summary Statistics -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5><i class="fas fa-chart-bar"></i> Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
+                                    <small class="text-muted">Confirmed</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
+                                    <small class="text-muted">Paid</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
+                                    <small class="text-muted">Cancelled</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     function updateStatus(bookingId, newStatus) {
-        if (confirm('Are you sure you want to update the status?')) {
+        const statusNames = {
+            0: 'Pending',
+            1: 'Confirmed',
+            2: 'Paid',
+            3: 'Cancelled'
+        };
+
+        const statusName = statusNames[newStatus] || 'Unknown';
+
+        if (confirm(`Are you sure you want to update the status to "${statusName}"?`)) {
+            // Show loading state
+            const statusElement = document.getElementById(`status-${bookingId}`);
+            const originalContent = statusElement.innerHTML;
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
             $.ajax({
                 url: '@Url.Action("UpdateBookingStatus")',
                 type: 'POST',
                 data: { id: bookingId, newStatus: newStatus },
                 success: function(response) {
                     if (response.success) {
-                        alert(response.message);
-                        location.reload();
+                        // Update the badge
+                        statusElement.className = `badge badge-${response.newStatusClass}`;
+                        statusElement.innerHTML = `<i class="fas ${getStatusIcon(newStatus)}"></i> ${response.newStatusText}`;
+
+                        // Show success message
+                        showAlert('success', response.message);
+
+                        // Reload after 1 second to update action buttons
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert('Error: ' + response.message);
+                        // Restore original content
+                        statusElement.innerHTML = originalContent;
+                        showAlert('error', response.message);
                     }
                 },
                 error: function() {
-                    alert('An error occurred while updating status');
+                    // Restore original content
+                    statusElement.innerHTML = originalContent;
+                    showAlert('error', 'An error occurred while updating status');
                 }
             });
         }
     }
 
+    function getStatusIcon(status) {
+        const icons = {
+            0: 'fa-hourglass-half',
+            1: 'fa-check-circle',
+            2: 'fa-money-bill-wave',
+            3: 'fa-times-circle'
+        };
+        return icons[status] || 'fa-question-circle';
+    }
+
     function runAutoUpdate() {
         if (confirm('Do you want to run auto-update to check for expired orders?')) {
             // Disable button to prevent multiple clicks
-            $('button:contains("Auto Update")').prop('disabled', true).text('Updating...');
+            const button = $('button:contains("Auto Update")');
+            button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
 
             $.ajax({
                 url: '@Url.Action("RunAutoUpdateExpired")',
@@ -127,25 +266,53 @@
                 success: function(response) {
                     if (response.success) {
                         if (response.updatedCount > 0) {
-                            alert(response.message);
-                            location.reload();
+                            showAlert('success', response.message);
+                            setTimeout(() => location.reload(), 2000);
                         } else {
-                            alert('No orders need to be updated.');
+                            showAlert('info', 'No orders need to be updated.');
                         }
                     } else {
-                        alert('Error: ' + response.message);
+                        showAlert('error', response.message);
                     }
                 },
                 error: function() {
-                    alert('An error occurred while running auto-update');
+                    showAlert('error', 'An error occurred while running auto-update');
                 },
                 complete: function() {
                     // Re-enable button
-                    $('button:contains("Updating...")').prop('disabled', false).text('Auto Update');
+                    button.prop('disabled', false).html('<i class="fas fa-sync"></i> Auto Update');
                 }
             });
         }
     }
+
+    function showAlert(type, message) {
+        const alertClass = type === 'success' ? 'alert-success' :
+                          type === 'error' ? 'alert-danger' : 'alert-info';
+
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+        `;
+
+        // Insert alert at the top of the container
+        $('.container-fluid .row .col-md-12').prepend(alertHtml);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            $('.alert').fadeOut();
+        }, 5000);
+    }
+
+    // Initialize tooltips
+    $(document).ready(function() {
+        $('[title]').tooltip();
+    });
 </script>
 
 <style>
@@ -154,7 +321,8 @@
     }
 
     .table th {
-        background-color: #f8f9fa;
+        background-color: #343a40;
+        color: white;
         font-weight: 600;
     }
 
@@ -166,5 +334,42 @@
     .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+    }
+
+    .notes-tooltip {
+        cursor: help;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,123,255,0.1);
+    }
+
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .alert {
+        border-radius: 8px;
+    }
+
+    .btn-outline-info {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+        .btn-outline-info:hover {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+    .thead-dark th {
+        background-color: #343a40 !important;
+        border-color: #454d55 !important;
+        color: white !important;
+    }
+
+    .font-weight-bold {
+        font-weight: 600 !important;
     }
 </style>

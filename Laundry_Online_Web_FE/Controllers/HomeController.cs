@@ -55,8 +55,10 @@ namespace Laundry_Online_Web_FE.Controllers
 
             var customer = Session["customer"] as CustomerView;
 
-            // Get all customer bookings
-            var allBookings = InvoiceRepository.Instance.GetByCustomerId(customer.Id);
+            // Get all customer bookings (only active ones)
+            var allBookings = InvoiceRepository.Instance.GetByCustomerId(customer.Id)
+                .Where(b => b.Status == 1) // Only show active bookings
+                .ToList();
 
             // Sort by newest creation date
             var sortedBookings = allBookings.OrderByDescending(b => b.Invoice_Date).ToList();
@@ -141,10 +143,10 @@ namespace Laundry_Online_Web_FE.Controllers
                     Total_Amount = 0m,
                     Payment_Type = 0,
                     Payment_Id = string.Empty,
-                    Order_Status = 0,
+                    Order_Status = 0,  // 0 = Chờ xác nhận
                     Invoice_Type = 1,
                     CustomerPackage_Id = null,
-                    Status = 0,
+                    Status = 1,  // 1 = Active (còn hoạt động)
                     Notes = bookingNotes,
                     Ship_Cost = 0m,
                     Delivery_Status = 0
@@ -198,17 +200,17 @@ namespace Laundry_Online_Web_FE.Controllers
 
             System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING-GET] ID: {id}, Booking found: {booking != null}");
 
-            // Check ownership
-            if (booking == null || booking.Customer_Id != customer.Id)
+            // Check ownership and active status
+            if (booking == null || booking.Customer_Id != customer.Id || booking.Status != 1)
             {
                 TempData["ErrorMessage"] = "Booking not found or you don't have permission to edit.";
                 return RedirectToAction("MyBookings");
             }
 
-            // Check booking must have order_status = 0 (booked)
+            // Check booking must have order_status = 0 (chờ xác nhận)
             if (booking.Order_Status != 0)
             {
-                TempData["ErrorMessage"] = "Only unconfirmed bookings can be edited.";
+                TempData["ErrorMessage"] = "Only pending bookings can be edited.";
                 return RedirectToAction("MyBookings");
             }
 
@@ -246,18 +248,18 @@ namespace Laundry_Online_Web_FE.Controllers
 
                 System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Booking found: {booking != null}, Customer match: {booking?.Customer_Id == customer?.Id}");
 
-                if (booking == null || booking.Customer_Id != customer.Id)
+                if (booking == null || booking.Customer_Id != customer.Id || booking.Status != 1)
                 {
                     System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Booking not found or access denied");
                     TempData["ErrorMessage"] = "Booking not found.";
                     return RedirectToAction("MyBookings");
                 }
 
-                // Check order_status must be 0 (booked)
+                // Check order_status must be 0 (chờ xác nhận)
                 if (booking.Order_Status != 0)
                 {
                     System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Invalid status: {booking.Order_Status}");
-                    TempData["ErrorMessage"] = "Only unconfirmed bookings can be edited.";
+                    TempData["ErrorMessage"] = "Only pending bookings can be edited.";
                     return RedirectToAction("MyBookings");
                 }
 
@@ -355,39 +357,44 @@ namespace Laundry_Online_Web_FE.Controllers
                 return RedirectToAction("MyBookings");
             }
         }
+
         // Helper methods cho booking
         private bool CanEditBooking(InvoiceView booking)
         {
             // Chỉ cho phép chỉnh sửa nếu:
-            // 1. Order_Status = 0 (đã đặt lịch)
-            // 2. Lịch hẹn chưa tới (invoice_date > now + 12h)
+            // 1. Status = 1 (active)
+            // 2. Order_Status = 0 (chờ xác nhận)
+            // 3. Lịch hẹn chưa tới (invoice_date > now + 12h)
 
-            if (booking.Order_Status != 0) return false; // Chỉ cho phép edit status = 0
+            if (booking.Status != 1) return false; // Chỉ cho phép edit booking active
+            if (booking.Order_Status != 0) return false; // Chỉ cho phép edit status chờ xác nhận
 
-            var appointmentTime = booking.Invoice_Date; // Removed null-coalescing operator
+            var appointmentTime = booking.Invoice_Date;
             return appointmentTime > DateTime.Now.AddHours(12);
         }
 
-        // Helper method để lấy text trạng thái booking
-        private string GetBookingStatusText(int status)
+        // Helper method để lấy text trạng thái booking - CẬP NHẬT
+        private string GetBookingStatusText(int orderStatus)
         {
-            switch (status)
+            switch (orderStatus)
             {
-                case 0: return "Đã đặt lịch";
-                case 1: return "Đã xác nhận";
-                case 2: return "Đã hủy";
-                default: return "Không xác định";
+                case 0: return "Pending"; // Chờ xác nhận
+                case 1: return "Confirmed"; // Đã xác nhận
+                case 2: return "Paid"; // Đã thanh toán
+                case 3: return "Cancelled"; // Đã hủy
+                default: return "Unknown";
             }
         }
 
-        // Helper method để lấy CSS class cho trạng thái booking
-        private string GetBookingStatusClass(int status)
+        // Helper method để lấy CSS class cho trạng thái booking - CẬP NHẬT
+        private string GetBookingStatusClass(int orderStatus)
         {
-            switch (status)
+            switch (orderStatus)
             {
-                case 0: return "success";
-                case 1: return "info";
-                case 2: return "danger";
+                case 0: return "warning"; // Pending - màu vàng
+                case 1: return "info"; // Confirmed - màu xanh dương
+                case 2: return "success"; // Paid - màu xanh lá
+                case 3: return "danger"; // Cancelled - màu đỏ
                 default: return "secondary";
             }
         }
@@ -401,9 +408,9 @@ namespace Laundry_Online_Web_FE.Controllers
             {
                 System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Starting auto-cancel check at {DateTime.Now}");
 
-                // Get all bookings with order_status = 0 (booked)
+                // Get all active bookings with order_status = 0 (chờ xác nhận)
                 var pendingBookings = InvoiceRepository.Instance.GetAll()
-                    .Where(b => b.Order_Status == 0 && b.Invoice_Type == 1) // Only online bookings
+                    .Where(b => b.Status == 1 && b.Order_Status == 0 && b.Invoice_Type == 1) // Only active online bookings
                     .ToList();
 
                 System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Found {pendingBookings.Count} pending bookings");
@@ -417,8 +424,8 @@ namespace Laundry_Online_Web_FE.Controllers
                     // Check if appointment is over 1 hour past current time
                     if (booking.Invoice_Date <= DateTime.Now.AddHours(-1))
                     {
-                        // Update status to "cancelled"
-                        booking.Order_Status = 2;
+                        // Update status to "cancelled" (Order_Status = 3)
+                        booking.Order_Status = 3;
 
                         // Add log to Notes
                         var cancelLog = $"\n[AUTO CANCELLED] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Automatically cancelled due to 1 hour past appointment time without confirmation";
@@ -477,7 +484,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            
+
             ViewBag.Message = TempData["Message"];
             return View();
         }
@@ -494,7 +501,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            
+
             return View();
         }
         [HttpPost]
@@ -522,7 +529,7 @@ namespace Laundry_Online_Web_FE.Controllers
 
                 try
                 {
-                  
+
                     var smsService = new eSmsService();
                     string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
 
@@ -539,14 +546,14 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = "Register Error. Try again";
+                ViewBag.ErrorMessage =  "Register Error. Try again";
                 return View("Register");
             }
         }
 
         public ActionResult DetailService(int id)
         {
-            
+
             var service = ServiceRepository.Instance.GetById(id);
             if (service == null)
             {
@@ -568,7 +575,7 @@ namespace Laundry_Online_Web_FE.Controllers
         }
         public ActionResult DetailPackage(int id)
         {
-            
+
             var package = PackageRepository.Instance.GetById(id);
             if (package == null)
             {

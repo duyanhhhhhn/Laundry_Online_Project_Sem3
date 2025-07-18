@@ -52,29 +52,41 @@
                                     <td>@booking.Invoice_Date.ToString("HH:mm")</td>
                                     <td>
                                         @{
+                                            // CẬP NHẬT: Định nghĩa trạng thái mới
                                             string statusText = "";
                                             string statusClass = "";
+                                            string statusIcon = "";
                                             switch (booking.Order_Status)
                                             {
                                                 case 0:
                                                     statusText = "Pending";
                                                     statusClass = "warning";
+                                                    statusIcon = "fa-hourglass-half";
                                                     break;
                                                 case 1:
                                                     statusText = "Confirmed";
-                                                    statusClass = "success";
+                                                    statusClass = "info";
+                                                    statusIcon = "fa-check-circle";
                                                     break;
                                                 case 2:
+                                                    statusText = "Paid";
+                                                    statusClass = "success";
+                                                    statusIcon = "fa-money-bill-wave";
+                                                    break;
+                                                case 3:
                                                     statusText = "Cancelled";
                                                     statusClass = "danger";
+                                                    statusIcon = "fa-times-circle";
                                                     break;
                                                 default:
                                                     statusText = "Unknown";
                                                     statusClass = "secondary";
+                                                    statusIcon = "fa-question-circle";
                                                     break;
                                             }
                                         }
                                         <span class="badge badge-@statusClass">
+                                            <i class="fas @statusIcon"></i>
                                             @statusText
                                         </span>
                                     </td>
@@ -103,15 +115,19 @@
                                             <span class="text-muted">
                                                 @if (booking.Order_Status == 1)
                                                 {
-                                                    <em>Confirmed</em>
+                                                    <i class="fas fa-check-circle text-info"></i> <em>Confirmed</em>
                                                 }
                                                 else if (booking.Order_Status == 2)
                                                 {
-                                                    <em>Cancelled</em>
+                                                    <i class="fas fa-money-bill-wave text-success"></i> <em>Paid</em>
+                                                }
+                                                else if (booking.Order_Status == 3)
+                                                {
+                                                    <i class="fas fa-times-circle text-danger"></i> <em>Cancelled</em>
                                                 }
                                                 else
                                                 {
-                                                    <em>Cannot edit</em>
+                                                    <i class="fas fa-clock text-muted"></i> <em>Cannot edit</em>
                                                 }
                                             </span>
                                         }
@@ -120,6 +136,37 @@
                             }
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Booking Statistics -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5><i class="fas fa-chart-bar"></i> Booking Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
+                                        <small class="text-muted">Pending</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
+                                        <small class="text-muted">Confirmed</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
+                                        <small class="text-muted">Paid</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
+                                        <small class="text-muted">Cancelled</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }
             else
@@ -168,5 +215,30 @@
 
     .table-hover tbody tr:hover {
         background-color: rgba(0,123,255,0.1);
+    }
+
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+        color: white;
     }
 </style>
