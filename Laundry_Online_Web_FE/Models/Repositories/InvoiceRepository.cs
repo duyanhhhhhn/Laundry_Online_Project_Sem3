@@ -35,8 +35,6 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                // var invoices = _context.Invoices.ToList();
-                // return invoices.Select(i => MapToView(i)).ToHashSet();
                 var data = _context.Invoices
                     .OrderByDescending(i => i.invoice_id) // 👉 Sắp xếp theo ID mới nhất
                     .Select(i => new InvoiceView
