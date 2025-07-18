@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewBag.Title = "InVoiceItemList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@model List<Laundry_Online_Web_FE.Models.ModelViews.InvoiceItemView>
+@if (Model != null && Model.Count > 0)
+{
+    int i = 1;
+    <div class="container-fluid px-4 mt-2">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Invoice Item List
+            </div>
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>Stt</th>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>unit Price</th>
+                            <th>UnitPrice</th>
+                            <th>SubTotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var inV in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@inV.ItemName</td>
+                                <td>@inV.Quantity</td>
+                                <td>@inV.UnitPrice</td>
+                                <td>@string.Format("{0:N0} $", inV.UnitPrice)</td>
+                                <td>@inV.SubTotal</td>
+                                <td>
+
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No data available.</p>
+}
+
+

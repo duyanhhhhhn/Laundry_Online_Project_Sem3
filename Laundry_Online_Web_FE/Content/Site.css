@@ -18,3 +18,24 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.icon-wrapper {
+    width: 110px;
+    height: 110px;
+    background-color: #fff; /* viền trắng bên ngoài */
+    border-radius: 50%; /* bo tròn */
+    padding: 6px; /* độ dày của viền trắng */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.icon-orange {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+    background-color: transparent;
+}

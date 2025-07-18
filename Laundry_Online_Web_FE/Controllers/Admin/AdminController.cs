@@ -572,6 +572,14 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 case 2: return "danger";
                 default: return "secondary";
             }
+        public ActionResult CustomerDetail(int id)
+        {
+            var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            return View(customer);
         }
     }
 

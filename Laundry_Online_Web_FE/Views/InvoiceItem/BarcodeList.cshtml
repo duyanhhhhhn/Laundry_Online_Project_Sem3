@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "BarcodeList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@model dynamic
+@if (ViewBag.Invoice != null)
+{
+    Laundry_Online_Web_FE.Models.ModelViews.InvoiceView invoice = ViewBag.Invoice;
+    List<Laundry_Online_Web_FE.Models.ModelViews.InvoiceItemView> itemlist = ViewBag.InvoiceItem;
+    var imageBC = ViewBag.ImageBC;
+
+    <h2>Barcode List for Invoice</h2>
+
+    <div id="barcodeContent" style="max-width: 900px; margin: 40px auto;">
+        <div class="text-end mb-3">
+            <button class="btn btn-primary" onclick="printBarcode()">In mã vạch</button>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Mã vạch</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < itemlist.Count; i++)
+                {
+                    var item = itemlist[i];
+                    var barcode = imageBC[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@item.ItemName</td>
+                        <td>
+                            <img src="@barcode" alt="Barcode" style="height: 80px;" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- JavaScript để in -->
+    <script>
+        function printBarcode() {
+            var printContents = document.getElementById("barcodeContent").innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+
+            // Reload lại trang để khôi phục các sự kiện, script (nếu cần)
+            location.reload();
+        }
+    </script>
+
+}
+
+

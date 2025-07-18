@@ -35,8 +35,32 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                var invoices = _context.Invoices.ToList();
-                return invoices.Select(i => MapToView(i)).ToHashSet();
+                // var invoices = _context.Invoices.ToList();
+                // return invoices.Select(i => MapToView(i)).ToHashSet();
+                var data = _context.Invoices
+                    .OrderByDescending(i => i.invoice_id) // 👉 Sắp xếp theo ID mới nhất
+                    .Select(i => new InvoiceView
+                    {
+                        Id = i.invoice_id,
+                        Customer_Id = i.customer_id,
+                        Employee_Id = i.employee_id ?? 0,
+                        Invoice_Date = i.invoice_date ?? DateTime.MinValue,
+                        Delivery_Date = i.delivery_date ?? DateTime.MinValue,
+                        Pickup_Date = i.pickup_date ?? DateTime.MinValue,
+                        Total_Amount = i.total_amount,
+                        Payment_Type = i.payment_type ?? 0,
+                        Payment_Id = i.payment_id ?? "",
+                        Order_Status = i.order_status ?? 0,
+                        Invoice_Type = i.invoice_type ?? 0,
+                        CustomerPackage_Id = i.cp_id ?? 0,
+                        Status = i.status ?? 0,
+                        Notes = i.notes ?? "",
+                        Ship_Cost = i.ship_cost ?? 0,
+                        Delivery_Status = i.delivery_status ?? 0
+                    })
+                    .ToHashSet();
+
+                return data;
             }
             catch (Exception ex)
             {
@@ -44,6 +68,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return new HashSet<InvoiceView>();
             }
         }
+
 
         public InvoiceView GetById(int id)
         {

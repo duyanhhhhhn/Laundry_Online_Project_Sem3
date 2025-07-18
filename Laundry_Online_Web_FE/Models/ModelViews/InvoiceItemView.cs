@@ -18,4 +18,5 @@ namespace Laundry_Online_Web_FE.Models.ModelViews
         public int ServiceId { get; set; } = 0;
 
     }
+    
 }

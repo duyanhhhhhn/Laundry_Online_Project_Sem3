@@ -11,6 +11,7 @@ using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
+    
     public class PackageController : Controller
     {
         private readonly PackageRepository _packageRepository;
@@ -40,6 +41,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             if (package == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy gói.";
+                return RedirectToAction("Index");
+            }
+            return View(package);
+        }
+        [Route("Admin/Package/AdminDetail")]
+        public ActionResult AdminDetail(int id)
+        {
+            var package = PackageRepository.Instance.GetById(id);
+            if (package == null)
+            {
+                TempData["ErrorMessage"] = "No found Package.";
                 return RedirectToAction("Index");
             }
             return View(package);

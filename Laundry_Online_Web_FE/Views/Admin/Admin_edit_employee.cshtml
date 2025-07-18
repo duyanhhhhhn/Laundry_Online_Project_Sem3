@@ -19,7 +19,7 @@
                                 <div class="card-header"><h3 class="text-center font-weight-light my-4">Edit Customer</h3></div>
                                 <div class="card-body">
                                     <form method="post" action="@Url.Action("EditEmployee")">
-                                        <input type="hidden" name="CustomerId" value="@employee.Id" />
+                                        <input type="hidden" name="EmployeeId" value="@employee.Id" />
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <div class="form-floating mb-3 mb-md-0">
@@ -35,9 +35,17 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3">
-                                            <div class="form-floating col-md-6">
-                                                <input name="Salary" class="form-control" value="@employee.Salary" id="salary" type="text" placeholder="salary" />
-                                                <label for="Salary">Salary</label>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    <input readonly name="PhoneNumber" class="form-control" value="@employee.Phone" id="PhoneNumber" type="text" />
+                                                    <label for="PhoneNumber">Phone Number</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    <input name="Salary" class="form-control" value="@employee.Salary" id="Salary" type="text" placeholder="Enter Salary" />
+                                                    <label for="Salary">Salary</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="mt-4 mb-0">

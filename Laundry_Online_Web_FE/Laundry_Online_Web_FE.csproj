@@ -157,14 +157,22 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\Admin\CheckoutController.cs" />
+    <Compile Include="Controllers\Admin\CustomerPackageController.cs" />
+    <Compile Include="Controllers\Admin\InvoiceController.cs" />
+    <Compile Include="Controllers\Admin\PackageController.cs" />
+    <Compile Include="Controllers\Admin\AdminController.cs" />
+    <Compile Include="Controllers\Admin\PaymentController.cs" />
+    <Compile Include="Controllers\Auth\AuthController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\Admin\CustomerController.cs" />
     <Compile Include="Controllers\Auth\AuthController.cs" />
     <Compile Include="Controllers\BlogController.cs" />
     <Compile Include="Controllers\CustomerPackageController.cs" />
+    <Compile Include="Controllers\BookingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InvoiceItemController.cs" />
-    <Compile Include="Controllers\PackageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -173,7 +181,6 @@
     <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
     <Compile Include="Models\Dao\BlogPostDao.cs" />
-    <Compile Include="Models\Dao\CustomerDAO.cs" />
     <Compile Include="Models\Dao\EmployeeDAO.cs" />
     <Compile Include="Models\Dao\eSmsService.cs" />
     <Compile Include="Models\Dao\ServiceDAO.cs" />
@@ -216,15 +223,31 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Libraries\VnPayLibrary.cs" />
+    <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
+    <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\DTO\CustomerPackageForm.cs" />
+    <Compile Include="Models\Libraries\VnPayLibrary_backup.cs" />
+    <Compile Include="Models\ModelViews\DTO\InvoiceForm.cs" />
+    <Compile Include="Models\ModelViews\DTO\InvoiceItemForm.cs" />
+    <Compile Include="Models\ModelViews\LoginView.cs" />
+    <Compile Include="Models\ModelViews\Payments\PaymentInformation.cs" />
+    <Compile Include="Models\ModelViews\Payments\PaymentResponseModel.cs" />
+    <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\ModelViews\BlogPostView.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
+    <Compile Include="Models\ModelViews\DTO\CustomerDetailModel.cs" />
     <Compile Include="Models\ModelViews\DTO\HeaderModel.cs" />
     <Compile Include="Models\ModelViews\LoginView.cs" />
     <Compile Include="Models\ModelViews\ServiceView.cs" />
     <Compile Include="Models\Repositories\BlogPostRepository.cs" />
     <Compile Include="Models\Repositories\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\InvoiceItemRepo.cs" />
+    <Compile Include="Models\Repositories\RepoBackup\CustomerDAO.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\ModelViews\DTO\CustomerPackageForm.cs" />
     <Compile Include="Models\ModelViews\EmployeeView.cs" />
@@ -234,10 +257,12 @@
     <Compile Include="Models\Repositories\CustomerPackageRepository.cs" />
     <Compile Include="Models\Repositories\InvoiceRepository.cs" />
     <Compile Include="Models\Repositories\PackageRepository.cs" />
-    <Compile Include="Models\Repositories\RepoBackup\CustomerDAO.cs" />
+    <Compile Include="Models\Repositories\CustomerRepo.cs" />
     <Compile Include="Models\Repositories\ServiceRepository.cs" />
     <Compile Include="Models\Repositories\EmployeeRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\VnPay\IVnPayService.cs" />
+    <Compile Include="Services\VnPay\VnPayPaymentService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Admin\assets\demo\chart-area-demo.js" />
@@ -352,6 +377,19 @@
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_31f0e.png" />
     <Content Include="Content\Client\100\431\113\themes\826533\assets\step_41f0e.png" />
     <Content Include="Content\Client\images\638877624178554009_images.jpg" />
+    <Content Include="Content\Client\images\chatluong.png" />
+    <Content Include="Content\Client\images\feature_search_image_1.svg" />
+    <Content Include="Content\Client\images\feature_search_image_2.svg" />
+    <Content Include="Content\Client\images\feature_search_image_3.svg" />
+    <Content Include="Content\Client\images\feature_search_image_4.svg" />
+    <Content Include="Content\Client\images\giaoh.png" />
+    <Content Include="Content\Client\images\hoantien.jpg" />
+    <Content Include="Content\Client\images\logo811e.png" />
+    <Content Include="Content\Client\images\step_11f0e.png" />
+    <Content Include="Content\Client\images\step_21f0e.png" />
+    <Content Include="Content\Client\images\step_31f0e.png" />
+    <Content Include="Content\Client\images\step_41f0e.png" />
+    <Content Include="Content\Client\images\thanhtoan.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-19b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-29b10.jpg" />
     <Content Include="Content\Client\thumb\1024x1024\100\431\113\products\ai-wit-poster-274-39b10.jpg" />
@@ -553,6 +591,25 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\CViews\CustomerPackage\Create.cshtml" />
+    <Content Include="Views\CustomerPackage\Detail.cshtml" />
+    <Content Include="Views\CustomerPackage\Edit.cshtml" />
+    <Content Include="Views\CustomerPackage\Index.cshtml" />
+    <Content Include="Views\Package\Create.cshtml" />
+    <Content Include="Views\Package\Detail.cshtml" />
+    <Content Include="Views\Package\Edit.cshtml" />
+    <Content Include="Views\Package\Index.cshtml" />
+    <Content Include="Views\CustomerPackage\Create.cshtml" />
+    <Content Include="Views\Invoice\Index.cshtml" />
+    <Content Include="Views\Invoice\Create.cshtml" />
+    <Content Include="Views\Invoice\Edit.cshtml" />
+    <Content Include="Views\Checkout\PaymentSuccessAdmin.cshtml" />
+    <Content Include="Views\Checkout\PayInvoice.cshtml" />
+    <Content Include="Views\Checkout\PaymentFailedAdmin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_LayoutClient.cshtml" />
@@ -586,6 +643,11 @@
     <Content Include="Views\Home\EditBooking.cshtml" />
     <Content Include="Views\Admin\BookingManagement.cshtml" />
     <Content Include="Views\Admin\BookingDetails.cshtml" />
+    <Content Include="Views\Admin\Admin_edit_employee.cshtml" />
+    <Content Include="Views\InvoiceItem\InVoiceItemList.cshtml" />
+    <Content Include="Views\Admin\CustomerDetail.cshtml" />
+    <Content Include="Views\InvoiceItem\ItemDetail.cshtml" />
+    <Content Include="Views\InvoiceItem\BarcodeList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />
@@ -602,7 +664,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Barcodes\" />
-    <Folder Include="Views\InvoiceItem\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
