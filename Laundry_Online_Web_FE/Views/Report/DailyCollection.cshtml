@@ -1,0 +1,275 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.DailyCollectionReportModel
+
+@{
+    ViewBag.Title = "DailyCollection";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+    <div class="report-section">
+        <h3>Select Report Date</h3>
+        @using (Html.BeginForm("DailyCollection", "Report", FormMethod.Get))
+        {
+            <label for="reportDate">Date:</label>
+            <input type="date" id="reportDate" name="reportDate" value="@ViewBag.SelectedDate" />
+            <button type="submit" class="btn-primary">View Report</button>
+            if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <p class="message">@Model.ErrorMessage</p>
+            }
+        }
+    </div>
+
+    @if (Model.Summary != null)
+    {
+        <div class="report-section">
+            <h3>Daily Overview</h3>
+            <div class="summary-box">
+                <p><strong>Report Date:</strong> @Model.Summary.ReportDate.ToString("dd/MM/yyyy")</p>
+                <p><strong>Total Revenue:</strong> @Model.Summary.TotalRevenue.ToString("N0") VND</p>
+                <p><strong>Total Invoices:</strong> @Model.Summary.TotalInvoices</p>
+            </div>
+
+            <h4>Revenue by Payment Type</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment Type</th>
+                        <th>Total Amount</th>
+                        <th>Number of Invoices</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Summary.PaymentTypeBreakdown != null && Model.Summary.PaymentTypeBreakdown.Any())
+                    {
+                        foreach (var item in Model.Summary.PaymentTypeBreakdown)
+                        {
+                            <tr>
+                                <td>@item.PaymentType</td>
+                                <td>@item.TotalAmount.ToString("N0")</td>
+                                <td>@item.Count</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="3" class="no-data-message">No payment type data found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (Model.Details != null && Model.Details.Any())
+    {
+        <div class="report-section">
+            <h3>Transaction Details</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Customer Name</th>
+                        <th>Time</th>
+                        <th>Total Amount</th>
+                        <th>Payment Type</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Details)
+                    {
+                        <tr>
+                            <td>@item.InvoiceId</td>
+                            <td>@item.CustomerName</td>
+                            <td>@item.PickupDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.TotalAmount.ToString("N0")</td>
+                            <td>@item.PaymentType</td>
+                            <td>@item.Notes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.Summary != null && Model.Summary.TotalRevenue == 0 && string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="no-data-message">No transaction details for the selected date.</p>
+    }
+</div>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f7f6;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2em;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 15px;
+    }
+
+    h3 {
+        color: #34495e;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+    }
+
+    h4 {
+        color: #555;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+    }
+
+    .report-section {
+        margin-bottom: 40px;
+        padding: 25px;
+        background-color: #fcfcfc;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+    }
+
+    label {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    input[type="date"], input[type="text"], input[type="number"] {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 15px;
+        width: auto;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+        input[type="date"]:focus, input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+    .summary-box {
+        background-color: #e9f5ff;
+        border-left: 5px solid #007bff;
+        padding: 15px 20px;
+        border-radius: 4px;
+        margin-top: 20px;
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-around;
+    }
+
+        .summary-box p {
+            margin: 0;
+            flex: 1;
+            min-width: 250px;
+        }
+
+            .summary-box p strong {
+                color: #004085;
+                font-size: 1.1em;
+            }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+    }
+
+    th, td {
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        color: #4a4a4a;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9em;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #eef;
+        transition: background-color 0.2s ease;
+    }
+
+    .amount-in {
+        color: green;
+        font-weight: bold;
+    }
+
+    .amount-out {
+        color: red;
+        font-weight: bold;
+    }
+
+    .message {
+        color: red;
+        font-weight: bold;
+        margin-top: 15px;
+        text-align: center;
+        background-color: #fff3f3;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .no-data-message {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px dashed #e0e0e0;
+        border-radius: 5px;
+    }
+</style>

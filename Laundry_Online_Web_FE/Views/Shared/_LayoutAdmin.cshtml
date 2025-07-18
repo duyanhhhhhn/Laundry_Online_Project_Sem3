@@ -133,7 +133,20 @@
                         <div class="collapse" id="pagesCollapseFeedback" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="@Url.Action("BlogpostList", "BLog")">Blog List</a>
- 
+
+                            </nav>
+                        </div>
+                        @*Report*@
+                        <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#pagesCollapseFeedback" aria-expanded="false">
+                            <div class="sb-nav-link-icon"><i class="fas fa-comment-dots"></i></div>
+                            Report
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="pagesCollapseFeedback" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="@Url.Action("DailyCollection", "Report")">Daily Collection</a>
+                                <a class="nav-link" href="@Url.Action("GarmentCollection", "Report")">Garment Collection</a>
+                                <a class="nav-link" href="@Url.Action("PaymentTypeTotals", "Report")">Payment Type Totals</a>
                             </nav>
                         </div>
                     </div>
