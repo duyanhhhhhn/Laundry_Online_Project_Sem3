@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                         phone_number = customer.PhoneNumber,
                         address = customer.Address,
                         registration_date = DateTime.Now,
-               
+
                         active = 1
                     };
                     en.Customers.Add(newCustomer);
@@ -89,7 +89,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = customer.phone_number,
                             Address = customer.address,
                             RegistrationDate = (DateTime)customer.registration_date,
-                        
+
                             Active = customer.active
                         };
                     }
@@ -164,7 +164,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -191,7 +191,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -218,7 +218,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -246,7 +246,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = customer.phone_number,
                             Address = customer.address,
                             RegistrationDate = (DateTime)customer.registration_date,
-                          
+
                             Active = customer.active
                         };
                     }
@@ -274,7 +274,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -301,7 +301,6 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
                             Active = c.active
                         }).ToList());
                 }
@@ -328,7 +327,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -399,7 +398,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             PhoneNumber = c.phone_number,
                             Address = c.address,
                             RegistrationDate = (DateTime)c.registration_date,
-                          
+
                             Active = c.active
                         }).ToList());
                 }
@@ -469,7 +468,7 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
                             Id = customer.customer_id,
                             FirstName = customer.first_name,
                             LastName = customer.last_name,
-                            PhoneNumber = customer.phone_number,                          
+                            PhoneNumber = customer.phone_number,
                             Address = customer.address,
                             RegistrationDate = customer.registration_date ?? DateTime.MinValue,
                             Active = customer.active

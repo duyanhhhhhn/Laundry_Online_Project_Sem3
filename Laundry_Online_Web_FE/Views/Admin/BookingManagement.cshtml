@@ -1,0 +1,170 @@
+﻿@model List<Laundry_Online_Web_FE.Models.ModelViews.InvoiceView>
+@{
+    ViewBag.Title = "Order Management";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Order Management</h2>
+
+            <!-- Filter buttons -->
+            <div class="mb-3">
+                <a href="@Url.Action("BookingManagement")" class="btn btn-primary">All</a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 0 })" class="btn btn-warning">Pending</a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 1 })" class="btn btn-success">Confirmed</a>
+                <a href="@Url.Action("BookingsByStatus", new { status = 2 })" class="btn btn-danger">Cancelled</a>
+                <button class="btn btn-info" onclick="runAutoUpdate()">Auto Update</button>
+            </div>
+
+            <!-- Bookings table -->
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Phone Number</th>
+                            <th>Appointment Date</th>
+                            <th>Appointment Time</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model)
+                        {
+                            <tr>
+                                <td>@(booking.CustomerName ?? $"ID: {booking.Customer_Id}")</td>
+                                <td>@(booking.CustomerPhone ?? "N/A")</td>
+                                <td>@booking.Invoice_Date.ToString("dd/MM/yyyy")</td>
+                                <td>@booking.Invoice_Date.ToString("HH:mm")</td>
+                                <td>
+                                    @if (booking.Order_Status == 0)
+                                    {
+                                        <span class="badge" style="background-color: #ffc107; color: #000;">Pending</span>
+                                    }
+                                    else if (booking.Order_Status == 1)
+                                    {
+                                        <span class="badge" style="background-color: #28a745; color: #fff;">Confirmed</span>
+                                    }
+                                    else if (booking.Order_Status == 2)
+                                    {
+                                        <span class="badge" style="background-color: #dc3545; color: #fff;">Cancelled</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(booking.Notes))
+                                    {
+                                        <span title="@booking.Notes">
+                                            @(booking.Notes.Length > 30 ? booking.Notes.Substring(0, 30) + "..." : booking.Notes)
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("BookingDetails", new { id = booking.Id })" class="btn btn-sm btn-info">Details</a>
+
+                                        @if (booking.Order_Status == 0)
+                                        {
+                                            <button class="btn btn-sm btn-success" onclick="updateStatus(@booking.Id, 1)">Confirm</button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
+                                        }
+                                        else if (booking.Order_Status == 1)
+                                        {
+                                            <button class="btn btn-sm btn-warning" onclick="updateStatus(@booking.Id, 0)">Set Pending</button>
+                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Count == 0)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No orders found.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateStatus(bookingId, newStatus) {
+        if (confirm('Are you sure you want to update the status?')) {
+            $.ajax({
+                url: '@Url.Action("UpdateBookingStatus")',
+                type: 'POST',
+                data: { id: bookingId, newStatus: newStatus },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while updating status');
+                }
+            });
+        }
+    }
+
+    function runAutoUpdate() {
+        if (confirm('Do you want to run auto-update to check for expired orders?')) {
+            // Disable button to prevent multiple clicks
+            $('button:contains("Auto Update")').prop('disabled', true).text('Updating...');
+
+            $.ajax({
+                url: '@Url.Action("RunAutoUpdateExpired")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        if (response.updatedCount > 0) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('No orders need to be updated.');
+                        }
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while running auto-update');
+                },
+                complete: function() {
+                    // Re-enable button
+                    $('button:contains("Updating...")').prop('disabled', false).text('Auto Update');
+                }
+            });
+        }
+    }
+</script>
+
+<style>
+    .btn-group .btn {
+        margin-right: 2px;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.6em;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>

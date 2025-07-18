@@ -1,0 +1,315 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.InvoiceView
+@{
+    ViewBag.Title = "Edit Booking";
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
+}
+
+<style>
+    .booking-edit-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .alert {
+        border-radius: 8px;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        transition: all 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+            color: #000;
+        }
+
+    .current-info {
+        background: #e8f4f8;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-left: 3px solid #17a2b8;
+    }
+
+    .booking-id-display {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="booking-edit-container">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-edit"></i> Edit Booking</h4>
+                        <div class="booking-id-display">
+                            <i class="fas fa-hashtag"></i> #@Model.Id
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge badge-warning status-badge">
+                            <i class="fas fa-hourglass-half"></i> Pending
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Alert Important Information -->
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important Notes:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Only <strong>pending bookings</strong> can be edited</li>
+                        <li>New time must be <strong>at least 12 hours</strong> from now</li>
+                        <li>All changes will be recorded in booking history</li>
+                    </ul>
+                </div>
+
+                <!-- Current Info -->
+                <div class="current-info">
+                    <h6><i class="fas fa-info-circle"></i> Current Booking Information:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1">
+                                <strong><i class="fas fa-hashtag"></i> Booking ID:</strong>
+                                <span class="text-primary">#@Model.Id</span>
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-calendar"></i> Date:</strong>
+                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("dd/MM/yyyy") : "Not set"))
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1">
+                                <strong><i class="fas fa-clock"></i> Time:</strong>
+                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "Not set"))
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-info-circle"></i> Status:</strong>
+                                <span class="badge badge-warning">Pending</span>
+                            </p>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <hr class="my-2">
+                        <p class="mb-0"><strong><i class="fas fa-sticky-note"></i> Current Notes:</strong></p>
+                        <div class="mt-1 p-2 bg-light rounded">
+                            <small>@Html.Raw(Model.Notes.Replace("\n", "<br />"))</small>
+                        </div>
+                    }
+                </div>
+
+                <!-- SUCCESS/ERROR Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                <!-- Edit Form -->
+                <form method="post" action="@Url.Action("EditBooking", "Home", new { id = Model.Id })">
+                    @Html.AntiForgeryToken()
+
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-edit"></i> Update Booking Information</h6>
+                        <small>Please select new date and time for your appointment</small>
+                    </div>
+
+                    <!-- New Date & Time Selection -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="serviceDate" class="form-label">
+                                    <i class="fas fa-calendar"></i> New Date <span class="text-danger">*</span>
+                                </label>
+                                <input type="date"
+                                       id="serviceDate"
+                                       name="ServiceDate"
+                                       class="form-control"
+                                       value="@((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("yyyy-MM-dd") : DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")))"
+                                       required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Select from tomorrow onwards
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="serviceTime" class="form-label">
+                                    <i class="fas fa-clock"></i> New Time <span class="text-danger">*</span>
+                                </label>
+                                <select id="serviceTime" name="ServiceTime" class="form-control" required>
+                                    <option value="">-- Select Time --</option>
+                                    @{
+                                        var currentTime = Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "";
+                                        var timeOptions = new string[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
+                                        var timeLabels = new string[] { "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM" };
+                                    }
+                                    @for (int i = 0; i < timeOptions.Length; i++)
+                                    {
+                                        <option value="@timeOptions[i]" @(currentTime == timeOptions[i] ? "selected" : "")>@timeLabels[i]</option>
+                                    }
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-business-time"></i> Working hours: 8:00 AM - 5:00 PM
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Notes <span class="text-muted">(Optional)</span>
+                        </label>
+                        <textarea name="Notes"
+                                  id="notes"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Enter any additional notes for your booking...">@Model.Notes</textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Update notes for your booking (changes will be logged)
+                        </div>
+                    </div>
+
+                    <!-- System Information (Hidden in production) -->
+                    @if (System.Configuration.ConfigurationManager.AppSettings["Environment"] == "Development")
+                    {
+                        <div class="alert alert-light border">
+                            <small class="text-muted">
+                                <strong>Debug Info:</strong><br>
+                                Form Action: @Url.Action("EditBooking", "Home", new { id = Model.Id })<br>
+                                Booking ID: @Model.Id<br>
+                                Current Status: @Model.Order_Status<br>
+                                Can Edit: @(Model.Order_Status == 0 && Model.Invoice_Date > DateTime.Now.AddHours(12))
+                            </small>
+                        </div>
+                    }
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="@Url.Action("MyBookings", "Home")" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to My Bookings
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set minimum date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const serviceDate = document.getElementById('serviceDate');
+        serviceDate.min = tomorrow.toISOString().split('T')[0];
+
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function (e) {
+            const dateInput = document.getElementById('serviceDate');
+            const timeSelect = document.getElementById('serviceTime');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Validation
+            if (!dateInput.value || !timeSelect.value) {
+                e.preventDefault();
+                alert('Please select both date and time!');
+                return;
+            }
+
+            // Check if time is at least 12 hours from now
+            const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
+            const now = new Date();
+            const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+
+            if (hoursDiff < 12) {
+                e.preventDefault();
+                alert('Booking time must be at least 12 hours from now!');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving Changes...';
+
+            console.log('Form submitting with data:', {
+                BookingId: @Model.Id,
+                ServiceDate: dateInput.value,
+                ServiceTime: timeSelect.value,
+                Notes: document.getElementById('notes').value
+            });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').not('.alert-warning').not('.alert-info').fadeOut('slow');
+        }, 5000);
+    });
+</script>

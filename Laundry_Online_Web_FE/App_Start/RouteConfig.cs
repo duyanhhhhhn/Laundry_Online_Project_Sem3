@@ -19,5 +19,7 @@ namespace Laundry_Online_Web_FE
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
         }
+        
+       
     }
 }

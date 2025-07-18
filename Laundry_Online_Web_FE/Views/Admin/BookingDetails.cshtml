@@ -1,0 +1,127 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.InvoiceView
+@{
+    ViewBag.Title = "Order Details";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Order Details #@Model.Id</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Basic Information</h5>
+                            <p><strong>Customer:</strong> @(Model.CustomerName ?? $"ID: {Model.Customer_Id}")</p>
+                            <p><strong>Phone Number:</strong> @(Model.CustomerPhone ?? "N/A")</p>
+                            <p><strong>Appointment:</strong> @Model.Invoice_Date.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p>
+                                <strong>Status:</strong>
+                                @if (Model.Order_Status == 0)
+                                {
+                                    <span class="badge" style="background-color: #ffc107; color: #000;">Pending</span>
+                                }
+                                else if (Model.Order_Status == 1)
+                                {
+                                    <span class="badge" style="background-color: #28a745; color: #fff;">Confirmed</span>
+                                }
+                                else if (Model.Order_Status == 2)
+                                {
+                                    <span class="badge" style="background-color: #dc3545; color: #fff;">Cancelled</span>
+                                }
+                            </p>
+                            <p><strong>Invoice Type:</strong> @Model.Invoice_Type</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Additional Information</h5>
+                            <p><strong>Total Amount:</strong> @Model.Total_Amount.ToString("N0") VND</p>
+                            <p><strong>Shipping Cost:</strong> @Model.Ship_Cost.ToString("N0") VND</p>
+                            <p><strong>Delivery Status:</strong> @Model.Delivery_Status</p>
+                            <p><strong>Delivery Date:</strong> @(Model.Delivery_Date?.ToString("dd/MM/yyyy") ?? "Not set")</p>
+                            <p><strong>Pickup Date:</strong> @(Model.Pickup_Date?.ToString("dd/MM/yyyy") ?? "Not set")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h5>Notes</h5>
+                            <div class="border p-3" style="background-color: #f8f9fa;">
+                                @if (!string.IsNullOrEmpty(Model.Notes))
+                                {
+                                    @Html.Raw(Model.Notes.Replace("\n", "<br />"))
+                                }
+                                else
+                                {
+                                    <em>No notes</em>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="@Url.Action("BookingManagement")" class="btn btn-secondary">Back to List</a>
+
+                    @if (Model.Order_Status == 0)
+                    {
+                        <button class="btn btn-success" onclick="updateStatus(@Model.Id, 1)">Confirm</button>
+                        <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 2)">Cancel</button>
+                    }
+                    else if (Model.Order_Status == 1)
+                    {
+                        <button class="btn btn-warning" onclick="updateStatus(@Model.Id, 0)">Set Pending</button>
+                        <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 2)">Cancel</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateStatus(bookingId, newStatus) {
+        if (confirm('Are you sure you want to update the status?')) {
+            $.ajax({
+                url: '@Url.Action("UpdateBookingStatus")',
+                type: 'POST',
+                data: { id: bookingId, newStatus: newStatus },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while updating status');
+                }
+            });
+        }
+    }
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        border-bottom: 2px solid rgba(0,0,0,0.1);
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.6em;
+    }
+
+    .btn {
+        margin-right: 10px;
+    }
+</style>

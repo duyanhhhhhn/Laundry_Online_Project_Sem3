@@ -1,23 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Laundry_Online_Web_BE.Models.Repositories;
+using Laundry_Online_Web_FE.Controllers;
 using Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE
 {
     public class MvcApplication : System.Web.HttpApplication
     {
+        private static System.Timers.Timer _autoUpdateTimer;
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            _autoUpdateTimer = new System.Timers.Timer(5 * 60 * 1000); // 5 phút
+            _autoUpdateTimer.Elapsed += (sender, e) => {
+                try
+                {
+                    InvoiceRepository.Instance.AutoUpdateExpiredOrders();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Timer auto-update error: {ex.Message}");
+                }
+            };
+            _autoUpdateTimer.Start();
         }
+
+
         //protected void Application_AcquireRequestState(object sender, EventArgs e)
         //{
         //    var app = (HttpApplication)sender;

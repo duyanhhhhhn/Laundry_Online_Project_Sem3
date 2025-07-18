@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "BookService";
+    ViewBag.Title = "Book Service";
     Layout = "~/Views/Shared/_LayoutClient.cshtml";
     var customer = Session["customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
 }
@@ -9,13 +9,13 @@
         <div class="container">
             <ul class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
                 <li class="home" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <a itemprop="item" href="@Url.Action("Index", "Home")" title="Trang chủ">
-                        <span itemprop="name">Trang chủ</span>
+                    <a itemprop="item" href="@Url.Action("Index", "Home")" title="Home">
+                        <span itemprop="name">Home</span>
                         <meta itemprop="position" content="1" />
                     </a>
                 </li>
                 <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <strong itemprop="name">Đặt lịch dịch vụ</strong>
+                    <strong itemprop="name">Book Service</strong>
                     <meta itemprop="position" content="2" />
                 </li>
             </ul>
@@ -29,15 +29,15 @@
                 <div class="stepwizard-row setup-panel">
                     <div class="stepwizard-step">
                         <a href="#step-1" class="btn btn-primary btn-circle" id="step-1-btn">1</a>
-                        <p>Chọn ngày và giờ</p>
+                        <p>Select Date & Time</p>
                     </div>
                     <div class="stepwizard-step">
                         <a href="#step-2" class="btn btn-default btn-circle disabled" id="step-2-btn">2</a>
-                        <p>Xác nhận thông tin</p>
+                        <p>Confirm Details</p>
                     </div>
                     <div class="stepwizard-step">
                         <a href="#step-3" class="btn btn-default btn-circle disabled" id="step-3-btn">3</a>
-                        <p>Hoàn thành</p>
+                        <p>Complete</p>
                     </div>
                 </div>
             </div>
@@ -45,8 +45,8 @@
             <!-- Customer Info Display -->
             <div class="customer-welcome mb-4">
                 <div class="alert alert-info">
-                    <h5><i class="fas fa-user"></i> Xin chào, @customer.FirstName @customer.LastName!</h5>
-                    <p class="mb-0"><strong>Điện thoại:</strong> @customer.PhoneNumber | <strong>Địa chỉ:</strong> @customer.Address</p>
+                    <h5><i class="fas fa-user"></i> Hello, @customer.FirstName @customer.LastName!</h5>
+                    <p class="mb-0"><strong>Phone:</strong> @customer.PhoneNumber | <strong>Address:</strong> @customer.Address</p>
                 </div>
             </div>
 
@@ -55,40 +55,40 @@
                 <div class="row setup-content" id="step-1">
                     <div class="col-md-6 col-sm-12 col-12">
                         <div class="time-selection-panel">
-                            <h3>Chọn thời gian</h3>
+                            <h3>Select Time</h3>
 
                             <!-- Time Selection -->
                             <div class="form-group">
-                                <label>Thời gian <span class="required">*</span></label>
+                                <label>Time <span class="required">*</span></label>
                                 <select name="ServiceTime" id="serviceTime" class="form-control" required>
-                                    <option value="">-- Chọn thời gian --</option>
-                                    <option value="08:00">8:00 sáng</option>
-                                    <option value="08:30">8:30 sáng</option>
-                                    <option value="09:00">9:00 sáng</option>
-                                    <option value="09:30">9:30 sáng</option>
-                                    <option value="10:00">10:00 sáng</option>
-                                    <option value="10:30">10:30 sáng</option>
-                                    <option value="11:00">11:00 sáng</option>
-                                    <option value="11:30">11:30 sáng</option>
-                                    <option value="12:00">12:00 trưa</option>
-                                    <option value="12:30">12:30 trưa</option>
-                                    <option value="13:00">1:00 chiều</option>
-                                    <option value="13:30">1:30 chiều</option>
-                                    <option value="14:00">2:00 chiều</option>
-                                    <option value="14:30">2:30 chiều</option>
-                                    <option value="15:00">3:00 chiều</option>
-                                    <option value="15:30">3:30 chiều</option>
-                                    <option value="16:00">4:00 chiều</option>
-                                    <option value="16:30">4:30 chiều</option>
-                                    <option value="17:00">5:00 chiều</option>
+                                    <option value="">-- Select Time --</option>
+                                    <option value="08:00">8:00 AM</option>
+                                    <option value="08:30">8:30 AM</option>
+                                    <option value="09:00">9:00 AM</option>
+                                    <option value="09:30">9:30 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="10:30">10:30 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="11:30">11:30 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="12:30">12:30 PM</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="13:30">1:30 PM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="14:30">2:30 PM</option>
+                                    <option value="15:00">3:00 PM</option>
+                                    <option value="15:30">3:30 PM</option>
+                                    <option value="16:00">4:00 PM</option>
+                                    <option value="16:30">4:30 PM</option>
+                                    <option value="17:00">5:00 PM</option>
                                 </select>
                             </div>
 
                             <div class="selected-info mt-4">
-                                <h5>Thông tin đã chọn:</h5>
+                                <h5>Selected Information:</h5>
                                 <div class="info-box">
-                                    <p><strong>Ngày:</strong> <span id="selected-date">Chưa chọn</span></p>
-                                    <p><strong>Giờ:</strong> <span id="selected-time">Chưa chọn</span></p>
+                                    <p><strong>Date:</strong> <span id="selected-date">Not selected</span></p>
+                                    <p><strong>Time:</strong> <span id="selected-time">Not selected</span></p>
                                 </div>
                             </div>
                         </div>
@@ -97,11 +97,11 @@
                     <div class="col-md-6 col-sm-12 col-12">
                         <!-- Custom Calendar -->
                         <div class="calendar-panel">
-                            <h3>Chọn ngày</h3>
+                            <h3>Select Date</h3>
                             <div class="custom-calendar">
                                 <div class="calendar-header">
                                     <button type="button" class="calendar-nav prev" onclick="changeMonth(-1)">‹</button>
-                                    <span class="calendar-title" id="calendar-title">Tháng 7 - 2025</span>
+                                    <span class="calendar-title" id="calendar-title">July - 2025</span>
                                     <button type="button" class="calendar-nav next" onclick="changeMonth(1)">›</button>
                                 </div>
                                 <div class="calendar-weekdays">
@@ -122,7 +122,7 @@
                     </div>
 
                     <div class="col-md-12 col-sm-12 col-12 ant-button">
-                        <button class="btn btn-primary nextBtn pull-right" type="button" onclick="goToStep(2)">Tiếp theo</button>
+                        <button class="btn btn-primary nextBtn pull-right" type="button" onclick="goToStep(2)">Next</button>
                     </div>
                 </div>
 
@@ -131,20 +131,20 @@
                     <div class="col-md-6 col-sm-12 col-12">
                         <!-- Booking Summary -->
                         <div class="booking-summary">
-                            <h4>Thông tin đặt lịch</h4>
+                            <h4>Booking Information</h4>
                             <div class="summary-content">
-                                <p><strong>Ngày:</strong> <span id="summary-date"></span></p>
-                                <p><strong>Thời gian:</strong> <span id="summary-time"></span></p>
+                                <p><strong>Date:</strong> <span id="summary-date"></span></p>
+                                <p><strong>Time:</strong> <span id="summary-time"></span></p>
                             </div>
                         </div>
 
                         <!-- Customer Info Summary -->
                         <div class="customer-summary">
-                            <h4>Thông tin khách hàng</h4>
+                            <h4>Customer Information</h4>
                             <div class="summary-content">
-                                <p><strong>Họ tên:</strong> @customer.FirstName @customer.LastName</p>
-                                <p><strong>Điện thoại:</strong> @customer.PhoneNumber</p>
-                                <p><strong>Địa chỉ:</strong> @customer.Address</p>
+                                <p><strong>Name:</strong> @customer.FirstName @customer.LastName</p>
+                                <p><strong>Phone:</strong> @customer.PhoneNumber</p>
+                                <p><strong>Address:</strong> @customer.Address</p>
                             </div>
                         </div>
                     </div>
@@ -152,15 +152,15 @@
                     <div class="col-md-6 col-sm-12 col-12">
                         <!-- Notes Section -->
                         <div class="notes-section">
-                            <h4>Ghi chú thêm</h4>
+                            <h4>Additional Notes</h4>
                             <div class="form-group">
-                                <label>Ghi chú cho đơn đặt lịch</label>
-                                <textarea name="Notes" id="notes" class="form-control" rows="6" placeholder="Nhập ghi chú nếu có (không bắt buộc)"></textarea>
+                                <label>Notes for booking</label>
+                                <textarea name="Notes" id="notes" class="form-control" rows="6" placeholder="Enter notes if any (optional)"></textarea>
                             </div>
 
                             <div class="step-buttons">
-                                <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Quay lại</button>
-                                <button type="button" class="btn btn-primary" onclick="goToStep(3)">Xác nhận đặt lịch</button>
+                                <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(3)">Confirm Booking</button>
                             </div>
                         </div>
                     </div>
@@ -173,37 +173,67 @@
                             <div class="success-icon">
                                 <i class="fas fa-check-circle" style="font-size: 80px; color: #28a745;"></i>
                             </div>
-                            <h3 class="display-3">Cảm ơn bạn!</h3>
+                            <h3 class="display-3">Thank you!</h3>
                             <p class="lead">
-                                <strong>Bạn đã đặt lịch thành công. Chúng tôi sẽ liên hệ để xác nhận trong thời gian sớm nhất.</strong>
+                                <strong>Your booking has been submitted successfully!</strong>
                             </p>
+
+                            <!-- IMPORTANT NOTICE -->
+                            <div class="alert alert-warning mt-4" style="max-width: 600px; margin: 0 auto;">
+                                <h5><i class="fas fa-exclamation-triangle"></i> Important Notice</h5>
+                                <p class="mb-2">
+                                    <strong>Please visit our store to confirm your booking appointment.</strong>
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-clock text-danger"></i>
+                                    <strong class="text-danger">Your booking will be automatically cancelled if not confirmed within 1 hour of your appointment time.</strong>
+                                </p>
+                            </div>
+
                             <hr class="my-4">
 
                             <!-- Final Summary -->
                             <div class="final-summary">
-                                <h5>Thông tin đặt lịch</h5>
+                                <h5>Booking Information</h5>
                                 <div class="row">
                                     <div class="col-md-8 mx-auto">
                                         <div class="summary-details text-left">
-                                            <p><strong>Ngày:</strong> <span id="final-date"></span></p>
-                                            <p><strong>Thời gian:</strong> <span id="final-time"></span></p>
-                                            <p><strong>Khách hàng:</strong> @customer.FirstName @customer.LastName</p>
-                                            <p><strong>Điện thoại:</strong> @customer.PhoneNumber</p>
-                                            <p><strong>Địa chỉ:</strong> @customer.Address</p>
-                                            <p id="final-notes-wrapper" style="display: none;"><strong>Ghi chú:</strong> <span id="final-notes"></span></p>
+                                            <p><strong>Date:</strong> <span id="final-date"></span></p>
+                                            <p><strong>Time:</strong> <span id="final-time"></span></p>
+                                            <p><strong>Customer:</strong> @customer.FirstName @customer.LastName</p>
+                                            <p><strong>Phone:</strong> @customer.PhoneNumber</p>
+                                            <p><strong>Address:</strong> @customer.Address</p>
+                                            <p id="final-notes-wrapper" style="display: none;"><strong>Notes:</strong> <span id="final-notes"></span></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Store Information -->
+                            <div class="store-info mt-4">
+                                <div class="alert alert-info" style="max-width: 600px; margin: 0 auto;">
+                                    <h6><i class="fas fa-store"></i> Store Information</h6>
+                                    <p class="mb-1">
+                                        <strong>Address:</strong> 123 Laundry Street, District 1, Ho Chi Minh City
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>Phone:</strong> <a href="tel:0909667322" class="text-primary"><strong>090 9667 322</strong></a>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Business Hours:</strong> 8:00 AM - 6:00 PM (Monday - Sunday)
+                                    </p>
+                                </div>
+                            </div>
+
                             <p class="mt-4">
-                                Nếu bạn có thắc mắc hay cần hỗ trợ, vui lòng liên hệ:
+                                If you have any questions or need support, please contact:
                                 <a href="tel:0909667322" title="0909667322"><strong>090 9667 322</strong></a>
                             </p>
 
                             <div class="mt-4">
-                                <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Về trang chủ</a>
-                                <a href="@Url.Action("BookService", "Home")" class="btn btn-outline-primary">Đặt lịch khác</a>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back to Home</a>
+                                <a href="@Url.Action("BookService", "Home")" class="btn btn-outline-primary">Book Another</a>
+                                <a href="@Url.Action("MyBookings", "Home")" class="btn btn-info ml-2">View My Bookings</a>
                             </div>
                         </div>
                     </div>
@@ -211,428 +241,479 @@
             </form>
         </div>
     </section>
+</div>
 
-    <!-- JavaScript -->
-    <script>
-        let currentDate = new Date();
-        let selectedDate = null;
+<!-- CSS Styles -->
+<style>
+    /* Step Wizard */
+    .stepwizard-row {
+        display: table-row;
+    }
 
-        // Initialize calendar
-        function initCalendar() {
-            updateCalendar();
-            updateSelectedInfo();
-        }
+    .stepwizard {
+        display: table;
+        width: 100%;
+        position: relative;
+        margin-bottom: 30px;
+    }
 
-        // Update calendar display
-        function updateCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
+    .stepwizard-step {
+        display: table-cell;
+        text-align: center;
+        position: relative;
+    }
 
-            // Update title
-            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-            document.getElementById('calendar-title').textContent = `${monthNames[month]} - ${year}`;
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 12px;
+        line-height: 1.428571429;
+        border-radius: 15px;
+    }
 
-            // Generate days
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
+    /* Calendar Styles */
+    .custom-calendar {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        padding: 15px;
+    }
 
-            const calendarDays = document.getElementById('calendar-days');
-            calendarDays.innerHTML = '';
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
 
-            for (let i = 0; i < 42; i++) {
-                const date = new Date(startDate);
-                date.setDate(startDate.getDate() + i);
+    .calendar-nav {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
 
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = date.getDate().toString().padStart(2, '0');
+    .calendar-nav:hover {
+        background-color: #f0f0f0;
+    }
 
-                // Add classes
-                if (date.getMonth() !== month) {
-                    dayElement.classList.add('other-month');
-                }
-                if (date < new Date().setHours(0, 0, 0, 0)) {
-                    dayElement.classList.add('past-date');
-                } else {
-                    dayElement.addEventListener('click', () => selectDate(date));
-                }
-                if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
-                    dayElement.classList.add('selected');
-                }
-                if (date.toDateString() === new Date().toDateString()) {
-                    dayElement.classList.add('today');
-                }
+    .calendar-title {
+        font-weight: bold;
+        font-size: 18px;
+    }
 
-                calendarDays.appendChild(dayElement);
-            }
-        }
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin-bottom: 10px;
+    }
 
-        // Change month
-        function changeMonth(direction) {
-            currentDate.setMonth(currentDate.getMonth() + direction);
-            updateCalendar();
-        }
+    .weekday {
+        text-align: center;
+        font-weight: bold;
+        padding: 10px 5px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
 
-        // Select date
-        function selectDate(date) {
-            selectedDate = new Date(date);
-            document.getElementById('serviceDate').value = selectedDate.toISOString().split('T')[0];
-            updateCalendar();
-            updateSelectedInfo();
-        }
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
 
-        // Time selection change event
-        document.getElementById('serviceTime').addEventListener('change', function () {
-            updateSelectedInfo();
-        });
+    .calendar-day {
+        text-align: center;
+        padding: 12px 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+    }
 
-        // Update selected info display
-        function updateSelectedInfo() {
-            const timeValue = document.getElementById('serviceTime').value;
-            const timeText = document.getElementById('serviceTime').options[document.getElementById('serviceTime').selectedIndex].text;
+    .calendar-day:hover {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+    }
 
-            document.getElementById('selected-date').textContent = selectedDate ? formatDate(selectedDate) : 'Chưa chọn';
-            document.getElementById('selected-time').textContent = timeValue ? timeText : 'Chưa chọn';
-        }
+    .calendar-day.selected {
+        background-color: #2196f3;
+        color: white;
+        font-weight: bold;
+    }
 
-        // Step navigation function
-        function goToStep(stepNumber) {
-            // Validate current step before proceeding
-            if (stepNumber === 2 && !validateStep1()) {
-                return false;
-            }
-            if (stepNumber === 3 && !validateStep2()) {
-                return false;
-            }
+    .calendar-day.today {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+    }
 
-            // Hide all steps
-            document.getElementById('step-1').style.display = 'none';
-            document.getElementById('step-2').style.display = 'none';
-            document.getElementById('step-3').style.display = 'none';
+    .calendar-day.other-month {
+        color: #ccc;
+        cursor: not-allowed;
+    }
 
-            // Show target step
-            document.getElementById('step-' + stepNumber).style.display = 'block';
+    .calendar-day.past-date {
+        color: #999;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
 
-            // Update step indicators
-            updateStepIndicators(stepNumber);
+    /* Form Panels */
+    .time-selection-panel,
+    .calendar-panel {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
 
-            // Update summary when going to step 2
-            if (stepNumber === 2) {
-                updateBookingSummary();
-            }
+    .selected-info .info-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 15px;
+    }
 
-            // Submit form and show final summary when going to step 3
-            if (stepNumber === 3) {
-                submitBooking();
-            }
+    /* Summary Sections */
+    .booking-summary,
+    .customer-summary,
+    .notes-section {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
 
-            return true;
-        }
+    .summary-content p {
+        margin-bottom: 8px;
+    }
 
-        // Validate Step 1
-        function validateStep1() {
-            const serviceTime = document.getElementById('serviceTime').value;
-            const serviceDate = document.getElementById('serviceDate').value;
+    /* Step Buttons */
+    .step-buttons {
+        margin-top: 20px;
+    }
 
-            if (!serviceTime || !serviceDate) {
-                alert('Vui lòng chọn ngày và giờ!');
-                return false;
-            }
-            return true;
-        }
+    .step-buttons .btn {
+        margin-right: 10px;
+    }
 
-        // Validate Step 2 (simplified since customer info is pre-filled)
-        function validateStep2() {
-            return true; // No additional validation needed
-        }
+    /* Next Button */
+    .ant-button {
+        text-align: right;
+        margin-top: 20px;
+    }
 
-        // Update step indicators
-        function updateStepIndicators(currentStep) {
-            // Reset all step indicators
-            for (let i = 1; i <= 3; i++) {
-                const stepBtn = document.getElementById('step-' + i + '-btn');
-                stepBtn.className = 'btn btn-default btn-circle';
-                if (i < currentStep) {
-                    stepBtn.className = 'btn btn-success btn-circle';
-                } else if (i === currentStep) {
-                    stepBtn.className = 'btn btn-primary btn-circle';
-                }
-            }
-        }
+    .nextBtn {
+        min-width: 120px;
+    }
 
-        // Update booking summary
-        function updateBookingSummary() {
-            const timeText = document.getElementById('serviceTime').options[document.getElementById('serviceTime').selectedIndex].text;
+    /* Final Success Page */
+    .success-icon {
+        margin-bottom: 20px;
+    }
 
-            document.getElementById('summary-date').textContent = selectedDate ? formatDate(selectedDate) : '';
-            document.getElementById('summary-time').textContent = timeText;
-        }
+    .final-summary {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
 
-        // Submit booking and show final summary
-        function submitBooking() {
-            const timeText = document.getElementById('serviceTime').options[document.getElementById('serviceTime').selectedIndex].text;
-            const notesValue = document.getElementById('notes').value;
+    .summary-details p {
+        margin-bottom: 8px;
+    }
 
-            // Update final summary
-            document.getElementById('final-date').textContent = selectedDate ? formatDate(selectedDate) : '';
-            document.getElementById('final-time').textContent = timeText;
+    /* Store Information */
+    .store-info .alert {
+        text-align: left;
+    }
 
-            // Handle notes display
-            if (notesValue && notesValue.trim() !== '') {
-                document.getElementById('final-notes').textContent = notesValue;
-                document.getElementById('final-notes-wrapper').style.display = 'block';
-            } else {
-                document.getElementById('final-notes-wrapper').style.display = 'none';
-            }
+    .store-info p {
+        margin-bottom: 5px;
+    }
 
-            // Submit form to server
-            const formData = new FormData(document.getElementById('ant-booking-form'));
+    /* Required field indicator */
+    .required {
+        color: red;
+    }
 
-            fetch('@Url.Action("SubmitBooking", "Home")', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Booking submitted successfully:', data);
-                    // Success message is already displayed in step 3
-                } else {
-                    console.error('Booking submission failed:', data.message);
-                    alert('Lỗi: ' + data.message);
-                    // Go back to step 2 if there's an error
-                    goToStep(2);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi khi gửi đặt lịch. Vui lòng thử lại.');
-                goToStep(2);
-            });
-        }
+    /* Customer Welcome */
+    .customer-welcome {
+        margin-bottom: 30px;
+    }
 
-        // Format date helper
-        function formatDate(date) {
-            return date.toLocaleDateString('vi-VN');
-        }
+    /* Enhanced Alert Styles */
+    .alert-warning {
+        border-left: 4px solid #ffc107;
+    }
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            initCalendar();
-            updateStepIndicators(1);
-        });
-    </script>
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
 
-    <style>
-        .setup-content {
-            margin-top: 40px;
-        }
-
+    /* Responsive Design */
+    @@media (max-width: 768px) {
         .stepwizard-step p {
-            margin-top: 10px;
-        }
-
-        .stepwizard-row {
-            display: table-row;
-        }
-
-        .stepwizard {
-            display: table;
-            width: 100%;
-            position: relative;
-        }
-
-        .stepwizard-step {
-            display: table-cell;
-            text-align: center;
-            position: relative;
-        }
-
-        .btn-circle {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            padding: 6px 0;
-            font-size: 18px;
-            line-height: 1.428571429;
-            border-radius: 25px;
-        }
-
-        .time-selection-panel, .calendar-panel, .customer-info, .booking-summary, .customer-summary, .notes-section {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .customer-welcome {
-            margin-top: 20px;
-        }
-
-        .step-buttons {
-            margin-top: 20px;
-            text-align: right;
-        }
-
-            .step-buttons .btn {
-                margin-left: 10px;
-            }
-
-        .required {
-            color: red;
-        }
-
-        .summary-content, .info-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        .final-summary {
-            margin: 20px 0;
-        }
-
-        .summary-details {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-        }
-
-        .selected-info {
-            border-top: 2px solid #007bff;
-            padding-top: 15px;
-        }
-
-        .success-icon {
-            margin-bottom: 20px;
-        }
-
-        .ant-button {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        /* Custom Calendar Styles */
-        .custom-calendar {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .calendar-nav {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-            .calendar-nav:hover {
-                background: #e9ecef;
-            }
-
-        .calendar-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .calendar-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            background: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .weekday {
-            padding: 10px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .calendar-days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            font-size: 12px;
         }
 
         .calendar-day {
-            padding: 12px;
+            padding: 8px 3px;
+            font-size: 14px;
+        }
+
+        .time-selection-panel,
+        .calendar-panel {
+            margin-bottom: 15px;
+        }
+
+        .alert {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-right: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-            min-height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-            .calendar-day:hover:not(.past-date):not(.other-month) {
-                background: #e3f2fd;
+        .store-info .alert {
+            text-align: left;
+        }
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+    let currentDate = new Date();
+    let selectedDate = null;
+
+    // Initialize calendar
+    function initCalendar() {
+        updateCalendar();
+        updateSelectedInfo();
+    }
+
+    // Update calendar display
+    function updateCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // Update title
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        document.getElementById('calendar-title').textContent = `${monthNames[month]} - ${year}`;
+
+        // Generate days
+        const firstDay = new Date(year, month, 1);
+        const startDate = new Date(firstDay);
+        // Set to Monday of the week containing the first day
+        startDate.setDate(startDate.getDate() - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
+
+        const calendarDays = document.getElementById('calendar-days');
+        calendarDays.innerHTML = '';
+
+        for (let i = 0; i < 42; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = date.getDate().toString().padStart(2, '0');
+
+            // Add classes
+            if (date.getMonth() !== month) {
+                dayElement.classList.add('other-month');
             }
 
-            .calendar-day.selected {
-                background: #2196F3;
-                color: white;
-                font-weight: bold;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (date < today) {
+                dayElement.classList.add('past-date');
+            } else {
+                dayElement.addEventListener('click', () => selectDate(date));
             }
 
-            .calendar-day.today {
-                background: #ffeb3b;
-                font-weight: bold;
+            if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+                dayElement.classList.add('selected');
             }
 
-            .calendar-day.past-date {
-                color: #ccc;
-                cursor: not-allowed;
+            if (date.toDateString() === new Date().toDateString()) {
+                dayElement.classList.add('today');
             }
 
-            .calendar-day.other-month {
-                color: #ddd;
-                cursor: default;
-            }
+            calendarDays.appendChild(dayElement);
+        }
+    }
 
-        /* Form Controls */
-        .form-control {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    // Change month
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        updateCalendar();
+    }
+
+    // Select date
+    function selectDate(date) {
+        selectedDate = new Date(date);
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        document.getElementById('serviceDate').value = `${year}-${month}-${day}`;
+        updateCalendar();
+        updateSelectedInfo();
+    }
+
+    // Update selected info display
+    function updateSelectedInfo() {
+        const timeValue = document.getElementById('serviceTime').value;
+        const timeSelect = document.getElementById('serviceTime');
+        const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+
+        document.getElementById('selected-date').textContent =
+            selectedDate ? selectedDate.toLocaleDateString('en-US') : 'Not selected';
+        document.getElementById('selected-time').textContent =
+            timeValue ? timeText : 'Not selected';
+    }
+
+    // Step navigation function
+    function goToStep(stepNumber) {
+        // Validate current step before proceeding
+        if (stepNumber === 2 && !validateStep1()) {
+            return false;
+        }
+        if (stepNumber === 3 && !validateStep2()) {
+            return false;
         }
 
-            .form-control:focus {
-                color: #495057;
-                background-color: #fff;
-                border-color: #80bdff;
-                outline: 0;
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        // Hide all steps
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-3').style.display = 'none';
+
+        // Show target step
+        document.getElementById('step-' + stepNumber).style.display = 'block';
+
+        // Update step indicators
+        updateStepIndicators(stepNumber);
+
+        // Update summary when going to step 2
+        if (stepNumber === 2) {
+            updateBookingSummary();
+        }
+
+        // Submit form and show final summary when going to step 3
+        if (stepNumber === 3) {
+            submitBooking();
+        }
+
+        return true;
+    }
+
+    // Validate Step 1
+    function validateStep1() {
+        const serviceTime = document.getElementById('serviceTime').value;
+        const serviceDate = document.getElementById('serviceDate').value;
+
+        if (!serviceTime || !serviceDate) {
+            alert('Please select both date and time!');
+            return false;
+        }
+
+        // Check if selected time is at least 2 hours from now
+        const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
+        const now = new Date();
+        const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+
+        if (hoursDiff < 2) {
+            alert('Please select a time at least 2 hours from now!');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Validate Step 2
+    function validateStep2() {
+        return true;
+    }
+
+    // Update step indicators
+    function updateStepIndicators(currentStep) {
+        for (let i = 1; i <= 3; i++) {
+            const stepBtn = document.getElementById('step-' + i + '-btn');
+            stepBtn.className = 'btn btn-default btn-circle';
+            if (i < currentStep) {
+                stepBtn.className = 'btn btn-success btn-circle';
+            } else if (i === currentStep) {
+                stepBtn.className = 'btn btn-primary btn-circle';
             }
-    </style>
-</div>
+        }
+    }
+
+    // Update booking summary
+    function updateBookingSummary() {
+        const timeSelect = document.getElementById('serviceTime');
+        const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+
+        document.getElementById('summary-date').textContent =
+            selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
+        document.getElementById('summary-time').textContent = timeText;
+    }
+
+    // Submit booking
+    function submitBooking() {
+        const timeSelect = document.getElementById('serviceTime');
+        const timeText = timeSelect.options[timeSelect.selectedIndex].text;
+        const notesValue = document.getElementById('notes').value;
+
+        // Update final summary
+        document.getElementById('final-date').textContent =
+            selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
+        document.getElementById('final-time').textContent = timeText;
+
+        // Handle notes display
+        if (notesValue && notesValue.trim() !== '') {
+            document.getElementById('final-notes').textContent = notesValue;
+            document.getElementById('final-notes-wrapper').style.display = 'block';
+        } else {
+            document.getElementById('final-notes-wrapper').style.display = 'none';
+        }
+
+        // Submit form to server
+        const formData = new FormData(document.getElementById('ant-booking-form'));
+
+        fetch('@Url.Action("SubmitBooking", "Home")', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Booking submitted successfully:', data);
+            } else {
+                console.error('Booking submission failed:', data.message);
+                alert('Error: ' + data.message);
+                goToStep(2);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting booking. Please try again.');
+            goToStep(2);
+        });
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        initCalendar();
+        updateStepIndicators(1);
+
+        // Add event listener for time selection
+        document.getElementById('serviceTime').addEventListener('change', function () {
+            updateSelectedInfo();
+        });
+    });
+</script>

@@ -377,6 +377,202 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return View(blog);
         }
+
+        public ActionResult BookingManagement()
+        {
+            // Chạy auto-update trước khi hiển thị
+            InvoiceRepository.Instance.AutoUpdateExpiredOrders();
+
+            var allBookings = InvoiceRepository.Instance.GetAll()
+                .Where(b => b.Invoice_Type == 1) // Chỉ lấy booking online
+                .OrderByDescending(b => b.Invoice_Date)
+                .ToList();
+
+            // Lấy thông tin khách hàng cho từng booking
+            foreach (var booking in allBookings)
+            {
+                var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
+                if (customer != null)
+                {
+                    booking.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                    booking.CustomerPhone = customer.PhoneNumber;
+                }
+            }
+
+            // Thêm helper functions cho View
+            ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
+            ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            return View(allBookings);
+        }
+
+        // GET: Danh sách đơn đặt lịch theo trạng thái
+        public ActionResult BookingsByStatus(int status)
+        {
+            var bookings = InvoiceRepository.Instance.GetAll()
+                .Where(b => b.Invoice_Type == 1 && b.Order_Status == status)
+                .OrderByDescending(b => b.Invoice_Date)
+                .ToList();
+
+            // Lấy thông tin khách hàng cho từng booking
+            foreach (var booking in bookings)
+            {
+                var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
+                if (customer != null)
+                {
+                    booking.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                    booking.CustomerPhone = customer.PhoneNumber;
+                }
+            }
+
+            ViewBag.StatusFilter = status;
+            ViewBag.StatusText = GetBookingStatusText(status);
+            ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
+            ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            return View("BookingManagement", bookings);
+        }
+
+        // GET: Danh sách đơn đã quá hạn
+        public ActionResult ExpiredBookings()
+        {
+            if (Session["admin"] == null)
+            {
+                return RedirectToAction("Login", "Home");
+            }
+
+            var expiredBookings = InvoiceRepository.Instance.GetExpiredOrders();
+
+            ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
+            ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            return View(expiredBookings);
+        }
+
+        // POST: Cập nhật trạng thái đơn đặt lịch
+        [HttpPost]
+        public JsonResult UpdateBookingStatus(int id, int newStatus)
+        {
+            try
+            {
+                // Tạo log message
+                var statusText = GetBookingStatusText(newStatus);
+                var updateLog = $"\n[ADMIN UPDATE] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Status changed to {statusText}";
+
+                // Sử dụng method chuyên dụng để update status
+                bool success = InvoiceRepository.Instance.UpdateOrderStatus(id, newStatus, updateLog);
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Status updated successfully",
+                        newStatusText = statusText,
+                        newStatusClass = GetBookingStatusClass(newStatus)
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Database update error" });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateBookingStatus Error: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
+        // GET: Chi tiết đơn đặt lịch
+        public ActionResult BookingDetails(int id)
+        {
+            var booking = InvoiceRepository.Instance.GetById(id);
+            if (booking == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn đặt lịch";
+                return RedirectToAction("BookingManagement");
+            }
+
+            // Lấy thông tin khách hàng
+            var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
+            if (customer != null)
+            {
+                booking.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                booking.CustomerPhone = customer.PhoneNumber;
+            }
+
+            ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
+            ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            return View(booking);
+        }
+
+        // POST: Chạy auto-update đơn quá hạn
+        [HttpPost]
+        public JsonResult RunAutoUpdateExpired()
+        {
+            try
+            {
+                int updatedCount = InvoiceRepository.Instance.AutoUpdateExpiredOrders();
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Updated {updatedCount} expired orders",
+                    updatedCount = updatedCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        // GET: Thống kê đơn đặt lịch
+        public ActionResult BookingStatistics()
+        {
+
+            var allBookings = InvoiceRepository.Instance.GetAll()
+                .Where(b => b.Invoice_Type == 1)
+                .ToList();
+
+            var stats = new
+            {
+                TotalBookings = allBookings.Count,
+                PendingBookings = allBookings.Count(b => b.Order_Status == 0),
+                ConfirmedBookings = allBookings.Count(b => b.Order_Status == 1),
+                CancelledBookings = allBookings.Count(b => b.Order_Status == 2),
+                ExpiredBookings = InvoiceRepository.Instance.GetExpiredOrders().Count,
+                TodayBookings = allBookings.Count(b => b.Invoice_Date.Date == DateTime.Today)
+            };
+
+            ViewBag.Statistics = stats;
+            return View();
+        }
+
+        // Helper methods
+        private string GetBookingStatusText(int status)
+        {
+            switch (status)
+            {
+                case 0: return "Pending";
+                case 1: return "Confirmed";
+                case 2: return "Cancelled";
+                default: return "Unknown";
+            }
+        }
+
+        private string GetBookingStatusClass(int status)
+        {
+            switch (status)
+            {
+                case 0: return "warning";
+                case 1: return "success";
+                case 2: return "danger";
+                default: return "secondary";
+            }
+        }
         public ActionResult CustomerDetail(int id)
         {
             var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
@@ -387,4 +583,5 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View(customer);
         }
     }
+
 }
