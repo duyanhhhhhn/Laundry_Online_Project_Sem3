@@ -157,36 +157,42 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == model.Id);
                 if (invoice == null) return false;
 
-                // Update fields with proper validation
+                // Cập nhật các trường đơn giản
                 invoice.customer_id = model.Customer_Id;
-                invoice.employee_id = model.Employee_Id == 0 ? null : (int?)model.Employee_Id;
+                invoice.employee_id = model.Employee_Id > 0 ? (int?)model.Employee_Id : null;
                 invoice.invoice_date = model.Invoice_Date;
                 invoice.delivery_date = model.Delivery_Date;
                 invoice.pickup_date = model.Pickup_Date;
-                // Ensure total_amount is never null or zero for existing invoices
-                invoice.total_amount = model.Total_Amount <= 0 ? invoice.total_amount : model.Total_Amount;
 
-                invoice.payment_type = model.Payment_Type == 0 ? null : (int?)model.Payment_Type;
-                invoice.payment_id = string.IsNullOrEmpty(model.Payment_Id) ? null : model.Payment_Id;
-                invoice.order_status = model.Order_Status == 0 ? null : (int?)model.Order_Status;
-                invoice.invoice_type = model.Invoice_Type == 0 ? null : (int?)model.Invoice_Type;
-                invoice.cp_id = model.CustomerPackage_Id == 0 ? null : model.CustomerPackage_Id;
-                invoice.status = model.Status == 0 ? null : (int?)model.Status;
-
-                // Truncate notes to fit database constraint (200 characters max)
-                if (!string.IsNullOrEmpty(model.Notes))
+                // Giữ lại total_amount cũ nếu giá trị mới không hợp lệ
+                if (model.Total_Amount > 0)
                 {
-                    invoice.notes = model.Notes.Length > 200 ? model.Notes.Substring(0, 200) : model.Notes;
+                    invoice.total_amount = model.Total_Amount;
+                }
+
+                invoice.payment_type = model.Payment_Type > 0 ? (int?)model.Payment_Type : null;
+                invoice.payment_id = string.IsNullOrWhiteSpace(model.Payment_Id) ? null : model.Payment_Id;
+                invoice.order_status = model.Order_Status > 0 ? (int?)model.Order_Status : null;
+                invoice.invoice_type = model.Invoice_Type > 0 ? (int?)model.Invoice_Type : null;
+                invoice.cp_id = model.CustomerPackage_Id > 0 ? (int?)model.CustomerPackage_Id : null;
+                invoice.status = model.Status > 0 ? (int?)model.Status : null;
+
+                // Xử lý ghi chú giới hạn 200 ký tự
+                if (!string.IsNullOrWhiteSpace(model.Notes))
+                {
+                    invoice.notes = model.Notes.Length > 200
+                        ? model.Notes.Substring(0, 200)
+                        : model.Notes;
                 }
                 else
                 {
                     invoice.notes = null;
                 }
 
-                invoice.ship_cost = model.Ship_Cost == 0 ? null : (decimal?)model.Ship_Cost;
-                invoice.delivery_status = model.Delivery_Status == 0 ? null : (int?)model.Delivery_Status;
+                invoice.ship_cost = model.Ship_Cost > 0 ? (decimal?)model.Ship_Cost : null;
+                invoice.delivery_status = model.Delivery_Status;
 
-                // Validate the entity state before saving
+                // Validate entity trước khi lưu
                 var validationResults = _context.Entry(invoice).GetValidationResult();
                 if (!validationResults.IsValid)
                 {
@@ -425,5 +431,32 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return false;
             }
         }
+
+
+        public bool ConfirmInvoicePayment(int invoiceId, string transactionId)
+        {
+            try
+            {
+                var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == invoiceId);
+                if (invoice == null)
+                {
+                    Debug.WriteLine("Invoice not found for ID: " + invoiceId);
+                    return false;
+                }
+
+                invoice.order_status = 2; // Đã thanh toán
+                invoice.payment_id = string.IsNullOrWhiteSpace(transactionId) ? null : transactionId;
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("ConfirmInvoicePayment error: " + ex.Message);
+                return false;
+            }
+        }
+
     }
+
 }

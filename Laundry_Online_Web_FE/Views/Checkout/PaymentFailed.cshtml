@@ -4,8 +4,8 @@
 
     // Check if user is admin or client
     var customer = Session["customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
-    var admin = Session["employee"] as Laundry_Online_Web_FE.Models.ModelViews.EmployeeView;
-    bool isAdmin = admin != null;
+    var employee = Session["employee"] as Laundry_Online_Web_FE.Models.ModelViews.EmployeeView;
+    bool isAdmin = employee != null;
     bool isClient = customer != null;
 
     // Set appropriate layout
@@ -80,7 +80,7 @@
                                         }
                                         else if (isAdmin)
                                         {
-                                            <span>Admin Payment</span>
+                                            <span>@employee.FirstName @employee.LastName</span>
                                         }
                                         else
                                         {
@@ -132,20 +132,12 @@
                                 <i class="fas fa-redo mr-2"></i>
                                 Try Again
                             </a>
-                            <a href="@Url.Action("Index", "CustomerPackage")" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Go Back
-                            </a>
                         }
                         else if (isClient)
                         {
-                            <a href="@Url.Action("Index", "ClientInvoice")" class="btn btn-danger btn-lg mr-3">
-                                <i class="fas fa-redo mr-2"></i>
-                                Try Again
-                            </a>
-                            <a href="@Url.Action("Index", "ClientPackage")" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Go Back
+                            <a href="@Url.Action("CustomerDetail", "Home",new { id = customer.Id })" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-box mr-2"></i>
+                                My Packages
                             </a>
                         }
                         else
@@ -182,9 +174,17 @@
     }
 
     @@keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-        20%, 40%, 60%, 80% { transform: translateX(5px); }
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
     }
 
     .card {
@@ -214,8 +214,8 @@
         border: 1px solid #ffeaa7;
     }
 
-    .troubleshooting ul li {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
+        .troubleshooting ul li {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
 </style>

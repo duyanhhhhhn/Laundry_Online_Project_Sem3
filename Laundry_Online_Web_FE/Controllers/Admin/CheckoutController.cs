@@ -11,6 +11,8 @@ using Laundry_Online_Web_FE.Models.Librabries;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews.Payments;
+using System.Linq;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO.Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -44,27 +46,82 @@ namespace Laundry_Online_Web_FE.Controllers
         }
 
         // Method for Invoice Controller to call
+
         public ActionResult PayInvoice(int invoiceId)
         {
             var invoice = _invoiceRepository.GetById(invoiceId);
             if (invoice == null)
             {
+
                 TempData["ErrorMessage"] = "Không tìm thấy hóa đơn.";
                 return RedirectToAction("Index", "Invoice");
             }
 
-            // Check invoice status, status = 2 means paid
+            var employee = Session["employee"] as EmployeeView;
+            if (employee == null)
+            {
+                Session["employee"] = new EmployeeView
+                {
+                    Id = 1,
+                    FirstName = "Test",
+                    LastName = "Employee"
+                };
+                Session["employee"] = employee;
+                //TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục.";
+                //return RedirectToAction("Login", "Home");
+            }
+
             if (invoice.Order_Status == 2)
             {
                 TempData["ErrorMessage"] = "Hóa đơn này đã được thanh toán.";
                 return RedirectToAction("Index", "Invoice", new { id = invoiceId });
             }
 
-            // IMPROVEMENT: Store invoice in session for payment callback
-            Session["invoice"] = invoice;
+            var invoiceItems = _invoiceItemRepository
+                .GetItemsByInvoiceId(invoiceId)
+                .Select(item =>
+                {
+                    var service = _serviceRepository.GetById(item.ServiceId);
+                    return new InvoiceItemForm
+                    {
+                        Id = item.Id,
+                        ItemName = item.ItemName,
+                        Invoice_Id = item.InvoiceId,
+                        Quantity = (int)item.Quantity,
+                        Unit_Price = item.UnitPrice,
+                        Item_Status = item.ItemStatus,
+                        Service_Id = item.ServiceId,
+                        Service_Name = service.Title ?? "",
+                        Service_Description = service?.Description ?? "",
+                        Service_Price = service?.Price ?? 0,
+                        ItemUnit = service?.Unit ?? ""
+                    };
+                }).ToList();
 
-            return View(invoice);
+            var model= new InvoiceForm
+            {
+                Id = invoice.Id,
+                Customer_Name = invoice.CustomerName,
+                Customer_Id = invoice.Customer_Id,
+               // Employee_Name = employee.LastName + " " + employee.FirstName,
+                Employee_Id = (int)invoice.Employee_Id,
+                Delivery_Date = (DateTime)invoice.Delivery_Date,
+                Pickup_Date = (DateTime)invoice.Pickup_Date,
+                InvoiceItems = invoiceItems, // This is where Total_Amount is calculated via InvoiceForm
+                Invoice_Type = invoice.Invoice_Type,
+                Payment_Type = invoice.Payment_Type,
+                CustomerPackage_Id = invoice.CustomerPackage_Id,
+                Ship_Cost = invoice.Ship_Cost,
+                Notes = invoice.Notes,
+                Order_Status = invoice.Order_Status
+            };
+
+            Session["invoice"] = model;
+
+            return View(model);
         }
+
+
 
         // Method for Package payment
         public ActionResult PayPackage(int packageId)
@@ -116,12 +173,12 @@ namespace Laundry_Online_Web_FE.Controllers
 
                 if (response.Success)
                 {
-                    var invoice = Session["invoice"] as InvoiceView;
+                    var invoice = Session["invoice"] as InvoiceForm;
                     var package = Session["customerPackage"] as PayPackageInfor; // ✅ Đúng tên session
 
                     if (invoice != null)
                     {
-                        return ProcessInvoicePayment(invoice);
+                        return ProcessInvoicePayment(invoice,response);
                     }
                     else if (package != null)
                     {
@@ -148,11 +205,12 @@ namespace Laundry_Online_Web_FE.Controllers
 
 
         // IMPROVEMENT: Extract invoice payment logic to separate method
-        private ActionResult ProcessInvoicePayment(InvoiceView invoice)
+        private ActionResult ProcessInvoicePayment(InvoiceForm invoice, PaymentResponseModel response)
         {
+            var employee = Session["employee"] as EmployeeView;
             bool success = false;
-            invoice.Order_Status = 2; // Mark as paid
 
+            //invoice.Employee_Id = employee.Id;
             if (invoice.CustomerPackage_Id != null)
             {
                 var cp_id = invoice.CustomerPackage_Id;
@@ -203,8 +261,9 @@ namespace Laundry_Online_Web_FE.Controllers
                 }
             }
 
+
             // IMPROVEMENT: Update invoice status regardless of package update
-            var invoiceUpdateSuccess = _invoiceRepository.Update(invoice);
+            var invoiceUpdateSuccess = _invoiceRepository.ConfirmInvoicePayment(invoice.Id, response.TransactionId);
 
             if (invoiceUpdateSuccess)
             {
@@ -215,7 +274,7 @@ namespace Laundry_Online_Web_FE.Controllers
             else
             {
                 TempData["ErrorMessage"] = "Thanh toán thành công nhưng có lỗi khi cập nhật hóa đơn!";
-                return RedirectToAction("Detail", "Invoice", new { id = invoice.Id });
+                return RedirectToAction("Index", "Invoice", new { id = invoice.Id });
             }
         }
 

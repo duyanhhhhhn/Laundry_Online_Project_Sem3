@@ -8,6 +8,7 @@ using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
 using Newtonsoft.Json;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO.Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
@@ -38,16 +39,16 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         [HttpGet]
         [Route("")]
         // GET: Invoice
-        public ActionResult Index(int? status)
+        public ActionResult Index(int? orderStatus)
         {
             var invoiceList = _invoiceRepository.GetAll();
             var customerList = _customerRepository.GetAll();
             var employeeList = _employeeRepository.All();
 
             // Filter by status if provided
-            if (status.HasValue)
+            if (orderStatus.HasValue)
             {
-                invoiceList = invoiceList.Where(i => i.Status == status.Value).ToHashSet();
+                invoiceList = invoiceList.Where(i => i.Order_Status == orderStatus.Value).ToHashSet();
             }
 
             var invoiceViewList = new List<InvoiceForm>();
@@ -68,8 +69,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         Employee_Name = employee != null ? $"{employee.FirstName} {employee.LastName}" : "Not Found",
                         Invoice_Date = invoice.Invoice_Date,
                         Delivery_Date = (DateTime)invoice.Delivery_Date,
-                        Pickup_Date = (DateTime)invoice.Pickup_Date,
-                        //Total_
+                        Pickup_Date = (DateTime)invoice.Pickup_Date,                     
                         Payment_Type = invoice.Payment_Type,
                         Order_Status = invoice.Order_Status,
                         Invoice_Type = invoice.Invoice_Type,
@@ -86,10 +86,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
 
             ViewBag.Data = invoiceViewList;
-            ViewBag.CurrentStatus = status;
+            ViewBag.CurrentStatus = orderStatus;
 
             return View();
         }
+
         [HttpGet]
         [Route("Details/{id:int}")]
         // GET: Invoice/Details/5
@@ -233,79 +234,45 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         // POST: Invoice/Edit/5
         [HttpPost]
         [Route("Edit/{id:int}")]
-        public ActionResult EditInvoice(int id)
+    
+        public ActionResult EditInvoice(int id, InvoiceForm form)
         {
             try
             {
-                string customerId = Request.Form["Customer_Id"];
-                string employeeId = Request.Form["Employee_Id"];
-                string deliveryDate = Request.Form["Delivery_Date"];
-                string pickupDate = Request.Form["Pickup_Date"];
-                string paymentType = Request.Form["Payment_Type"];
-                string invoiceType = Request.Form["Invoice_Type"];
-                string customerPackageId = Request.Form["CustomerPackage_Id"];
-                string notes = Request.Form["Notes"];
-                string shipCost = Request.Form["Ship_Cost"];
-                string orderStatus = Request.Form["Order_Status"];
-                string deliveryStatus = Request.Form["Delivery_Status"];
-                string status = Request.Form["Status"];
-                string invoiceItemsJson = Request.Form["InvoiceItems"];
-
                 var existingInvoice = _invoiceRepository.GetById(id);
                 if (existingInvoice == null)
-                {
                     return Json(new { success = false, message = "Invoice not found." });
-                }
 
-                // Calculate total amount from invoice items
-                decimal totalAmount = 0;
-                if (!string.IsNullOrEmpty(invoiceItemsJson))
-                {
-                    try
-                    {
-                        var invoiceItems = JsonConvert.DeserializeObject<List<dynamic>>(invoiceItemsJson);
-                        totalAmount = invoiceItems.Sum(item => (decimal)item.subTotal);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle JSON parsing error
-                        System.Diagnostics.Debug.WriteLine("JSON parsing error: " + ex.Message);
-                    }
-                }
-
-                // Add shipping cost to total
-                decimal shippingCost = string.IsNullOrEmpty(shipCost) ? 0 : Convert.ToDecimal(shipCost);
-                totalAmount += shippingCost;
-
+                // Gán lại dữ liệu từ form vào InvoiceView để lưu
                 var updatedInvoice = new InvoiceView
                 {
                     Id = id,
-                    Customer_Id = string.IsNullOrEmpty(customerId) ? 0 : Convert.ToInt32(customerId),
-                    Employee_Id = string.IsNullOrEmpty(employeeId) ? 0 : Convert.ToInt32(employeeId),
-                    Invoice_Date = existingInvoice.Invoice_Date, // Keep original invoice date
-                    Delivery_Date = string.IsNullOrEmpty(deliveryDate) ? DateTime.Now.AddDays(1) : Convert.ToDateTime(deliveryDate),
-                    Pickup_Date = string.IsNullOrEmpty(pickupDate) ? DateTime.Now.AddDays(3) : Convert.ToDateTime(pickupDate),
-                    Total_Amount = totalAmount,
-                    Payment_Type = string.IsNullOrEmpty(paymentType) ? 1 : Convert.ToInt32(paymentType),
-                    Invoice_Type = string.IsNullOrEmpty(invoiceType) ? 1 : Convert.ToInt32(invoiceType),
-                    CustomerPackage_Id = string.IsNullOrEmpty(customerPackageId) ? 0 : Convert.ToInt32(customerPackageId),
-                    Notes = notes ?? "",
-                    Ship_Cost = shippingCost,
-                    Order_Status = string.IsNullOrEmpty(orderStatus) ? 1 : Convert.ToInt32(orderStatus),
-                    Delivery_Status = string.IsNullOrEmpty(deliveryStatus) ? 1 : Convert.ToInt32(deliveryStatus),
-                    Status = string.IsNullOrEmpty(status) ? 1 : Convert.ToInt32(status),
-                    Payment_Id = existingInvoice.Payment_Id // Keep existing payment ID
+                    Customer_Id = form.Customer_Id,
+                    Employee_Id = form.Employee_Id,
+                    Invoice_Date = existingInvoice.Invoice_Date,
+                    Delivery_Date = form.Delivery_Date,
+                    Pickup_Date = form.Pickup_Date,
+                    Total_Amount = form.Total_Amount,
+                    Payment_Type = form.Payment_Type,
+                    Invoice_Type = form.Invoice_Type,
+                    CustomerPackage_Id = form.CustomerPackage_Id ?? 0,
+                    Notes = form.Notes ?? "",
+                    Ship_Cost = form.Ship_Cost,
+                    Order_Status = form.Order_Status,
+                    Delivery_Status = form.Delivery_Status,
+                    Status = form.Status,
+                    Payment_Id = existingInvoice.Payment_Id
                 };
 
+                // Cập nhật hóa đơn
                 bool result = _invoiceRepository.Update(updatedInvoice);
 
                 if (result)
                 {
-                    //Handle invoice items if repository exists
-                    // This is where you would save invoice items to database
-                     if (_invoiceItemRepository != null && !string.IsNullOrEmpty(invoiceItemsJson))
+                    // Cập nhật chi tiết hóa đơn
+                    if (_invoiceItemRepository != null && form.InvoiceItems != null)
                     {
-                        SaveInvoiceItems(id, invoiceItemsJson);
+                        SaveInvoiceItems(id, form.InvoiceItems); // truyền list object thay vì JSON
                     }
 
                     return Json(new { success = true, message = "Invoice updated successfully!" });
@@ -320,6 +287,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 return Json(new { success = false, message = "Error: " + ex.Message });
             }
         }
+
 
         // POST: Invoice/Delete/5
         [HttpPost]
@@ -352,74 +320,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View("Index", invoices);
         }
 
-        // GET: Invoice/ProcessPayment
-        //public ActionResult ProcessPayment(int id)
-        //{
-        //    var invoice = _invoiceRepository.GetById(id);
-        //    if (invoice == null)
-        //    {
-        //        TempData["ErrorMessage"] = "Invoice not found.";
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    if (!string.IsNullOrEmpty(invoice.Payment_Id) && invoice.Order_Status == 2)
-        //    {
-        //        TempData["InfoMessage"] = "This invoice has already been paid!";
-        //        return RedirectToAction("Edit", new { id });
-        //    }
-
-        //    try
-        //    {
-        //        var invoiceView = new InvoiceView
-        //        {
-        //            Id = invoice.Id,
-        //            Total_Amount = invoice.Total_Amount
-        //        };
-
-        //        string ipAddress = GetIpAddress();
-        //        string paymentUrl = _paymentService.CreatePaymentUrl(invoiceView, ipAddress);
-        //        return Redirect(paymentUrl);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["ErrorMessage"] = "Error processing payment: " + ex.Message;
-        //        return RedirectToAction("Edit", new { id });
-        //    }
-        //}
-
-        //public ActionResult PaymentReturn()
-        //{
-        //    var (isSuccess, message, updatedInvoice) = _paymentService.HandleReturn(Request.QueryString);
-
-        //    if (isSuccess && updatedInvoice != null)
-        //    {
-        //        var invoice = _invoiceRepository.GetById(updatedInvoice.Id);
-        //        if (invoice != null)
-        //        {
-        //            invoice.Payment_Id = updatedInvoice.Payment_Id;
-        //            invoice.Payment_Type = updatedInvoice.Payment_Type;
-        //            invoice.Order_Status = updatedInvoice.Order_Status;
-
-        //            if (_invoiceRepository.Update(invoice))
-        //            {
-        //                TempData["SuccessMessage"] = message;
-        //                return RedirectToAction("Edit", new { id = invoice.Id });
-        //            }
-        //            else
-        //            {
-        //                TempData["ErrorMessage"] = "Payment successful, but invoice update failed.";
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        TempData["ErrorMessage"] = message;
-        //    }
-
-        //    return RedirectToAction("Index");
-        //}
-
-        // AJAX: Get Customer Packages
+      
         [HttpGet]
         public ActionResult GetCustomerPackages(int customerId)
         {
@@ -488,36 +389,34 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return Request.ServerVariables["REMOTE_ADDR"];
         }
 
-        // Helper method to save invoice items (implement based on your InvoiceItemRepository)
-        private void SaveInvoiceItems(int invoiceId, string invoiceItemsJson)
+        private void SaveInvoiceItems(int invoiceId, List<InvoiceItemForm> items)
         {
-            try
+            if (items == null || !items.Any()) return;
+
+            // Xoá item cũ
+            var oldItems = _invoiceItemRepository.GetItemsByInvoiceId(invoiceId);
+            foreach (var oldItem in oldItems)
             {
-                // Parse JSON and save to database
-                var invoiceItems = JsonConvert.DeserializeObject<List<dynamic>>(invoiceItemsJson);
-
-                // Delete existing items first
-                _invoiceItemRepository.DeleteInvoiceItem(invoiceId);
-
-                // Add new items
-                foreach (var item in invoiceItems)
-                {
-                    var invoiceItem = new InvoiceItemView
-                    {
-                        InvoiceId = invoiceId,
-                        ServiceId = (int)item.serviceId,
-                        Quantity = (int)item.quantity,
-                        UnitPrice = (decimal)item.unitPrice,
-                        ItemStatus = 1
-                    };
-
-                    _invoiceItemRepository.AddInvoiceItem(invoiceItem);
-                }
+                _invoiceItemRepository.DeleteInvoiceItem(oldItem.Id);
             }
-            catch (Exception ex)
+
+            // Lưu item mới
+            foreach (var item in items)
             {
-                System.Diagnostics.Debug.WriteLine("Error saving invoice items: " + ex.Message);
+                var newItem = new InvoiceItemView
+                {
+                    InvoiceId = invoiceId,
+                    ItemName=item.ItemName,
+                    ServiceId = item.Service_Id,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.Unit_Price,
+                    SubTotal = item.Sub_Total,  
+                    ItemStatus = item.Item_Status
+                };
+
+                _invoiceItemRepository.AddInvoiceItem(newItem);
             }
         }
+
     }
 }
