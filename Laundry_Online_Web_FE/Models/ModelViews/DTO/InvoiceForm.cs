@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web; 
+using System.Web;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO.Laundry_Online_Web_FE.Models.ModelViews;
 
 namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
 {
@@ -49,10 +50,10 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public decimal Ship_Cost { get; set; } = 0m;
 
         [Display(Name = "Service List")]
-        public List<InvoiceItemView> InvoiceItems { get; set; } = new List<InvoiceItemView>();
+        public List<InvoiceItemForm> InvoiceItems { get; set; } = new List<InvoiceItemForm>();
 
         [Display(Name = "Total Amount")]
-        public decimal Total_Amount => InvoiceItems.Sum(x => x.SubTotal) + Ship_Cost;
+        public decimal Total_Amount => InvoiceItems.Sum(x => x.Sub_Total) + Ship_Cost;
 
         // Display properties for views
         public string Customer_Name { get; set; } = "";
@@ -62,7 +63,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public int Delivery_Status { get; set; } = 1;
         public int Status { get; set; } = 1;
         public string Payment_Id { get; set; } = "";
-
+        public string Service_name { get; set; } = "";
         // Helper methods for dropdown lists
         public static List<SelectListItem> GetPaymentTypes()
         {
@@ -77,8 +78,9 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
-                new SelectListItem { Value = "1", Text = "Regular Invoice" },
-                new SelectListItem { Value = "2", Text = "VIP Invoice" }
+                new SelectListItem { Value = "0", Text = "Kg" },
+                new SelectListItem { Value = "1", Text = "Piece" },
+                new SelectListItem { Value = "2", Text = "Pair" }
             };
         }
 
@@ -86,10 +88,10 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
+                new SelectListItem { Value = "0", Text = "Scheduled" },
                 new SelectListItem { Value = "1", Text = "Pending" },
                 new SelectListItem { Value = "2", Text = "Paid" },
-                new SelectListItem { Value = "3", Text = "Processing" },
-                new SelectListItem { Value = "4", Text = "Completed" },
+                new SelectListItem { Value = "3", Text = "Cancelled" },
                 new SelectListItem { Value = "5", Text = "Cancelled" }
             };
         }
@@ -98,6 +100,8 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
+            
+                new SelectListItem { Value = "0", Text = "No Delivery" },
                 new SelectListItem { Value = "1", Text = "Pending Delivery" },
                 new SelectListItem { Value = "2", Text = "In Transit" },
                 new SelectListItem { Value = "3", Text = "Delivered" },

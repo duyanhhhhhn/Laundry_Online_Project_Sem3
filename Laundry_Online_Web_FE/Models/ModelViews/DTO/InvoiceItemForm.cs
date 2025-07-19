@@ -14,7 +14,8 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public class InvoiceItemForm
         {
             public int Id { get; set; } = 0;
-
+            public string ItemName { get; set; } = "";
+            public string ItemUnit { get; set; } = "";
             [Required(ErrorMessage = "Invoice ID is required")]
             public int Invoice_Id { get; set; } = 0;
 
@@ -33,7 +34,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
             public decimal Unit_Price { get; set; } = 0m;
 
             [Display(Name = "Sub Total")]
-            public decimal Sub_Price => Quantity * Unit_Price;
+            public decimal Sub_Total => (Quantity * Unit_Price)+Service_Price;
 
             [Display(Name = "Status")]
             public int Item_Status { get; set; } = 1;
