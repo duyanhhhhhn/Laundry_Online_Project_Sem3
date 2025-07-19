@@ -4,6 +4,607 @@
     Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
 
+<div class="container mt-4">
+    <div class="booking-edit-container">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4><i class="fas fa-edit"></i> Edit Booking</h4>
+                        <div class="booking-id-display">
+                            <i class="fas fa-hashtag"></i> #@Model.Id
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge badge-warning status-badge">
+                            <i class="fas fa-hourglass-half"></i> Pending
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Rules Alert -->
+                <div class="alert alert-danger rules-alert">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Booking Edit Rules & Time Restrictions</h5>
+                    <ul>
+                        <li><strong>Edit Window:</strong> Bookings can only be modified up to <strong>12 hours</strong> before the appointment time</li>
+                        <li><strong>New Appointment:</strong> The new time must be scheduled at least <strong>12 hours</strong> from now</li>
+                        <li><strong>Status Requirement:</strong> Only <strong>pending bookings</strong> can be edited</li>
+                        <li><strong>Auto-Cancellation:</strong> Unconfirmed bookings will be automatically cancelled <strong>1 hour</strong> after the scheduled time</li>
+                        <li><strong>Change History:</strong> All modifications will be logged in the booking notes</li>
+                    </ul>
+
+                    @{
+                        var appointmentTime = Model.Invoice_Date;
+                        var now = DateTime.Now;
+                        var hoursUntilAppointment = (appointmentTime - now).TotalHours;
+                        var canStillEdit = hoursUntilAppointment > 12;
+                    }
+
+                    <div class="time-remaining @(canStillEdit ? "" : "danger") mt-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            <div>
+                                <strong>Current Time:</strong> @now.ToString("dd/MM/yyyy HH:mm")<br>
+                                <strong>Appointment Time:</strong> @appointmentTime.ToString("dd/MM/yyyy HH:mm")<br>
+                                <strong>Time Until Appointment:</strong>
+                                @if (hoursUntilAppointment > 0)
+                                {
+                                    <span class="@(canStillEdit ? "text-info" : "text-danger")">
+                                        @Math.Floor(hoursUntilAppointment) hours @Math.Floor((hoursUntilAppointment - Math.Floor(hoursUntilAppointment)) * 60) minutes
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">Appointment time has passed</span>
+                                }
+                                <br>
+                                <strong>Edit Status:</strong>
+                                @if (canStillEdit)
+                                {
+                                    <span class="text-success"><i class="fas fa-check-circle"></i> You can still edit this booking</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Edit window has closed (less than 12 hours remaining)</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✅ IMPROVED: Current Booking Information -->
+                <div class="current-info">
+                    <h6><i class="fas fa-info-circle"></i> Current Booking Information:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1">
+                                <strong><i class="fas fa-hashtag"></i> Booking ID:</strong>
+                                <span class="text-primary">#@Model.Id</span>
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-calendar"></i> Date:</strong>
+                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("dd/MM/yyyy") : "Not set"))
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1">
+                                <strong><i class="fas fa-clock"></i> Time:</strong>
+                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "Not set"))
+                            </p>
+                            <p class="mb-1">
+                                <strong><i class="fas fa-info-circle"></i> Status:</strong>
+                                <span class="badge badge-warning">Pending</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ✅ IMPROVED: Current Notes Display -->
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0"><i class="fas fa-sticky-note"></i> Current Notes:</h6>
+                        @if (!string.IsNullOrEmpty(Model.Notes))
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="showCurrentNotesModal()">
+                                <i class="fas fa-eye"></i> View Full Notes
+                            </button>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mt-2 p-3 bg-light rounded border">
+                            <div class="notes-preview-text">
+                                @{
+                                    var notesPreview = Model.Notes.Length > 100 ? Model.Notes.Substring(0, 100) + "..." : Model.Notes;
+                                }
+                                <small>@Html.Raw(notesPreview.Replace("\n", "<br />"))</small>
+                                @if (Model.Notes.Length > 100)
+                                {
+                                    <div class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Showing first 100 characters. Click "View Full Notes" to see complete history.
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mt-2 p-3 bg-light rounded border text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-sticky-note"></i> No notes have been added to this booking yet.
+                            </small>
+                        </div>
+                    }
+                </div>
+
+                <!-- Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                <!-- ✅ IMPROVED: Edit Form -->
+                <form method="post" action="@Url.Action("EditBooking", "Home", new { id = Model.Id })">
+                    @Html.AntiForgeryToken()
+
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-edit"></i> Update Booking Information</h6>
+                        <small>Please select new date and time for your appointment (must be at least 12 hours from now)</small>
+                    </div>
+
+                    <!-- Date & Time Selection -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="serviceDate" class="form-label">
+                                    <i class="fas fa-calendar"></i> New Date <span class="text-danger">*</span>
+                                </label>
+                                <input type="date"
+                                       id="serviceDate"
+                                       name="ServiceDate"
+                                       class="form-control"
+                                       value="@((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("yyyy-MM-dd") : DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")))"
+                                       required>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Select from tomorrow onwards (minimum 12 hours advance)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="serviceTime" class="form-label">
+                                    <i class="fas fa-clock"></i> New Time <span class="text-danger">*</span>
+                                </label>
+                                <select id="serviceTime" name="ServiceTime" class="form-control" required>
+                                    <option value="">-- Select Time --</option>
+                                    @{
+                                        var currentTime = Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "";
+                                        var timeOptions = new string[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
+                                        var timeLabels = new string[] { "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM" };
+                                    }
+                                    @for (int i = 0; i < timeOptions.Length; i++)
+                                    {
+                                        <option value="@timeOptions[i]" @(currentTime == timeOptions[i] ? "selected" : "")>@timeLabels[i]</option>
+                                    }
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-business-time"></i> Working hours: 8:00 AM - 5:00 PM (minimum 12 hours from now)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Appointment Info -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="new-appointment-info" class="alert alert-light" style="display: none;">
+                                <h6><i class="fas fa-clock"></i> New Appointment Timing</h6>
+                                <p class="mb-1"><strong>Selected Time:</strong> <span id="selected-datetime">-</span></p>
+                                <p class="mb-0"><strong>Time from now:</strong> <span id="time-from-now" class="font-weight-bold">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ IMPROVED: Notes Section -->
+                    <div class="form-group">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="notes" class="form-label mb-0">
+                                <i class="fas fa-sticky-note"></i> Additional Notes <span class="text-muted">(Optional)</span>
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearNotes()">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                        <textarea name="Notes"
+                                  id="notes"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Add any additional notes for your booking..."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> Any changes you make will be logged automatically.
+                            This field is for <strong>additional notes</strong> only - existing notes and change history will be preserved.
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-history"></i>
+                                All booking changes are automatically tracked in the system logs.
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="@Url.Action("MyBookings", "Home")" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to My Bookings
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ FIXED: Current Notes Modal with proper close handlers -->
+    <div class="modal fade" id="currentNotesModal" tabindex="-1" role="dialog" aria-labelledby="currentNotesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="currentNotesModalLabel">
+                        <i class="fas fa-sticky-note"></i> Booking #@Model.Id - Current Notes & History
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="currentNotesContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ FIXED: Enhanced JavaScript with proper modal close handlers -->
+<script>
+$(document).ready(function () {
+    console.log('EditBooking page loaded');
+
+    // ✅ FIXED: Modal close event handlers
+    $('#currentNotesModal').on('hidden.bs.modal', function () {
+        console.log('Modal closed - cleaning up content');
+        $('#currentNotesContent').empty();
+    });
+
+    // ✅ FIXED: Multiple ways to close modal
+    $(document).on('click', '[data-dismiss="modal"]', function(e) {
+        console.log('Close button clicked');
+        $('#currentNotesModal').modal('hide');
+    });
+
+    // ✅ ESC key to close modal
+    $(document).on('keydown', function(e) {
+        if (e.keyCode === 27 && $('#currentNotesModal').hasClass('show')) {
+            console.log('ESC pressed');
+            $('#currentNotesModal').modal('hide');
+        }
+    });
+
+    // ✅ Click outside modal to close
+    $('#currentNotesModal').on('click', function(e) {
+        if (e.target === this) {
+            console.log('Clicked outside modal');
+            $(this).modal('hide');
+        }
+    });
+});
+
+let serverTime = null;
+
+// Server time function
+async function getServerTime() {
+    try {
+        const response = await fetch('@Url.Action("GetServerTime", "Home")');
+        const data = await response.json();
+        if (data.success) {
+            serverTime = new Date(data.serverTime);
+            return serverTime;
+        } else {
+            return new Date();
+        }
+    } catch (error) {
+        console.error('Error getting server time:', error);
+        return new Date();
+    }
+}
+
+// Update appointment info
+async function updateAppointmentInfo() {
+    const dateInput = document.getElementById('serviceDate');
+    const timeSelect = document.getElementById('serviceTime');
+    const infoDiv = document.getElementById('new-appointment-info');
+
+    if (dateInput.value && timeSelect.value) {
+        const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
+        const currentServerTime = await getServerTime();
+        const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
+
+        document.getElementById('selected-datetime').textContent = selectedDateTime.toLocaleString('en-US');
+
+        const hoursText = Math.floor(hoursDiff);
+        const minutesText = Math.floor((hoursDiff - hoursText) * 60);
+        const timeFromNowElement = document.getElementById('time-from-now');
+
+        if (hoursDiff >= 12) {
+            timeFromNowElement.textContent = `${hoursText} hours ${minutesText} minutes (✓ Valid - 12+ hours from server time)`;
+            timeFromNowElement.className = 'font-weight-bold text-success';
+        } else if (hoursDiff > 0) {
+            timeFromNowElement.textContent = `${hoursText} hours ${minutesText} minutes (✗ Too soon - need 12+ hours from server time)`;
+            timeFromNowElement.className = 'font-weight-bold text-danger';
+        } else {
+            timeFromNowElement.textContent = 'Invalid - time has passed server time';
+            timeFromNowElement.className = 'font-weight-bold text-danger';
+        }
+
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
+}
+
+// ✅ FIXED: Show current notes modal with error handling
+function showCurrentNotesModal() {
+    try {
+        console.log('showCurrentNotesModal called');
+        const notes = '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Notes ?? ""))';
+
+        if (!notes || notes.trim() === '') {
+            document.getElementById('currentNotesContent').innerHTML =
+                '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>';
+        } else {
+            const formattedNotes = parseAndFormatNotes(notes);
+            document.getElementById('currentNotesContent').innerHTML = formattedNotes;
+        }
+
+        // ✅ Show modal
+        $('#currentNotesModal').modal('show');
+
+    } catch (error) {
+        console.error('Error in showCurrentNotesModal:', error);
+        alert('Error displaying notes: ' + error.message);
+    }
+}
+
+// ✅ NEW: Clear notes function
+function clearNotes() {
+    if (confirm('Are you sure you want to clear the additional notes field?')) {
+        document.getElementById('notes').value = '';
+    }
+}
+
+// Parse and format notes (reused from MyBookings)
+function parseAndFormatNotes(notes) {
+    try {
+        const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
+        const userNotes = [];
+        const systemLogs = [];
+
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('[') && trimmedLine.includes(']')) {
+                const logEntry = parseSystemLogEntry(trimmedLine);
+                if (logEntry) {
+                    systemLogs.push(logEntry);
+                }
+            } else if (trimmedLine !== '') {
+                userNotes.push(trimmedLine);
+            }
+        });
+
+        let html = '';
+
+        if (userNotes.length > 0) {
+            html += '<div class="notes-section mb-4">';
+            html += '<h6><i class="fas fa-user-edit text-primary"></i> Your Notes:</h6>';
+            html += '<div class="user-notes-container">';
+            userNotes.forEach(note => {
+                html += '<div class="user-note-item"><i class="fas fa-quote-left"></i> ' + escapeHtml(note) + '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        if (systemLogs.length > 0) {
+            html += '<div class="notes-section">';
+            html += '<h6><i class="fas fa-history text-info"></i> Booking History:</h6>';
+            html += '<div class="timeline">';
+
+            systemLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            systemLogs.forEach((log) => {
+                const iconClass = getLogIcon(log.action);
+                const colorClass = getLogColor(log.action);
+
+                html += '<div class="timeline-item">';
+                html += '<div class="timeline-marker ' + colorClass + '">';
+                html += '<i class="fas ' + iconClass + '"></i>';
+                html += '</div>';
+                html += '<div class="timeline-content">';
+                html += '<div class="timeline-header">';
+                html += '<span class="timeline-title">' + getFriendlyActionName(log.action) + '</span>';
+                html += '<span class="timeline-date">' + formatDate(log.date) + '</span>';
+                html += '</div>';
+                if (log.message && log.message !== '') {
+                    html += '<div class="timeline-message">' + escapeHtml(log.message) + '</div>';
+                }
+                html += '</div>';
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        }
+
+        if (html === '') {
+            html = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes or history available.</div>';
+        }
+
+        return html;
+    } catch (error) {
+        console.error('Error parsing notes:', error);
+        return '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Error displaying notes.</div>';
+    }
+}
+
+function parseSystemLogEntry(logLine) {
+    try {
+        const regex = /\[([^\]]+)\]\s*(\d{2}\/\d{2}\/\d{4}\s*\d{2}:\d{2}):\s*(.+)/;
+        const match = logLine.match(regex);
+        if (match) {
+            return {
+                action: match[1].trim(),
+                date: match[2].trim(),
+                message: match[3].trim()
+            };
+        }
+    } catch (error) {
+        console.error('Error parsing log entry:', error);
+    }
+    return null;
+}
+
+function getFriendlyActionName(action) {
+    const actionMap = {
+        'CREATED': 'Booking Created',
+        'UPDATED': 'Booking Updated',
+        'AUTO-CANCELLED': 'Auto-Cancelled',
+        'AUTO CANCELLED': 'Auto-Cancelled',
+        'ADMIN UPDATE': 'Staff Update'
+    };
+    return actionMap[action.toUpperCase()] || action.replace(/-/g, ' ');
+}
+
+function getLogIcon(action) {
+    const iconMap = {
+        'CREATED': 'fa-plus-circle',
+        'UPDATED': 'fa-edit',
+        'AUTO-CANCELLED': 'fa-times-circle',
+        'AUTO CANCELLED': 'fa-times-circle',
+        'ADMIN UPDATE': 'fa-user-cog'
+    };
+    return iconMap[action.toUpperCase()] || 'fa-info-circle';
+}
+
+function getLogColor(action) {
+    const colorMap = {
+        'CREATED': 'text-success',
+        'UPDATED': 'text-warning',
+        'AUTO-CANCELLED': 'text-danger',
+        'AUTO CANCELLED': 'text-danger',
+        'ADMIN UPDATE': 'text-info'
+    };
+    return colorMap[action.toUpperCase()] || 'text-secondary';
+}
+
+function formatDate(dateStr) {
+    try {
+        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);
+        if (parts) {
+            const [, day, month, year, hour, minute] = parts;
+            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}`);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+        return dateStr;
+    } catch (e) {
+        console.error('Error formatting date:', e);
+        return dateStr;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ✅ FIXED: Initialize with proper modal handling
+document.addEventListener('DOMContentLoaded', async function () {
+    console.log('EditBooking: DOM loaded, initializing...');
+
+    await getServerTime();
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const serviceDate = document.getElementById('serviceDate');
+    serviceDate.min = tomorrow.toISOString().split('T')[0];
+
+    document.getElementById('serviceDate').addEventListener('change', updateAppointmentInfo);
+    document.getElementById('serviceTime').addEventListener('change', updateAppointmentInfo);
+
+    updateAppointmentInfo();
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async function (e) {
+        const dateInput = document.getElementById('serviceDate');
+        const timeSelect = document.getElementById('serviceTime');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (!dateInput.value || !timeSelect.value) {
+            e.preventDefault();
+            alert('Please select both date and time!');
+            return;
+        }
+
+        const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
+        const currentServerTime = await getServerTime();
+        const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
+
+        if (hoursDiff < 12) {
+            e.preventDefault();
+            alert('New appointment time must be at least 12 hours from server time!\n\n' +
+                  'Current server time: ' + currentServerTime.toLocaleString() + '\n' +
+                  'Selected time: ' + selectedDateTime.toLocaleString() + '\n' +
+                  'Time difference: ' + hoursDiff.toFixed(1) + ' hours\n\n' +
+                  'Please select a different date/time.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving Changes...';
+    });
+
+    setTimeout(function() {
+        $('.alert').not('.alert-danger').not('.alert-warning').not('.alert-info').fadeOut('slow');
+    }, 5000);
+});
+</script>
+
 <style>
     .booking-edit-container {
         max-width: 800px;
@@ -86,7 +687,6 @@
         padding: 0.5rem 1rem;
     }
 
-    /* THÊM: Style cho thông báo quy tắc */
     .rules-alert {
         border-left: 4px solid #dc3545;
         background-color: #f8d7da;
@@ -102,7 +702,6 @@
             margin-bottom: 0.5rem;
         }
 
-    /* THÊM: Style cho countdown timer */
     .time-remaining {
         background: #fff3cd;
         border: 1px solid #ffeaa7;
@@ -115,330 +714,153 @@
             background: #f8d7da;
             border-color: #f5c6cb;
         }
-</style>
 
-<div class="container mt-4">
-    <div class="booking-edit-container">
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4><i class="fas fa-edit"></i> Edit Booking</h4>
-                        <div class="booking-id-display">
-                            <i class="fas fa-hashtag"></i> #@Model.Id
-                        </div>
-                    </div>
-                    <div>
-                        <span class="badge badge-warning status-badge">
-                            <i class="fas fa-hourglass-half"></i> Pending
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <!-- THÊM: Alert về quy tắc chỉnh sửa - Cải thiện -->
-                <div class="alert alert-danger rules-alert">
-                    <h5><i class="fas fa-exclamation-triangle"></i> Booking Edit Rules & Time Restrictions</h5>
-                    <ul>
-                        <li><strong>Edit Window:</strong> Bookings can only be modified up to <strong>12 hours</strong> before the appointment time</li>
-                        <li><strong>New Appointment:</strong> The new time must be scheduled at least <strong>12 hours</strong> from now</li>
-                        <li><strong>Status Requirement:</strong> Only <strong>pending bookings</strong> can be edited</li>
-                        <li><strong>Auto-Cancellation:</strong> Unconfirmed bookings will be automatically cancelled <strong>1 hour</strong> after the scheduled time</li>
-                        <li><strong>Change History:</strong> All modifications will be logged in the booking notes</li>
-                    </ul>
+    /* ✅ NEW: Notes preview styles */
+    .notes-preview-text {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.4;
+    }
 
-                    <!-- THÊM: Hiển thị thời gian còn lại để chỉnh sửa -->
-                    @{
-                        var appointmentTime = Model.Invoice_Date;
-                        var now = DateTime.Now;
-                        var hoursUntilAppointment = (appointmentTime - now).TotalHours;
-                        var canStillEdit = hoursUntilAppointment > 12;
-                    }
+    /* Modal styles (reused from MyBookings) */
+    .notes-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 4px solid #007bff;
+    }
 
-                    <div class="time-remaining @(canStillEdit ? "" : "danger") mt-3">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-clock mr-2"></i>
-                            <div>
-                                <strong>Current Time:</strong> @now.ToString("dd/MM/yyyy HH:mm")<br>
-                                <strong>Appointment Time:</strong> @appointmentTime.ToString("dd/MM/yyyy HH:mm")<br>
-                                <strong>Time Until Appointment:</strong>
-                                @if (hoursUntilAppointment > 0)
-                                {
-                                    <span class="@(canStillEdit ? "text-info" : "text-danger")">
-                                        @Math.Floor(hoursUntilAppointment) hours @Math.Floor((hoursUntilAppointment - Math.Floor(hoursUntilAppointment)) * 60) minutes
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="text-danger">Appointment time has passed</span>
-                                }
-                                <br>
-                                <strong>Edit Status:</strong>
-                                @if (canStillEdit)
-                                {
-                                    <span class="text-success"><i class="fas fa-check-circle"></i> You can still edit this booking</span>
-                                }
-                                else
-                                {
-                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Edit window has closed (less than 12 hours remaining)</span>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    .user-notes-container {
+        margin-top: 10px;
+    }
 
-                <!-- Current Info -->
-                <div class="current-info">
-                    <h6><i class="fas fa-info-circle"></i> Current Booking Information:</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-1">
-                                <strong><i class="fas fa-hashtag"></i> Booking ID:</strong>
-                                <span class="text-primary">#@Model.Id</span>
-                            </p>
-                            <p class="mb-1">
-                                <strong><i class="fas fa-calendar"></i> Date:</strong>
-                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("dd/MM/yyyy") : "Not set"))
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-1">
-                                <strong><i class="fas fa-clock"></i> Time:</strong>
-                                @((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "Not set"))
-                            </p>
-                            <p class="mb-1">
-                                <strong><i class="fas fa-info-circle"></i> Status:</strong>
-                                <span class="badge badge-warning">Pending</span>
-                            </p>
-                        </div>
-                    </div>
-                    @if (!string.IsNullOrEmpty(Model.Notes))
-                    {
-                        <hr class="my-2">
-                        <p class="mb-0"><strong><i class="fas fa-sticky-note"></i> Current Notes:</strong></p>
-                        <div class="mt-1 p-2 bg-light rounded">
-                            <small>@Html.Raw(Model.Notes.Replace("\n", "<br />"))</small>
-                        </div>
-                    }
-                </div>
+    .user-note-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        font-style: italic;
+        color: #495057;
+    }
 
-                <!-- SUCCESS/ERROR Messages -->
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
-                    </div>
-                }
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
 
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
-                    </div>
-                }
-
-                <!-- Edit Form -->
-                <form method="post" action="@Url.Action("EditBooking", "Home", new { id = Model.Id })">
-                    @Html.AntiForgeryToken()
-
-                    <div class="alert alert-info">
-                        <h6><i class="fas fa-edit"></i> Update Booking Information</h6>
-                        <small>Please select new date and time for your appointment (must be at least 12 hours from now)</small>
-                    </div>
-
-                    <!-- New Date & Time Selection -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="serviceDate" class="form-label">
-                                    <i class="fas fa-calendar"></i> New Date <span class="text-danger">*</span>
-                                </label>
-                                <input type="date"
-                                       id="serviceDate"
-                                       name="ServiceDate"
-                                       class="form-control"
-                                       value="@((Model.Invoice_Date != null ? Model.Invoice_Date.ToString("yyyy-MM-dd") : DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")))"
-                                       required>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle"></i> Select from tomorrow onwards (minimum 12 hours advance)
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="serviceTime" class="form-label">
-                                    <i class="fas fa-clock"></i> New Time <span class="text-danger">*</span>
-                                </label>
-                                <select id="serviceTime" name="ServiceTime" class="form-control" required>
-                                    <option value="">-- Select Time --</option>
-                                    @{
-                                        var currentTime = Model.Invoice_Date != null ? Model.Invoice_Date.ToString("HH:mm") : "";
-                                        var timeOptions = new string[] { "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
-                                        var timeLabels = new string[] { "8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM" };
-                                    }
-                                    @for (int i = 0; i < timeOptions.Length; i++)
-                                    {
-                                        <option value="@timeOptions[i]" @(currentTime == timeOptions[i] ? "selected" : "")>@timeLabels[i]</option>
-                                    }
-                                </select>
-                                <div class="form-text">
-                                    <i class="fas fa-business-time"></i> Working hours: 8:00 AM - 5:00 PM (minimum 12 hours from now)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- THÊM: Hiển thị thời gian còn lại đến appointment mới -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="new-appointment-info" class="alert alert-light" style="display: none;">
-                                <h6><i class="fas fa-clock"></i> New Appointment Timing</h6>
-                                <p class="mb-1"><strong>Selected Time:</strong> <span id="selected-datetime">-</span></p>
-                                <p class="mb-0"><strong>Time from now:</strong> <span id="time-from-now" class="font-weight-bold">-</span></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="form-group">
-                        <label for="notes" class="form-label">
-                            <i class="fas fa-sticky-note"></i> Notes <span class="text-muted">(Optional)</span>
-                        </label>
-                        <textarea name="Notes"
-                                  id="notes"
-                                  class="form-control"
-                                  rows="4"
-                                  placeholder="Enter any additional notes for your booking...">@Model.Notes</textarea>
-                        <div class="form-text">
-                            <i class="fas fa-info-circle"></i> Update notes for your booking (changes will be logged)
-                        </div>
-                    </div>
-
-                    <!-- System Information (Hidden in production) -->
-                    @if (System.Configuration.ConfigurationManager.AppSettings["Environment"] == "Development")
-                    {
-                        <div class="alert alert-light border">
-                            <small class="text-muted">
-                                <strong>Debug Info:</strong><br>
-                                Form Action: @Url.Action("EditBooking", "Home", new { id = Model.Id })<br>
-                                Booking ID: @Model.Id<br>
-                                Current Status: @Model.Order_Status<br>
-                                Can Edit: @(Model.Order_Status == 0 && Model.Invoice_Date > DateTime.Now.AddHours(12))
-                            </small>
-                        </div>
-                    }
-
-                    <!-- Buttons -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="@Url.Action("MyBookings", "Home")" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to My Bookings
-                        </a>
-                        <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
-                            <i class="fas fa-save"></i> Save Changes
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Set minimum date to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const serviceDate = document.getElementById('serviceDate');
-        serviceDate.min = tomorrow.toISOString().split('T')[0];
-
-        // THÊM: Function để tính toán và hiển thị thời gian
-        function updateAppointmentInfo() {
-            const dateInput = document.getElementById('serviceDate');
-            const timeSelect = document.getElementById('serviceTime');
-            const infoDiv = document.getElementById('new-appointment-info');
-
-            if (dateInput.value && timeSelect.value) {
-                const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
-                const now = new Date();
-                const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
-
-                // Update display
-                document.getElementById('selected-datetime').textContent =
-                    selectedDateTime.toLocaleString('en-US');
-
-                const hoursText = Math.floor(hoursDiff);
-                const minutesText = Math.floor((hoursDiff - hoursText) * 60);
-                const timeFromNowElement = document.getElementById('time-from-now');
-
-                if (hoursDiff >= 12) {
-                    timeFromNowElement.textContent = `${hoursText} hours ${minutesText} minutes (✓ Valid)`;
-                    timeFromNowElement.className = 'font-weight-bold text-success';
-                } else if (hoursDiff > 0) {
-                    timeFromNowElement.textContent = `${hoursText} hours ${minutesText} minutes (✗ Too soon - need 12+ hours)`;
-                    timeFromNowElement.className = 'font-weight-bold text-danger';
-                } else {
-                    timeFromNowElement.textContent = 'Invalid - time has passed';
-                    timeFromNowElement.className = 'font-weight-bold text-danger';
-                }
-
-                infoDiv.style.display = 'block';
-            } else {
-                infoDiv.style.display = 'none';
-            }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
         }
 
-        // Add event listeners
-        document.getElementById('serviceDate').addEventListener('change', updateAppointmentInfo);
-        document.getElementById('serviceTime').addEventListener('change', updateAppointmentInfo);
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
 
-        // Initial call
-        updateAppointmentInfo();
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+    }
 
-        // Form validation
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function (e) {
-            const dateInput = document.getElementById('serviceDate');
-            const timeSelect = document.getElementById('serviceTime');
-            const submitBtn = document.getElementById('submitBtn');
+        .timeline-marker.text-success {
+            border-color: #28a745;
+            color: #28a745;
+        }
 
-            // Validation
-            if (!dateInput.value || !timeSelect.value) {
-                e.preventDefault();
-                alert('Please select both date and time!');
-                return;
-            }
+        .timeline-marker.text-warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
 
-            // Check if time is at least 12 hours from now
-            const selectedDateTime = new Date(dateInput.value + 'T' + timeSelect.value);
-            const now = new Date();
-            const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+        .timeline-marker.text-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
 
-            if (hoursDiff < 12) {
-                e.preventDefault();
-                alert('New appointment time must be at least 12 hours from now!\n\n' +
-                      'Current time: ' + now.toLocaleString() + '\n' +
-                      'Selected time: ' + selectedDateTime.toLocaleString() + '\n' +
-                      'Time difference: ' + hoursDiff.toFixed(1) + ' hours\n\n' +
-                      'Please select a different date/time.');
-                return;
-            }
+        .timeline-marker.text-info {
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
 
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving Changes...';
+    .timeline-content {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 12px;
+        margin-left: 10px;
+    }
 
-            console.log('Form submitting with data:', {
-                BookingId: @Model.Id,
-                ServiceDate: dateInput.value,
-                ServiceTime: timeSelect.value,
-                Notes: document.getElementById('notes').value,
-                HoursDifference: hoursDiff.toFixed(1)
-            });
-        });
+    .timeline-header {
+        display: flex;
+        justify-content-space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
 
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').not('.alert-danger').not('.alert-warning').not('.alert-info').fadeOut('slow');
-        }, 5000);
-    });
-</script>
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .timeline-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    /* ✅ FIXED: Enhanced modal styles */
+    .modal {
+        outline: none;
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal {
+        z-index: 1050;
+    }
+
+    .close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+        .close:hover {
+            opacity: 0.75;
+        }
+
+        .close:focus {
+            outline: none;
+            opacity: 1;
+        }
+</style>

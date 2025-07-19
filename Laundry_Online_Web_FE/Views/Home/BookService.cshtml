@@ -340,9 +340,9 @@
         border-radius: 4px;
     }
 
-    .calendar-nav:hover {
-        background-color: #f0f0f0;
-    }
+        .calendar-nav:hover {
+            background-color: #f0f0f0;
+        }
 
     .calendar-title {
         font-weight: bold;
@@ -379,32 +379,32 @@
         transition: all 0.2s;
     }
 
-    .calendar-day:hover {
-        background-color: #e3f2fd;
-        border-color: #2196f3;
-    }
+        .calendar-day:hover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
 
-    .calendar-day.selected {
-        background-color: #2196f3;
-        color: white;
-        font-weight: bold;
-    }
+        .calendar-day.selected {
+            background-color: #2196f3;
+            color: white;
+            font-weight: bold;
+        }
 
-    .calendar-day.today {
-        background-color: #fff3cd;
-        border-color: #ffc107;
-    }
+        .calendar-day.today {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
 
-    .calendar-day.other-month {
-        color: #ccc;
-        cursor: not-allowed;
-    }
+        .calendar-day.other-month {
+            color: #ccc;
+            cursor: not-allowed;
+        }
 
-    .calendar-day.past-date {
-        color: #999;
-        cursor: not-allowed;
-        text-decoration: line-through;
-    }
+        .calendar-day.past-date {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
 
     /* Form Panels */
     .time-selection-panel,
@@ -443,9 +443,9 @@
         margin-top: 20px;
     }
 
-    .step-buttons .btn {
-        margin-right: 10px;
-    }
+        .step-buttons .btn {
+            margin-right: 10px;
+        }
 
     /* Next Button */
     .ant-button {
@@ -538,10 +538,31 @@
     }
 </style>
 
-<!-- JavaScript -->
+<!-- Thay thế toàn bộ phần JavaScript cũ bằng script mới: -->
 <script>
     let currentDate = new Date();
     let selectedDate = null;
+    let serverTime = null;
+
+    // ✅ Function để lấy thời gian server
+    async function getServerTime() {
+        try {
+            const response = await fetch('@Url.Action("GetServerTime", "Home")');
+            const data = await response.json();
+
+            if (data.success) {
+                serverTime = new Date(data.serverTime);
+                console.log('Server time loaded:', data.displayTime);
+                return serverTime;
+            } else {
+                console.warn('Failed to get server time, using local time');
+                return new Date();
+            }
+        } catch (error) {
+            console.error('Error getting server time:', error);
+            return new Date(); // Fallback to local time
+        }
+    }
 
     // Initialize calendar
     function initCalendar() {
@@ -554,15 +575,12 @@
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        // Update title
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'];
         document.getElementById('calendar-title').textContent = `${monthNames[month]} - ${year}`;
 
-        // Generate days
         const firstDay = new Date(year, month, 1);
         const startDate = new Date(firstDay);
-        // Set to Monday of the week containing the first day
         startDate.setDate(startDate.getDate() - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
 
         const calendarDays = document.getElementById('calendar-days');
@@ -576,7 +594,6 @@
             dayElement.className = 'calendar-day';
             dayElement.textContent = date.getDate().toString().padStart(2, '0');
 
-            // Add classes
             if (date.getMonth() !== month) {
                 dayElement.classList.add('other-month');
             }
@@ -602,13 +619,11 @@
         }
     }
 
-    // Change month
     function changeMonth(direction) {
         currentDate.setMonth(currentDate.getMonth() + direction);
         updateCalendar();
     }
 
-    // Select date
     function selectDate(date) {
         selectedDate = new Date(date);
         const year = selectedDate.getFullYear();
@@ -619,15 +634,15 @@
         updateSelectedInfo();
     }
 
-    // THÊM: Function để tính toán và hiển thị thời gian còn lại
-    function calculateTimeRemaining() {
+    // ✅ CẬP NHẬT: Function để tính toán với server time
+    async function calculateTimeRemaining() {
         const serviceTime = document.getElementById('serviceTime').value;
         const serviceDate = document.getElementById('serviceDate').value;
 
         if (serviceTime && serviceDate) {
             const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
-            const now = new Date();
-            const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+            const currentServerTime = await getServerTime();
+            const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
 
             if (hoursDiff > 0) {
                 const hours = Math.floor(hoursDiff);
@@ -644,7 +659,6 @@
                     timeText = `${Math.floor(hoursDiff * 60)} minute${Math.floor(hoursDiff * 60) !== 1 ? 's' : ''}`;
                 }
 
-                // Update all time remaining displays
                 document.getElementById('time-diff').textContent = timeText;
                 document.getElementById('time-remaining').style.display = 'block';
 
@@ -672,7 +686,6 @@
         }
     }
 
-    // Update selected info display
     function updateSelectedInfo() {
         const timeValue = document.getElementById('serviceTime').value;
         const timeSelect = document.getElementById('serviceTime');
@@ -683,46 +696,12 @@
         document.getElementById('selected-time').textContent =
             timeValue ? timeText : 'Not selected';
 
-        // CẬP NHẬT: Tính toán thời gian còn lại
+        // ✅ CẬP NHẬT: Tính toán thời gian còn lại với server time
         calculateTimeRemaining();
     }
 
-    // Step navigation function
-    function goToStep(stepNumber) {
-        // Validate current step before proceeding
-        if (stepNumber === 2 && !validateStep1()) {
-            return false;
-        }
-        if (stepNumber === 3 && !validateStep2()) {
-            return false;
-        }
-
-        // Hide all steps
-        document.getElementById('step-1').style.display = 'none';
-        document.getElementById('step-2').style.display = 'none';
-        document.getElementById('step-3').style.display = 'none';
-
-        // Show target step
-        document.getElementById('step-' + stepNumber).style.display = 'block';
-
-        // Update step indicators
-        updateStepIndicators(stepNumber);
-
-        // Update summary when going to step 2
-        if (stepNumber === 2) {
-            updateBookingSummary();
-        }
-
-        // Submit form and show final summary when going to step 3
-        if (stepNumber === 3) {
-            submitBooking();
-        }
-
-        return true;
-    }
-
-    // Validate Step 1
-    function validateStep1() {
+    // ✅ CẬP NHẬT: Validate với server time
+    async function validateStep1() {
         const serviceTime = document.getElementById('serviceTime').value;
         const serviceDate = document.getElementById('serviceDate').value;
 
@@ -731,13 +710,13 @@
             return false;
         }
 
-        // Check if selected time is at least 2 hours from now
         const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
-        const now = new Date();
-        const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+        const currentServerTime = await getServerTime();
+        const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
 
         if (hoursDiff < 2) {
-            alert('Please select a time at least 2 hours from now!\n\nCurrent time: ' + now.toLocaleString() +
+            alert('Please select a time at least 2 hours from server time!\n\n' +
+                  'Current server time: ' + currentServerTime.toLocaleString() +
                   '\nSelected time: ' + selectedDateTime.toLocaleString() +
                   '\nTime difference: ' + hoursDiff.toFixed(1) + ' hours');
             return false;
@@ -746,12 +725,36 @@
         return true;
     }
 
-    // Validate Step 2
     function validateStep2() {
         return true;
     }
 
-    // Update step indicators
+    async function goToStep(stepNumber) {
+        if (stepNumber === 2 && !(await validateStep1())) {
+            return false;
+        }
+        if (stepNumber === 3 && !validateStep2()) {
+            return false;
+        }
+
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-3').style.display = 'none';
+        document.getElementById('step-' + stepNumber).style.display = 'block';
+
+        updateStepIndicators(stepNumber);
+
+        if (stepNumber === 2) {
+            updateBookingSummary();
+        }
+
+        if (stepNumber === 3) {
+            submitBooking();
+        }
+
+        return true;
+    }
+
     function updateStepIndicators(currentStep) {
         for (let i = 1; i <= 3; i++) {
             const stepBtn = document.getElementById('step-' + i + '-btn');
@@ -764,7 +767,6 @@
         }
     }
 
-    // Update booking summary
     function updateBookingSummary() {
         const timeSelect = document.getElementById('serviceTime');
         const timeText = timeSelect.options[timeSelect.selectedIndex].text;
@@ -773,22 +775,19 @@
             selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
         document.getElementById('summary-time').textContent = timeText;
 
-        // CẬP NHẬT: Update time remaining in summary
+        // ✅ CẬP NHẬT: Update time remaining in summary với server time
         calculateTimeRemaining();
     }
 
-    // Submit booking
     function submitBooking() {
         const timeSelect = document.getElementById('serviceTime');
         const timeText = timeSelect.options[timeSelect.selectedIndex].text;
         const notesValue = document.getElementById('notes').value;
 
-        // Update final summary
         document.getElementById('final-date').textContent =
             selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
         document.getElementById('final-time').textContent = timeText;
 
-        // Handle notes display
         if (notesValue && notesValue.trim() !== '') {
             document.getElementById('final-notes').textContent = notesValue;
             document.getElementById('final-notes-wrapper').style.display = 'block';
@@ -796,7 +795,6 @@
             document.getElementById('final-notes-wrapper').style.display = 'none';
         }
 
-        // Submit form to server
         const formData = new FormData(document.getElementById('ant-booking-form'));
 
         fetch('@Url.Action("SubmitBooking", "Home")', {
@@ -820,12 +818,12 @@
         });
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function () {
+    // ✅ Initialize when page loads
+    document.addEventListener('DOMContentLoaded', async function () {
+        await getServerTime(); // Lấy server time ngay khi load page
         initCalendar();
         updateStepIndicators(1);
 
-        // Add event listener for time selection
         document.getElementById('serviceTime').addEventListener('change', function () {
             updateSelectedInfo();
         });
