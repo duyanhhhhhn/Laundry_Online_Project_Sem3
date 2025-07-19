@@ -383,8 +383,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             // Chạy auto-update trước khi hiển thị
             InvoiceRepository.Instance.AutoUpdateExpiredOrders();
 
+            // CẬP NHẬT: Chỉ lấy active bookings
             var allBookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1) // Chỉ lấy booking online
+                .Where(b => b.Invoice_Type == 1 && b.Status == 1) // Chỉ lấy booking online và active
                 .OrderByDescending(b => b.Invoice_Date)
                 .ToList();
 
@@ -409,8 +410,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         // GET: Danh sách đơn đặt lịch theo trạng thái
         public ActionResult BookingsByStatus(int status)
         {
+            // CẬP NHẬT: Chỉ lấy active bookings
             var bookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1 && b.Order_Status == status)
+                .Where(b => b.Invoice_Type == 1 && b.Status == 1 && b.Order_Status == status) // Active bookings với order_status cụ thể
                 .OrderByDescending(b => b.Invoice_Date)
                 .ToList();
 
@@ -455,6 +457,12 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             try
             {
+                // CẬP NHẬT: Validate trạng thái mới (0-3)
+                if (newStatus < 0 || newStatus > 3)
+                {
+                    return Json(new { success = false, message = "Invalid status value" });
+                }
+
                 // Tạo log message
                 var statusText = GetBookingStatusText(newStatus);
                 var updateLog = $"\n[ADMIN UPDATE] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Status changed to {statusText}";
@@ -529,12 +537,12 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-        // GET: Thống kê đơn đặt lịch
+        // GET: Thống kê đơn đặt lịch - CẬP NHẬT
         public ActionResult BookingStatistics()
         {
-
+            // CẬP NHẬT: Chỉ lấy active bookings
             var allBookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1)
+                .Where(b => b.Invoice_Type == 1 && b.Status == 1) // Chỉ active bookings
                 .ToList();
 
             var stats = new
@@ -542,7 +550,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 TotalBookings = allBookings.Count,
                 PendingBookings = allBookings.Count(b => b.Order_Status == 0),
                 ConfirmedBookings = allBookings.Count(b => b.Order_Status == 1),
-                CancelledBookings = allBookings.Count(b => b.Order_Status == 2),
+                PaidBookings = allBookings.Count(b => b.Order_Status == 2), // CẬP NHẬT: Thêm Paid
+                CancelledBookings = allBookings.Count(b => b.Order_Status == 3), // CẬP NHẬT: Cancelled = 3
                 ExpiredBookings = InvoiceRepository.Instance.GetExpiredOrders().Count,
                 TodayBookings = allBookings.Count(b => b.Invoice_Date.Date == DateTime.Today)
             };
@@ -551,14 +560,15 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View();
         }
 
-        // Helper methods
+        // Helper methods - CẬP NHẬT
         private string GetBookingStatusText(int status)
         {
             switch (status)
             {
                 case 0: return "Pending";
                 case 1: return "Confirmed";
-                case 2: return "Cancelled";
+                case 2: return "Paid";        // CẬP NHẬT: Thêm Paid
+                case 3: return "Cancelled";   // CẬP NHẬT: Cancelled = 3
                 default: return "Unknown";
             }
         }
@@ -567,12 +577,14 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             switch (status)
             {
-                case 0: return "warning";
-                case 1: return "success";
-                case 2: return "danger";
+                case 0: return "warning";     // Pending
+                case 1: return "info";        // Confirmed
+                case 2: return "success";     // Paid
+                case 3: return "danger";      // Cancelled
                 default: return "secondary";
             }
         }
+
         public ActionResult CustomerDetail(int id)
         {
             var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
@@ -583,5 +595,4 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View(customer);
         }
     }
-
 }
