@@ -47,6 +47,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             string password = Request.Form["Password"];
             string salary = Request.Form["Salary"];
             int role = Request.Form["Role"] == "1" ? 1 : 0;
+
             var newemp = new EmployeeView
             {
                 FirstName = firstName,
@@ -58,9 +59,19 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 Role = role,
                 Active = 1
             };
-            EmployeeRepo.Instance.Create(newemp);
-            return RedirectToAction("EmployeeList");
+
+            bool result = EmployeeRepo.Instance.Create(newemp);
+            if (result)
+            {
+                return RedirectToAction("EmployeeList");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Unable to create new employee. The phone number may already exist.";
+                return View("Admin_create_employee", newemp);
+            }
         }
+
         [HttpPost]
         public ActionResult CreateCustomer()
         {
@@ -69,6 +80,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             string phone = Request.Form["PhoneNumber"];
             string address = Request.Form["Address"];
             string password = Request.Form["Password"];
+
             var newCustomer = new CustomerView
             {
                 FirstName = firstName,
@@ -79,9 +91,19 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 RegistrationDate = DateTime.Now,
                 Active = 1
             };
-            CustomerRepo.Instance.Create(newCustomer);
-            return RedirectToAction("CustomerList");
+
+            bool result = CustomerRepo.Instance.Create(newCustomer);
+            if (result)
+            {
+                return RedirectToAction("CustomerList");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Unable to create new customer. The phone number may already exist.";
+                return View("Admin_create_customer", newCustomer); // return lại view với dữ liệu đã nhập
+            }
         }
+
         public ActionResult EmployeeList()
         {
             HashSet<EmployeeView> listEmp = new HashSet<EmployeeView>();

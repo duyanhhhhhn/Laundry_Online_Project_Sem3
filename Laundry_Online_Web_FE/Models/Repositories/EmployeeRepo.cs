@@ -73,9 +73,9 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             return EmployeeDAO.Instance.Search(keyword);
         }
 
-        public void Create(EmployeeView entity)
+        public bool Create(EmployeeView entity)
         {
-            EmployeeDAO.Instance.Create(entity);
+            return EmployeeDAO.Instance.Create(entity);
         }
 
         public bool Update(EmployeeView entity)

@@ -51,7 +51,6 @@
                                         <th>Date_End</th>
                                         <th>Value</th>
                                         <th>Unit</th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>                                 
@@ -71,12 +70,7 @@
                                             <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
                                             <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
                                             <td>@cp.Value</td>
-                                            <td>@cp.Unite</td>
-                                            <td>
-                                                <a href="@Url.Action("", new { Id = cp.Id })">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                            </td>
+                                            <td>@cp.Unite</td>                                            
                                         </tr>
                                         i++;
                                     }

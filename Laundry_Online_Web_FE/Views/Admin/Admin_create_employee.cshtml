@@ -3,7 +3,12 @@
     ViewBag.Title = "Admin_create_employee";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
 
 <div id="layoutAuthentication">
     <div id="layoutAuthentication_content">
