@@ -18,9 +18,6 @@
                         <a class="nav-link" href="#" title="Promotions">Promotions</a>
                     </li>
                     <li class="nav-item ">
-                        <a class="nav-link" href="#" title="Service Price List">Service Price List</a>
-                    </li>
-                    <li class="nav-item ">
                         <a class="nav-link" href="#" title="Recruitment">Recruitment</a>
                     </li>
                 </ul>
@@ -88,35 +85,34 @@
                         </a>
                     </li>
                 }
+                @if (!string.IsNullOrEmpty(name))
+                {
+                    <li class="nav-item booking-history-item">
+                       <a href="@(customer != null? Url.Action("CustomerDetail", new { id = customer.Id }): Url.Action("Login", "Home")
+                                )" class="nav-link" aria-label="Account" title="Account">
+                           <span>Customer Detail</span>
+                        </a>
+                    </li>
+                }
                 <li>
 
                 </li>
 
                 <li class="nav-item evo-header-account ml-auto">
-                    <a href="@(customer != null? Url.Action("CustomerDetail", new { id = customer.Id }): Url.Action("Login", "Home")
-                                )" class="nav-link" aria-label="Account" title="Account">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                    <a
                         @if (!string.IsNullOrEmpty(name))
                         {
 
                             <span style="margin-left: 5px; color: white;">@name</span>
 
                         }
-                    </a>
                     <ul class="account-dropdown">
                         @if (!string.IsNullOrEmpty(name))
                         {
-                            <li>
-                                <a href="@Url.Action("MyBookings", "Home")" title="Lịch sử đặt lịch">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    Lịch sử đặt lịch
-                                </a>
-                            </li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
                             <li>
                                 <a href="@Url.Action("Logout", "Home")" title="Logout">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
