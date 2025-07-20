@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using Laundry_Online_Web_BE.Models.Repositories;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
+using Org.BouncyCastle.Bcpg;
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
     public class AdminController : Controller
@@ -108,6 +109,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             HashSet<EmployeeView> listEmp = new HashSet<EmployeeView>();
             var empList = EmployeeRepo.Instance.GetActiveStaffs();
+            if (empList != null && empList.Count > 0)
+            {
+                listEmp = empList;
+            }
+            ViewBag.Data = listEmp;
+            return View();
+        }
+        public ActionResult AdminList ()
+        {
+            HashSet<EmployeeView> listEmp = new HashSet<EmployeeView>();
+            var empList = EmployeeRepo.Instance.GetActiveAdmins();
             if (empList != null && empList.Count > 0)
             {
                 listEmp = empList;
@@ -603,6 +615,10 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 return HttpNotFound();
             }
             return View(customer);
+        }
+        public ActionResult AccessDenied()
+        {
+            return View();
         }
     }
 

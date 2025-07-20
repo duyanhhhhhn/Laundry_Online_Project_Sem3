@@ -109,7 +109,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             using (var en = new Entities.OnlineLaundryEntities())
             {
                 return en.Employees
-                         .Where(e => e.active == 1 && e.role == 0)
+                         .Where(e => e.active == 1 && e.role == 1)
                          .Select(e => new EmployeeView
                          {
                              Id = e.employee_id,
@@ -128,7 +128,7 @@ namespace Laundry_Online_Web_FE.Models.Dao
             using (var en = new Entities.OnlineLaundryEntities())
             {
                 return en.Employees
-                         .Where(e => e.active == 1 && e.role == 1)
+                         .Where(e => e.role == 0)
                          .Select(e => new EmployeeView
                          {
                              Id = e.employee_id,

@@ -17,7 +17,6 @@ namespace Laundry_Online_Web_FE.Controllers
             return View();
         }
         [Route("Admin/InvoiceItemList")]
-
         public ActionResult InVoiceItemList()
         {
             // Lấy danh sách tất cả các InvoiceItem từ kho dữ liệu

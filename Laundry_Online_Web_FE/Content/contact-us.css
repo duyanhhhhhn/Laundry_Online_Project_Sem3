@@ -1,0 +1,41 @@
+.contact-us-container {  
+   font-family: Arial, sans-serif;  
+   max-width: 800px;  
+   margin: 0 auto;  
+   padding: 20px;  
+   background-color: #f9f9f9;  
+   border: 1px solid #ddd;  
+   border-radius: 8px;  
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  
+}  
+
+.contact-us-container h1 {  
+   color: #333;  
+   text-align: center;  
+   margin-bottom: 20px;  
+}  
+
+.contact-us-container p {  
+   color: #555;  
+   font-size: 16px;  
+   line-height: 1.6;  
+}  
+
+.contact-us-container p strong {  
+   color: #000;  
+}  
+
+.map-container {  
+   margin-top: 20px;  
+   text-align: center;  
+}  
+
+.map-container h2 {  
+   color: #333;  
+   margin-bottom: 10px;  
+}  
+
+iframe {  
+   border: 1px solid #ddd;  
+   border-radius: 8px;  
+}

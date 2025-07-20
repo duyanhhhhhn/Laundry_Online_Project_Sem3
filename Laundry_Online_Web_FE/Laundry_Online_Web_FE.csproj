@@ -535,6 +535,7 @@
     <Content Include="Content\Client\thumb\medium\100\431\113\products\ve-sinh-rem-cua-298d4.jpg" />
     <Content Include="Content\Client\thumb\pico\100\431\113\themes\826533\assets\evo_block_product_banner_1811e.jpg" />
     <Content Include="Content\Client\thumb\pico\100\431\113\themes\826533\assets\evo_block_product_banner_2811e.jpg" />
+    <Content Include="Content\contact-us.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -612,6 +613,9 @@
     <Content Include="Views\Report\DailyCollection.cshtml" />
     <Content Include="Views\Report\GarmentCollection.cshtml" />
     <Content Include="Views\Report\PaymentTypeTotals.cshtml" />
+    <Content Include="Views\Admin\AdminList.cshtml" />
+    <Content Include="Views\Home\Contact_us.cshtml" />
+    <Content Include="Views\Admin\AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />

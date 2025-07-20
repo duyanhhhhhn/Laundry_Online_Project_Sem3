@@ -470,7 +470,11 @@ namespace Laundry_Online_Web_FE.Controllers
 
             return View();
         }
-
+        public ActionResult Contact_us()
+        {
+            ViewBag.Message = "Your contact page.";
+            return View();
+        }
         public ActionResult Login()
         {
             if (Session["customer"] != null)
