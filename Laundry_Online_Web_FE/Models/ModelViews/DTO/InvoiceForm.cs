@@ -4,36 +4,31 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web;
-using Laundry_Online_Web_FE.Models.ModelViews.DTO.Laundry_Online_Web_FE.Models.ModelViews;
+
 
 namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
 {
     public class InvoiceForm
     {
         public int Id { get; set; } = 0;
-
-        // Thêm property này để fix lỗi trong view
         public int Invoice_Id { get; set; } = 0;
 
-        [Required(ErrorMessage = "Please select a customer")]
         [Display(Name = "Customer")]
         public int Customer_Id { get; set; } = 0;
 
         [Display(Name = "Employee")]
         public int Employee_Id { get; set; } = 0;
 
-        [Required(ErrorMessage = "Please select delivery date")]
         [Display(Name = "Delivery Date")]
         [DataType(DataType.Date)]
         public DateTime Delivery_Date { get; set; } = DateTime.Now.AddDays(1);
 
-        [Required(ErrorMessage = "Please select pickup date")]
         [Display(Name = "Pickup Date")]
         [DataType(DataType.Date)]
         public DateTime Pickup_Date { get; set; } = DateTime.Now.AddDays(3);
 
         [Display(Name = "Payment Type")]
-        public int Payment_Type { get; set; } = 1; // 1: Cash, 2: VNPay
+        public int Payment_Type { get; set; } = 1;
 
         [Display(Name = "Invoice Type")]
         public int Invoice_Type { get; set; } = 1;
@@ -42,20 +37,19 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public int? CustomerPackage_Id { get; set; }
 
         [Display(Name = "Notes")]
-        [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
+        [StringLength(500)]
         public string Notes { get; set; } = "";
 
         [Display(Name = "Shipping Cost")]
-        [Range(0, double.MaxValue, ErrorMessage = "Shipping cost must be >= 0")]
         public decimal Ship_Cost { get; set; } = 0m;
 
-        [Display(Name = "Service List")]
+        [Display(Name = "Item List")]
         public List<InvoiceItemForm> InvoiceItems { get; set; } = new List<InvoiceItemForm>();
 
         [Display(Name = "Total Amount")]
         public decimal Total_Amount => InvoiceItems.Sum(x => x.Sub_Total) + Ship_Cost;
+        public decimal TotalAmountFromDb { get; set; }
 
-        // Display properties for views
         public string Customer_Name { get; set; } = "";
         public string Employee_Name { get; set; } = "";
         public DateTime Invoice_Date { get; set; } = DateTime.Now;
@@ -65,6 +59,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public string Payment_Id { get; set; } = "";
         public string Service_name { get; set; } = "";
         // Helper methods for dropdown lists
+
         public static List<SelectListItem> GetPaymentTypes()
         {
             return new List<SelectListItem>
@@ -100,7 +95,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
-            
+
                 new SelectListItem { Value = "0", Text = "No Delivery" },
                 new SelectListItem { Value = "1", Text = "Pending Delivery" },
                 new SelectListItem { Value = "2", Text = "In Transit" },
@@ -120,3 +115,4 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         }
     }
 }
+

@@ -57,7 +57,7 @@
                                 <option value="2" @(ViewBag.CurrentStatus == 1 ? "selected" : "")>Pending Payment</option>
                                 <option value="3" @(ViewBag.CurrentStatus == 2 ? "selected" : "")>Paid</option>
                                 <option value="4" @(ViewBag.CurrentStatus == 3 ? "selected" : "")>Cancelled</option>
-                                <button class="btn btn-outline-primary" type="submit">
+                                <button></button> class="btn btn-outline-primary" type="submit">
                                     <i class="fas fa-filter"></i> Filter
                                 </button>
                         </div>
@@ -105,7 +105,7 @@
                                     <td>@invoice.Invoice_Date.ToString("dd/MM/yyyy")</td>
                                     <td>@invoice.Delivery_Date.ToString("dd/MM/yyyy")</td>
                                     <td>@invoice.Pickup_Date.ToString("dd/MM/yyyy")</td>
-                                    <td>@invoice.Total_Amount.ToString("C")</td>
+                                    <td>@invoice.TotalAmountFromDb.ToString("C")</td>
                                     <td>
                                         @if (invoice.Payment_Type == 1)
                                         {

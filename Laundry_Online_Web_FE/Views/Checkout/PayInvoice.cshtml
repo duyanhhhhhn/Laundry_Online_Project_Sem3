@@ -75,7 +75,7 @@
 
             <form method="post" action="/Payment/CreatePaymentUrlVnpay">
                 <input type="hidden" name="Name" value="Invoice #@Model.Id" />
-                <input type="hidden" name="Amount" value="@Model.Total_Amount" />
+                <input type="hidden" name="Amount" value="@Model.TotalAmountFromDb" />
                 <input type="hidden" name="OrderDescription" value="Payment for Invoice #@Model.Id" />
                 <input type="hidden" name="OrderType" value="Pay Invoice" />
 

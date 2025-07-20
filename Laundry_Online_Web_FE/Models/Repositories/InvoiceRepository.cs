@@ -164,7 +164,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 invoice.delivery_date = model.Delivery_Date;
                 invoice.pickup_date = model.Pickup_Date;
 
-                // Giữ lại total_amount cũ nếu giá trị mới không hợp lệ
+                // Luôn cập nhật total_amount nếu có giá trị dương
                 if (model.Total_Amount > 0)
                 {
                     invoice.total_amount = model.Total_Amount;
@@ -177,7 +177,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 invoice.cp_id = model.CustomerPackage_Id > 0 ? (int?)model.CustomerPackage_Id : null;
                 invoice.status = model.Status > 0 ? (int?)model.Status : null;
 
-                // Xử lý ghi chú giới hạn 200 ký tự
+                // Ghi chú giới hạn 200 ký tự
                 if (!string.IsNullOrWhiteSpace(model.Notes))
                 {
                     invoice.notes = model.Notes.Length > 200
@@ -189,21 +189,11 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                     invoice.notes = null;
                 }
 
+                // Ghi nhận ship cost và delivery status
                 invoice.ship_cost = model.Ship_Cost > 0 ? (decimal?)model.Ship_Cost : null;
                 invoice.delivery_status = model.Delivery_Status;
 
-                // Validate entity trước khi lưu
-                var validationResults = _context.Entry(invoice).GetValidationResult();
-                if (!validationResults.IsValid)
-                {
-                    Debug.WriteLine("Entity validation failed:");
-                    foreach (var error in validationResults.ValidationErrors)
-                    {
-                        Debug.WriteLine($"  Property: {error.PropertyName}, Error: {error.ErrorMessage}");
-                    }
-                    return false;
-                }
-
+                // Lưu thay đổi vào database
                 _context.SaveChanges();
                 return true;
             }
@@ -213,6 +203,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return false;
             }
         }
+
 
         public bool Delete(int id)
         {
