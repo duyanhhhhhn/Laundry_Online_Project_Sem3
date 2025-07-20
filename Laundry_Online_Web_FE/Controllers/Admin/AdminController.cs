@@ -384,12 +384,13 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             // ✅ Run auto-update using SQL Server time
             InvoiceRepository.Instance.AutoUpdateExpiredOrders();
 
+            // ✅ CHỈ LẤY CÁC ĐỚN CÓ ORDER STATUS 0 VÀ 3
             var allBookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Status == 1) // Only active bookings
+                .Where(b => b.Status == 1 && (b.Order_Status == 0 || b.Order_Status == 3)) // Chỉ pending và cancelled
                 .OrderByDescending(b => b.Invoice_Date)
                 .ToList();
 
-            // Get customer information for each booking
+            // Get customer information for each booking    
             foreach (var booking in allBookings)
             {
                 var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
@@ -433,6 +434,69 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
 
             return View(allBookings);
+        }
+
+        [HttpPost]
+        public JsonResult UpdateBookingStatus(int id, int newStatus)
+        {
+            try
+            {
+                if (newStatus < 0 || newStatus > 3 || newStatus == 2)
+                {
+                    return Json(new { success = false, message = "Invalid status value" });
+                }
+
+                // ✅ Use SQL Server time
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                var statusText = GetBookingStatusText(newStatus);
+                var updateLog = $"\n[ADMIN UPDATE] {sqlServerTime:dd/MM/yyyy HH:mm}: Status changed to {statusText} by admin";
+
+                bool success = InvoiceRepository.Instance.UpdateOrderStatus(id, newStatus, updateLog);
+
+                if (success)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ADMIN-UPDATE] Booking #{id} status updated to {newStatus} by admin at {sqlServerTime:yyyy-MM-dd HH:mm:ss}");
+
+                    // ✅ NẾU XÁC NHẬN ĐỚN (STATUS = 1), TRẢ VỀ URL CHUYỂN SANG EDIT INVOICE
+                    if (newStatus == 1)
+                    {
+                        var editUrl = Url.Action("Edit", "Invoice", new { id = id });
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đơn hàng đã được xác nhận thành công!",
+                            newStatusText = statusText,
+                            newStatusClass = GetBookingStatusClass(newStatus),
+                            updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm"),
+                            redirectToEdit = true,
+                            editUrl = editUrl, // ✅ THÊM URL ĐỂ REDIRECT
+                            confirmMessage = "Đơn hàng đã được xác nhận. Bạn sẽ được chuyển đến trang chỉnh sửa hóa đơn."
+                        });
+                    }
+                    else
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Trạng thái đã được cập nhật thành công!",
+                            newStatusText = statusText,
+                            newStatusClass = GetBookingStatusClass(newStatus),
+                            updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm"),
+                            redirectToEdit = false
+                        });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Lỗi cập nhật cơ sở dữ liệu" });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateBookingStatus Error: {ex.Message}");
+                return Json(new { success = false, message = "Đã xảy ra lỗi: " + ex.Message });
+            }
         }
 
         public ActionResult BookingsByStatus(int status)
@@ -538,48 +602,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
 
             return View(expiredBookings);
-        }
-
-        [HttpPost]
-        public JsonResult UpdateBookingStatus(int id, int newStatus)
-        {
-            try
-            {
-                if (newStatus < 0 || newStatus > 3)
-                {
-                    return Json(new { success = false, message = "Invalid status value" });
-                }
-
-                // ✅ Use SQL Server time
-                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
-                var statusText = GetBookingStatusText(newStatus);
-                var updateLog = $"\n[ADMIN UPDATE] {sqlServerTime:dd/MM/yyyy HH:mm}: Status changed to {statusText} by admin";
-
-                bool success = InvoiceRepository.Instance.UpdateOrderStatus(id, newStatus, updateLog);
-
-                if (success)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[ADMIN-UPDATE] Booking #{id} status updated to {newStatus} by admin at {sqlServerTime:yyyy-MM-dd HH:mm:ss}");
-
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Status updated successfully",
-                        newStatusText = statusText,
-                        newStatusClass = GetBookingStatusClass(newStatus),
-                        updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm")
-                    });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Database update error" });
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"UpdateBookingStatus Error: {ex.Message}");
-                return Json(new { success = false, message = "An error occurred: " + ex.Message });
-            }
         }
 
         public ActionResult BookingDetails(int id)
@@ -730,6 +752,144 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
+        [HttpPost]
+        public JsonResult SearchBookingsAjax(string keyword)
+        {
+            try
+            {
+                // Run auto-update using SQL Server time
+                InvoiceRepository.Instance.AutoUpdateExpiredOrders();
+
+                HashSet<InvoiceView> searchResults;
+
+                if (string.IsNullOrWhiteSpace(keyword))
+                {
+                    // If no keyword, return all bookings
+                    searchResults = InvoiceRepository.Instance.GetAll()
+                        .Where(b => b.Status == 1 && (b.Order_Status == 0 || b.Order_Status == 3))
+                        .ToHashSet();
+                }
+                else
+                {
+                    // Search in all bookings, then filter by status
+                    var allBookings = InvoiceRepository.Instance.GetAll()
+                        .Where(b => b.Status == 1 && (b.Order_Status == 0 || b.Order_Status == 3))
+                        .ToList();
+
+                    // Get customer list for searching customer names
+                    var customers = CustomerRepo.Instance.GetAll().ToDictionary(c => c.Id, c => c);
+
+                    // Search by multiple criteria
+                    searchResults = allBookings.Where(booking =>
+                        // Search by booking ID
+                        booking.Id.ToString().Contains(keyword) ||
+                        // Search by customer name
+                        (customers.ContainsKey(booking.Customer_Id) &&
+                         (customers[booking.Customer_Id].FirstName + " " + customers[booking.Customer_Id].LastName)
+                         .IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                        // Search by customer phone
+                        (customers.ContainsKey(booking.Customer_Id) &&
+                         !string.IsNullOrEmpty(customers[booking.Customer_Id].PhoneNumber) &&
+                         customers[booking.Customer_Id].PhoneNumber.Contains(keyword)) ||
+                        // Search by notes
+                        (!string.IsNullOrEmpty(booking.Notes) &&
+                         booking.Notes.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                        // Search by payment ID
+                        (!string.IsNullOrEmpty(booking.Payment_Id) &&
+                         booking.Payment_Id.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                    ).ToHashSet();
+                }
+
+                // Sort by newest first
+                var sortedResults = searchResults.OrderByDescending(b => b.Invoice_Date).ToList();
+
+                // Get customer information and format data for JSON
+                var formattedResults = sortedResults.Select(booking => {
+                    var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
+                    var customerName = customer != null ? $"{customer.FirstName} {customer.LastName}" : $"Customer #{booking.Customer_Id}";
+                    var customerPhone = customer?.PhoneNumber ?? "";
+
+                    var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                    var daysDiff = (booking.Invoice_Date.Date - sqlServerTime.Date).Days;
+                    var timeDiff = (booking.Invoice_Date - sqlServerTime).TotalHours;
+
+                    var timeText = daysDiff == 0 ? "Today" :
+                                  daysDiff == 1 ? "Tomorrow" :
+                                  daysDiff == -1 ? "Yesterday" :
+                                  daysDiff > 0 ? $"In {daysDiff} days" : $"{Math.Abs(daysDiff)} days ago";
+
+                    var timeStatus = timeDiff > 12 ? "text-info" :
+                                   timeDiff > 1 ? "text-warning" :
+                                   timeDiff > 0 ? "text-danger" : "text-muted";
+
+                    var timeLabel = timeDiff > 0 ? $"In {Math.Abs(timeDiff):F1}h" : $"{Math.Abs(timeDiff):F1}h ago";
+
+                    return new
+                    {
+                        Id = booking.Id,
+                        Customer_Id = booking.Customer_Id,
+                        CustomerName = customerName,
+                        CustomerPhone = customerPhone,
+                        Invoice_Date = booking.Invoice_Date.ToString("dd/MM/yyyy"),
+                        Invoice_Time = booking.Invoice_Date.ToString("HH:mm"),
+                        TimeText = timeText,
+                        TimeLabel = timeLabel,
+                        TimeStatus = timeStatus,
+                        Order_Status = booking.Order_Status,
+                        StatusText = GetBookingStatusText(booking.Order_Status),
+                        StatusClass = GetBookingStatusClass(booking.Order_Status),
+                        StatusIcon = GetStatusIcon(booking.Order_Status),
+                        Notes = booking.Notes ?? "",
+                        HasNotes = !string.IsNullOrEmpty(booking.Notes),
+                        // Check if search term matches different fields
+                        MatchesId = booking.Id.ToString().Contains(keyword ?? ""),
+                        MatchesCustomer = customerName.IndexOf(keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0,
+                        MatchesPhone = customerPhone.Contains(keyword ?? ""),
+                        MatchesNotes = !string.IsNullOrEmpty(booking.Notes) && booking.Notes.IndexOf(keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                    };
+                }).ToList();
+
+                // Calculate statistics
+                var stats = new
+                {
+                    Total = formattedResults.Count,
+                    Pending = formattedResults.Count(b => b.Order_Status == 0),
+                    Confirmed = formattedResults.Count(b => b.Order_Status == 1),
+                    Cancelled = formattedResults.Count(b => b.Order_Status == 3)
+                };
+
+                return Json(new
+                {
+                    success = true,
+                    data = formattedResults,
+                    stats = stats,
+                    keyword = keyword,
+                    serverTime = InvoiceRepository.Instance.GetSqlServerDateTime().ToString("dd/MM/yyyy HH:mm:ss")
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SearchBookingsAjax Error: {ex.Message}");
+                return Json(new
+                {
+                    success = false,
+                    message = "An error occurred while searching bookings: " + ex.Message
+                });
+            }
+        }
+
+        // Helper method để get status icon
+        private string GetStatusIcon(int status)
+        {
+            switch (status)
+            {
+                case 0: return "fa-hourglass-half";
+                case 1: return "fa-check-circle";
+                case 2: return "fa-money-bill-wave";
+                case 3: return "fa-times-circle";
+                default: return "fa-question-circle";
+            }
+        }
         public ActionResult CustomerDetail(int id)
         {
             var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
