@@ -9,7 +9,7 @@
         <div class="col-md-12">
             <h2><i class="fas fa-tasks"></i> Booking Management</h2>
 
-            <!-- ✅ NEW: SQL Server Time Display -->
+            <!-- Server Time Display -->
             <div class="alert alert-light border-left-primary mb-3">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-clock text-primary mr-2"></i>
@@ -27,71 +27,83 @@
                 </div>
             </div>
 
-            <!-- ✅ ENHANCED: Filter buttons with counts -->
-            <div class="mb-3">
-                <div class="btn-toolbar" role="toolbar">
-                    <div class="btn-group mr-2" role="group">
-                        <a href="@Url.Action("BookingManagement")" class="btn btn-primary">
-                            <i class="fas fa-list"></i> All (@Model.Count())
-                        </a>
-                        <a href="@Url.Action("BookingsByStatus", new { status = 0 })" class="btn btn-warning">
-                            <i class="fas fa-hourglass-half"></i> Pending (@Model.Count(b => b.Order_Status == 0))
-                        </a>
-                        <a href="@Url.Action("BookingsByStatus", new { status = 1 })" class="btn btn-info">
-                            <i class="fas fa-check-circle"></i> Confirmed (@Model.Count(b => b.Order_Status == 1))
-                        </a>
-                        <a href="@Url.Action("BookingsByStatus", new { status = 2 })" class="btn btn-success">
-                            <i class="fas fa-money-bill-wave"></i> Paid (@Model.Count(b => b.Order_Status == 2))
-                        </a>
-                        <a href="@Url.Action("BookingsByStatus", new { status = 3 })" class="btn btn-danger">
-                            <i class="fas fa-times-circle"></i> Cancelled (@Model.Count(b => b.Order_Status == 3))
-                        </a>
-                    </div>
+            <!-- Search and Filter Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-search"></i> Search & Filter Bookings
+                    </h5>
                 </div>
-            </div>
-
-            <!-- ✅ ENHANCED: Summary Statistics -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5><i class="fas fa-chart-bar"></i> Booking Summary</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Search Box -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text"
+                                       id="searchKeyword"
+                                       class="form-control"
+                                       placeholder="Search by ID, customer name, phone, or notes..."
+                                       autocomplete="off">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" onclick="performSearch()">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                    <button class="btn btn-secondary" type="button" onclick="clearSearch()" id="clearBtn" style="display: none;">
+                                        <i class="fas fa-times"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Search in: Booking ID, Customer Name, Phone Number, Notes, Payment ID
+                            </small>
+                            <!-- Loading indicator -->
+                            <div id="searchLoading" class="text-center mt-2" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Searching...
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-md-2">
-                                    <h4 class="text-primary">@Model.Count()</h4>
-                                    <small class="text-muted">Total Active</small>
+
+                        <!-- Quick Filter Buttons -->
+                        <div class="col-md-6">
+                            <div class="btn-toolbar justify-content-end" role="toolbar">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-outline-primary active" onclick="filterByStatus('all')" id="filterAll">
+                                        <i class="fas fa-list"></i> All Bookings
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="filterByStatus(0)" id="filterPending">
+                                        <i class="fas fa-hourglass-half"></i> Pending
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="filterByStatus(3)" id="filterCancelled">
+                                        <i class="fas fa-times-circle"></i> Cancelled
+                                    </button>
                                 </div>
-                                <div class="col-md-2">
-                                    <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
-                                    <small class="text-muted">Pending</small>
-                                </div>
-                                <div class="col-md-2">
-                                    <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
-                                    <small class="text-muted">Confirmed</small>
-                                </div>
-                                <div class="col-md-2">
-                                    <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
-                                    <small class="text-muted">Paid</small>
-                                </div>
-                                <div class="col-md-2">
-                                    <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
-                                    <small class="text-muted">Cancelled</small>
-                                </div>
-                                <div class="col-md-2">
-                                    <h4 class="text-secondary">@Model.Count(b => b.Invoice_Date.Date == ViewBag.SqlServerTime.Date)</h4>
-                                    <small class="text-muted">Today</small>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Results Info -->
+                    <div id="searchResultsInfo" class="row mt-3" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Search Results:</strong>
+                                <span id="searchResultText"></span>
+                                <button class="btn btn-link alert-link ml-2 p-0" onclick="clearSearch()">
+                                    <i class="fas fa-arrow-left"></i> View All Bookings
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ✅ ENHANCED: Bookings table with notes -->
+            <!-- Summary Cards -->
+            <div class="row mb-4" id="summaryCards">
+                <!-- Summary cards will be updated via AJAX -->
+            </div>
+
+            <!-- Bookings table -->
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" id="bookingsTable">
                     <thead class="thead-dark">
                         <tr>
                             <th><i class="fas fa-hashtag"></i> ID</th>
@@ -104,154 +116,25 @@
                             <th><i class="fas fa-cogs"></i> Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var booking in Model)
-                        {
-                            <tr data-booking-id="@booking.Id">
-                                <td class="text-primary font-weight-bold">#@booking.Id</td>
-                                <td>
-                                    <strong>@(booking.CustomerName ?? $"Customer #{booking.Customer_Id}")</strong>
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(booking.CustomerPhone))
-                                    {
-                                        <a href="tel:@booking.CustomerPhone" class="text-decoration-none">
-                                            <i class="fas fa-phone text-success"></i> @booking.CustomerPhone
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">N/A</span>
-                                    }
-                                </td>
-                                <td>
-                                    <strong>@booking.Invoice_Date.ToString("dd/MM/yyyy")</strong>
-                                    <br>
-                                    <small class="text-muted">
-                                        @{
-                                            var daysDiff = (booking.Invoice_Date.Date - ViewBag.SqlServerTime.Date).Days;
-                                            var timeText = daysDiff == 0 ? "Today" :
-                                                          daysDiff == 1 ? "Tomorrow" :
-                                                          daysDiff == -1 ? "Yesterday" :
-                                                          daysDiff > 0 ? $"In {daysDiff} days" : $"{Math.Abs(daysDiff)} days ago";
-                                        }
-                                        @timeText
-                                    </small>
-                                </td>
-                                <td>
-                                    <span class="badge badge-light">@booking.Invoice_Date.ToString("HH:mm")</span>
-                                    <br>
-                                    <small class="text-muted">
-                                        @{
-                                            var timeDiff = (booking.Invoice_Date - ViewBag.SqlServerTime).TotalHours;
-                                            var timeStatus = timeDiff > 12 ? "text-info" :
-                                                           timeDiff > 1 ? "text-warning" :
-                                                           timeDiff > 0 ? "text-danger" : "text-muted";
-                                            var timeLabel = timeDiff > 0 ? $"In {Math.Abs(timeDiff):F1}h" : $"{Math.Abs(timeDiff):F1}h ago";
-                                        }
-                                        <span class="@timeStatus">@timeLabel</span>
-                                    </small>
-                                </td>
-                                <td>
-                                    @{
-                                        string statusText = ViewBag.GetStatusText(booking.Order_Status);
-                                        string statusClass = ViewBag.GetStatusClass(booking.Order_Status);
-                                        string statusIcon = "";
-                                        switch (booking.Order_Status)
-                                        {
-                                            case 0: statusIcon = "fa-hourglass-half"; break;
-                                            case 1: statusIcon = "fa-check-circle"; break;
-                                            case 2: statusIcon = "fa-money-bill-wave"; break;
-                                            case 3: statusIcon = "fa-times-circle"; break;
-                                            default: statusIcon = "fa-question-circle"; break;
-                                        }
-                                    }
-                                    <span class="badge badge-@statusClass" id="status-@booking.Id">
-                                        <i class="fas @statusIcon"></i> @statusText
-                                    </span>
-                                </td>
-                                <td class="notes-cell">
-                                    @if (!string.IsNullOrEmpty(booking.Notes))
-                                    {
-                                        <button type="button"
-                                                class="btn btn-sm btn-info notes-btn"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                title="Click to view notes and history"
-                                                onclick="showNotesModal(@booking.Id, '@Html.Raw(HttpUtility.JavaScriptStringEncode(booking.Notes))')">
-                                            <i class="fas fa-sticky-note"></i>
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">
-                                            <i class="fas fa-file-alt"></i>
-                                        </span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="@Url.Action("BookingDetails", new { id = booking.Id })"
-                                           class="btn btn-sm btn-outline-info" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-
-                                        @if (booking.Order_Status == 0) // Pending
-                                        {
-                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Confirm">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 3)" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        }
-                                        else if (booking.Order_Status == 1) // Confirmed
-                                        {
-                                            <button class="btn btn-sm btn-success" onclick="updateStatus(@booking.Id, 2)" title="Mark as Paid">
-                                                <i class="fas fa-dollar-sign"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-warning" onclick="updateStatus(@booking.Id, 0)" title="Set Pending">
-                                                <i class="fas fa-undo"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 3)" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        }
-                                        else if (booking.Order_Status == 2) // Paid
-                                        {
-                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Set Confirmed">
-                                                <i class="fas fa-check-circle"></i>
-                                            </button>
-                                        }
-                                        else if (booking.Order_Status == 3) // Cancelled
-                                        {
-                                            <button class="btn btn-sm btn-info" onclick="updateStatus(@booking.Id, 1)" title="Reactivate">
-                                                <i class="fas fa-redo"></i>
-                                            </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                    <tbody id="bookingsTableBody">
+                        <!-- Content will be populated via AJAX -->
                     </tbody>
                 </table>
             </div>
 
-            @if (Model.Count == 0)
-            {
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle fa-2x mb-3"></i>
-                    <h4>No Bookings Found</h4>
-                    <p>There are no bookings matching your current filter.</p>
-                    <a href="@Url.Action("BookingManagement")" class="btn btn-primary">
-                        <i class="fas fa-list"></i> View All Bookings
-                    </a>
-                </div>
-            }
+            <!-- No results message -->
+            <div id="noResultsMessage" class="alert alert-info text-center" style="display: none;">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <h4 id="noResultsTitle">No Results Found</h4>
+                <p id="noResultsText">No bookings found.</p>
+                <button class="btn btn-primary" onclick="clearSearch()">
+                    <i class="fas fa-list"></i> View All Bookings
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- ✅ NEW: Admin Notes Modal -->
+    <!-- Notes Modal -->
     <div class="modal fade" id="adminNotesModal" tabindex="-1" role="dialog" aria-labelledby="adminNotesModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -276,73 +159,364 @@
     </div>
 </div>
 
-<!-- ✅ ENHANCED: JavaScript with notes modal and server time -->
 <script>
+// Global variables
+let currentSearchKeyword = '';
+let currentFilter = 'all';
+let allBookingsData = [];
+
 $(document).ready(function () {
     console.log('Admin BookingManagement loaded');
 
-    // ✅ Initialize tooltips
+    // Initialize tooltips
     $('[data-toggle="tooltip"]').tooltip();
 
-    // ✅ Modal close event handlers
+    // Load initial data
+    loadBookings();
+
+    // Search on Enter key
+    $('#searchKeyword').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            performSearch();
+        }
+    });
+
+    // Search as you type (with debounce)
+    let searchTimeout;
+    $('#searchKeyword').on('input', function() {
+        clearTimeout(searchTimeout);
+        const keyword = $(this).val().trim();
+
+        if (keyword.length >= 2 || keyword.length === 0) {
+            searchTimeout = setTimeout(() => {
+                performSearch(keyword);
+            }, 500); // 500ms delay
+        }
+    });
+
+    // Auto-refresh server time every 30 seconds
+    setInterval(refreshServerTime, 30000);
+
+    // Modal close event handlers
     $('#adminNotesModal').on('hidden.bs.modal', function () {
-        console.log('Admin modal closed');
         $('#adminNotesContent').empty();
     });
-
-    // ✅ Multiple ways to close modal
-    $(document).on('click', '[data-dismiss="modal"]', function(e) {
-        console.log('Admin close button clicked');
-        $('#adminNotesModal').modal('hide');
-    });
-
-    // ✅ ESC key to close modal
-    $(document).on('keydown', function(e) {
-        if (e.keyCode === 27 && $('#adminNotesModal').hasClass('show')) {
-            console.log('Admin ESC pressed');
-            $('#adminNotesModal').modal('hide');
-        }
-    });
-
-    // ✅ Click outside modal to close
-    $('#adminNotesModal').on('click', function(e) {
-        if (e.target === this) {
-            console.log('Admin clicked outside modal');
-            $(this).modal('hide');
-        }
-    });
-
-    // ✅ Auto-refresh server time every 30 seconds
-    setInterval(refreshServerTime, 30000);
 });
 
-// ✅ NEW: Show admin notes modal
-    function showNotesModal(bookingId, notes) {
-    try {
-        console.log('Admin showNotesModal called with:', { bookingId, notes });
+// Load bookings via AJAX
+function loadBookings(keyword = '') {
+    console.log('loadBookings called with keyword:', keyword);
+    showLoading(true);
 
-        // Update modal title
-        $('#adminNotesModalLabel').html('<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Notes & History (Admin View)');
+    // Add debug info
+    const ajaxData = { keyword: keyword };
+    console.log('AJAX data:', ajaxData);
+    console.log('AJAX URL:', '@Url.Action("SearchBookingsAjax", "Admin")');
 
-        // Handle empty notes
-        if (!notes || notes.trim() === '') {
-            $('#adminNotesContent').html('<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>');
-        } else {
-            // Parse and format notes (reuse client-side functions)
-            const formattedNotes = parseAndFormatNotes(notes);
-            $('#adminNotesContent').html(formattedNotes);
+    $.ajax({
+        url: '@Url.Action("SearchBookingsAjax", "Admin")',
+        type: 'POST',
+        data: ajaxData,
+        dataType: 'json',
+        success: function(response) {
+            console.log('AJAX Success Response:', response);
+
+            if (response && response.success) {
+                allBookingsData = response.data;
+                currentSearchKeyword = keyword;
+
+                renderBookings(response.data);
+                updateSummaryCards(response.stats);
+                updateSearchInfo(keyword, response.stats.Total);
+                updateServerTime(response.serverTime);
+
+                console.log(`Loaded ${response.data.length} bookings`);
+            } else {
+                console.error('Response indicates failure:', response);
+                showAlert('error', response.message || 'Unknown error occurred');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error Details:', {
+                xhr: xhr,
+                status: status,
+                error: error,
+                responseText: xhr.responseText,
+                readyState: xhr.readyState,
+                statusText: xhr.statusText
+            });
+
+            let errorMessage = 'Failed to load bookings. ';
+            if (xhr.responseText) {
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    errorMessage += errorResponse.message || 'Please try again.';
+                } catch (e) {
+                    errorMessage += `Server error: ${xhr.status} ${xhr.statusText}`;
+                }
+            } else {
+                errorMessage += `Network error: ${error}`;
+            }
+
+            showAlert('error', errorMessage);
+        },
+        complete: function() {
+            showLoading(false);
         }
+    });
+}
 
-        // Show modal
-        $('#adminNotesModal').modal('show');
+// Perform search
+function performSearch(keyword = null) {
+    if (keyword === null) {
+        keyword = $('#searchKeyword').val().trim();
+    }
 
-    } catch (error) {
-        console.error('Error in admin showNotesModal:', error);
-        alert('Error displaying notes: ' + error.message);
+    loadBookings(keyword);
+}
+
+// Clear search
+function clearSearch() {
+    $('#searchKeyword').val('');
+    currentSearchKeyword = '';
+    currentFilter = 'all';
+
+    // Update filter buttons
+    $('.btn-group .btn').removeClass('active');
+    $('#filterAll').addClass('active');
+
+    // Hide clear button and search info
+    $('#clearBtn').hide();
+    $('#searchResultsInfo').hide();
+
+    loadBookings('');
+}
+
+// Filter by status
+function filterByStatus(status) {
+    currentFilter = status;
+
+    // Update active button
+    $('.btn-group .btn').removeClass('active');
+    $(`#filter${status === 'all' ? 'All' : (status === 0 ? 'Pending' : 'Cancelled')}`).addClass('active');
+
+    if (status === 'all') {
+        renderBookings(allBookingsData);
+    } else {
+        const filtered = allBookingsData.filter(booking => booking.Order_Status === status);
+        renderBookings(filtered);
     }
 }
 
-// ✅ ENHANCED: Update status with server time logging
+// Render bookings table
+function renderBookings(bookings) {
+    const tbody = $('#bookingsTableBody');
+    tbody.empty();
+
+    if (bookings.length === 0) {
+        $('#bookingsTable').hide();
+        $('#noResultsMessage').show();
+
+        if (currentSearchKeyword) {
+            $('#noResultsTitle').text('No Search Results Found');
+            $('#noResultsText').text(`No bookings found matching "${currentSearchKeyword}". Try a different search term.`);
+        } else {
+            $('#noResultsTitle').text('No Bookings Found');
+            $('#noResultsText').text('There are no bookings matching your current filter.');
+        }
+        return;
+    }
+
+    $('#bookingsTable').show();
+    $('#noResultsMessage').hide();
+
+    bookings.forEach(booking => {
+        const highlightClass = (booking.MatchesId || booking.MatchesCustomer || booking.MatchesPhone || booking.MatchesNotes) ? 'table-warning' : '';
+
+        const row = `
+            <tr data-booking-id="${booking.Id}" class="${highlightClass}">
+                <td class="text-primary font-weight-bold">
+                    #${booking.Id}
+                    ${booking.MatchesId ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                </td>
+                <td>
+                    <strong>${booking.CustomerName}</strong>
+                    ${booking.MatchesCustomer ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                </td>
+                <td>
+                    ${booking.CustomerPhone ?
+                        `<a href="tel:${booking.CustomerPhone}" class="text-decoration-none">
+                            <i class="fas fa-phone text-success"></i> ${booking.CustomerPhone}
+                            ${booking.MatchesPhone ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                        </a>` :
+                        '<span class="text-muted">N/A</span>'
+                    }
+                </td>
+                <td>
+                    <strong>${booking.Invoice_Date}</strong>
+                    <br>
+                    <small class="text-muted">${booking.TimeText}</small>
+                </td>
+                <td>
+                    <span class="badge badge-light">${booking.Invoice_Time}</span>
+                    <br>
+                    <small class="text-muted">
+                        <span class="${booking.TimeStatus}">${booking.TimeLabel}</span>
+                    </small>
+                </td>
+                <td>
+                    <span class="badge badge-${booking.StatusClass}" id="status-${booking.Id}">
+                        <i class="fas ${booking.StatusIcon}"></i> ${booking.StatusText}
+                    </span>
+                </td>
+                <td class="notes-cell">
+                    ${booking.HasNotes ?
+                        `<button type="button"
+                                class="btn btn-sm btn-info notes-btn ${booking.MatchesNotes ? 'btn-warning' : ''}"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Click to view notes and history${booking.MatchesNotes ? ' - Contains search term' : ''}"
+                                onclick="showNotesModal(${booking.Id}, '${escapeForJs(booking.Notes)}')">
+                            <i class="fas fa-sticky-note"></i>
+                            ${booking.MatchesNotes ? '<i class="fas fa-search"></i>' : ''}
+                        </button>` :
+                        '<span class="text-muted"><i class="fas fa-file-alt"></i></span>'
+                    }
+                </td>
+                <td>
+                    ${renderActionButtons(booking)}
+                </td>
+            </tr>
+        `;
+
+        tbody.append(row);
+    });
+
+    // Reinitialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
+// Render action buttons based on status
+function renderActionButtons(booking) {
+    let buttons = `
+        <div class="btn-group">
+            <a href="@Url.Action("BookingDetails")?id=${booking.Id}"
+               class="btn btn-sm btn-outline-info" title="View Details">
+                <i class="fas fa-eye"></i>
+            </a>
+    `;
+
+    switch (booking.Order_Status) {
+        case 0: // Pending
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Confirm">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="updateStatus(${booking.Id}, 3)" title="Cancel">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            break;
+        case 1: // Confirmed
+            buttons += `
+                <button class="btn btn-sm btn-success" onclick="updateStatus(${booking.Id}, 2)" title="Mark as Paid">
+                    <i class="fas fa-dollar-sign"></i>
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="updateStatus(${booking.Id}, 0)" title="Set Pending">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="updateStatus(${booking.Id}, 3)" title="Cancel">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            break;
+        case 2: // Paid
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Set Confirmed">
+                    <i class="fas fa-check-circle"></i>
+                </button>
+            `;
+            break;
+        case 3: // Cancelled
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Reactivate">
+                    <i class="fas fa-redo"></i>
+                </button>
+            `;
+            break;
+    }
+
+    buttons += '</div>';
+    return buttons;
+}
+
+// Update summary cards
+function updateSummaryCards(stats) {
+    const summaryHtml = `
+        <div class="col-md-4">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">${stats.Total}</h3>
+                    <p class="card-text">${currentSearchKeyword ? 'Search Results' : 'Total Active'}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning">${stats.Pending}</h3>
+                    <p class="card-text">Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-danger">
+                <div class="card-body">
+                    <h3 class="text-danger">${stats.Cancelled}</h3>
+                    <p class="card-text">Cancelled</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    $('#summaryCards').html(summaryHtml);
+}
+
+// Update search info
+function updateSearchInfo(keyword, resultCount) {
+    if (keyword && keyword.trim() !== '') {
+        $('#searchResultText').text(`Found ${resultCount} booking(s) for keyword "${keyword}"`);
+        $('#searchResultsInfo').show();
+        $('#clearBtn').show();
+    } else {
+        $('#searchResultsInfo').hide();
+        $('#clearBtn').hide();
+    }
+}
+
+// Show/hide loading
+function showLoading(show) {
+    if (show) {
+        $('#searchLoading').show();
+        $('#bookingsTable').css('opacity', '0.5');
+    } else {
+        $('#searchLoading').hide();
+        $('#bookingsTable').css('opacity', '1');
+    }
+}
+
+// Update server time
+function updateServerTime(serverTime) {
+    $('#server-time').text(serverTime);
+}
+
+// Escape string for JavaScript
+function escapeForJs(str) {
+    if (!str) return '';
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\r?\n/g, '\\n');
+}
+
+// Enhanced: Update status with AJAX refresh
 function updateStatus(bookingId, newStatus) {
     const statusNames = {
         0: 'Pending',
@@ -354,7 +528,6 @@ function updateStatus(bookingId, newStatus) {
     const statusName = statusNames[newStatus] || 'Unknown';
 
     if (confirm(`Are you sure you want to update booking #${bookingId} status to "${statusName}"?`)) {
-        // Show loading state
         const statusElement = document.getElementById(`status-${bookingId}`);
         const originalContent = statusElement.innerHTML;
         statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
@@ -365,35 +538,59 @@ function updateStatus(bookingId, newStatus) {
             data: { id: bookingId, newStatus: newStatus },
             success: function(response) {
                 if (response.success) {
-                    // Update the badge
                     statusElement.className = `badge badge-${response.newStatusClass}`;
                     statusElement.innerHTML = `<i class="fas ${getStatusIcon(newStatus)}"></i> ${response.newStatusText}`;
 
-                    // Show success message with server time
-                    showAlert('success', `${response.message} (Server Time: ${response.updateTime})`);
+                    showAlert('success', `${response.message} (Server time: ${response.updateTime})`);
 
-                    console.log(`[ADMIN-UPDATE] Booking #${bookingId} updated to ${newStatus} at ${response.updateTime}`);
-
-                    // Reload after 1.5 seconds to update action buttons
-                    setTimeout(() => location.reload(), 1500);
+                    // If confirming order (STATUS = 1), redirect to edit invoice
+                    if (response.redirectToEdit && response.editUrl) {
+                        if (response.confirmMessage) {
+                            showAlert('info', response.confirmMessage);
+                        }
+                        setTimeout(() => {
+                            window.location.href = response.editUrl;
+                        }, 2000);
+                    } else {
+                        // Refresh data after status update
+                        setTimeout(() => {
+                            performSearch(currentSearchKeyword);
+                        }, 1500);
+                    }
                 } else {
-                    // Restore original content
                     statusElement.innerHTML = originalContent;
                     showAlert('error', response.message);
                 }
             },
             error: function(xhr, status, error) {
-                // Restore original content
                 statusElement.innerHTML = originalContent;
-                showAlert('error', `An error occurred while updating status: ${error}`);
+                showAlert('error', `Error updating status: ${error}`);
                 console.error('AJAX Error:', { xhr, status, error });
             }
         });
     }
 }
 
+// Show admin notes modal
+function showNotesModal(bookingId, notes) {
+    try {
+        $('#adminNotesModalLabel').html('<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Notes & History');
 
-// ✅ NEW: Refresh server time
+        if (!notes || notes.trim() === '') {
+            $('#adminNotesContent').html('<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>');
+        } else {
+            const formattedNotes = parseAndFormatNotes(notes);
+            $('#adminNotesContent').html(formattedNotes);
+        }
+
+        $('#adminNotesModal').modal('show');
+    } catch (error) {
+        console.error('Error in showNotesModal:', error);
+        alert('Error displaying notes: ' + error.message);
+    }
+}
+
+// Refresh server time
 function refreshServerTime() {
     $.ajax({
         url: '@Url.Action("GetServerTime")',
@@ -436,16 +633,14 @@ function showAlert(type, message) {
         </div>
     `;
 
-    // Insert alert at the top of the container
     $('.container-fluid .row .col-md-12').prepend(alertHtml);
 
-    // Auto-dismiss after 5 seconds
     setTimeout(() => {
         $('.alert').fadeOut();
     }, 5000);
 }
 
-// ✅ Reuse notes parsing functions from client-side (from MyBookings)
+// Notes parsing functions
 function parseAndFormatNotes(notes) {
     try {
         const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
@@ -597,7 +792,6 @@ function escapeHtml(text) {
 </script>
 
 <style>
-    /* ✅ Enhanced styles */
     .border-left-primary {
         border-left: 4px solid #007bff !important;
     }
@@ -640,7 +834,6 @@ function escapeHtml(text) {
         font-weight: 600 !important;
     }
 
-    /* ✅ UPDATED NOTES STYLES - Simple button only (Admin) */
     .notes-cell {
         text-align: center;
         width: 80px;
@@ -661,7 +854,6 @@ function escapeHtml(text) {
         transition: transform 0.2s;
     }
 
-    /* Modal Notes Styles (consistent with client-side) */
     .notes-section {
         background: #f8f9fa;
         border-radius: 8px;
@@ -683,21 +875,20 @@ function escapeHtml(text) {
         color: #495057;
     }
 
-    /* Timeline Styles (consistent with client-side) */
     .timeline {
         position: relative;
         padding-left: 30px;
     }
 
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #dee2e6;
-        }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
 
     .timeline-item {
         position: relative;
@@ -719,25 +910,25 @@ function escapeHtml(text) {
         font-size: 8px;
     }
 
-        .timeline-marker.text-success {
-            border-color: #28a745;
-            color: #28a745;
-        }
+    .timeline-marker.text-success {
+        border-color: #28a745;
+        color: #28a745;
+    }
 
-        .timeline-marker.text-warning {
-            border-color: #ffc107;
-            color: #ffc107;
-        }
+    .timeline-marker.text-warning {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
 
-        .timeline-marker.text-danger {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
+    .timeline-marker.text-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
 
-        .timeline-marker.text-info {
-            border-color: #17a2b8;
-            color: #17a2b8;
-        }
+    .timeline-marker.text-info {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
 
     .timeline-content {
         background: white;
@@ -772,40 +963,6 @@ function escapeHtml(text) {
         color: #6c757d;
     }
 
-    /* ✅ Enhanced modal styles */
-    .modal {
-        outline: none;
-    }
-
-    .modal-backdrop {
-        z-index: 1040;
-    }
-
-    .modal {
-        z-index: 1050;
-    }
-
-    .close {
-        background: transparent;
-        border: none;
-        font-size: 1.5rem;
-        line-height: 1;
-        color: #000;
-        text-shadow: 0 1px 0 #fff;
-        opacity: 0.5;
-        cursor: pointer;
-    }
-
-        .close:hover {
-            opacity: 0.75;
-        }
-
-        .close:focus {
-            outline: none;
-            opacity: 1;
-        }
-
-    /* ✅ Responsive enhancements */
     @@media (max-width: 768px) {
         .btn-toolbar .btn-group {
             margin-bottom: 0.5rem;
