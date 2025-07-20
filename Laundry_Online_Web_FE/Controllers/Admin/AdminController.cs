@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Laundry_Online_Web_BE.Models.Repositories;
+using Laundry_Online_Web_FE.Helpers;
 using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
 namespace Laundry_Online_Web_FE.Controllers.Admin
@@ -380,16 +381,15 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
         public ActionResult BookingManagement()
         {
-            // Chạy auto-update trước khi hiển thị
+            // ✅ Run auto-update using SQL Server time
             InvoiceRepository.Instance.AutoUpdateExpiredOrders();
 
-            // CẬP NHẬT: Chỉ lấy active bookings
             var allBookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1 && b.Status == 1) // Chỉ lấy booking online và active
+                .Where(b => b.Status == 1) // Only active bookings
                 .OrderByDescending(b => b.Invoice_Date)
                 .ToList();
 
-            // Lấy thông tin khách hàng cho từng booking
+            // Get customer information for each booking
             foreach (var booking in allBookings)
             {
                 var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
@@ -400,23 +400,48 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 }
             }
 
-            // Thêm helper functions cho View
+            // ✅ Add helper functions for View including notes
             ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
             ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            // ✅ NEW: Add notes helper functions
+            ViewBag.FormatNotes = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.FormatNotesForDisplay(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error formatting notes: {ex.Message}");
+                    return "Error loading notes";
+                }
+            });
+
+            ViewBag.GetNotesTooltip = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.GetNotesTooltip(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error generating tooltip: {ex.Message}");
+                    return "Error loading tooltip";
+                }
+            });
+
+            // ✅ NEW: Add SQL Server time for display
+            ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
 
             return View(allBookings);
         }
 
-        // GET: Danh sách đơn đặt lịch theo trạng thái
         public ActionResult BookingsByStatus(int status)
         {
-            // CẬP NHẬT: Chỉ lấy active bookings
             var bookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1 && b.Status == 1 && b.Order_Status == status) // Active bookings với order_status cụ thể
+                .Where(b => b.Status == 1 && b.Order_Status == status)
                 .OrderByDescending(b => b.Invoice_Date)
                 .ToList();
 
-            // Lấy thông tin khách hàng cho từng booking
             foreach (var booking in bookings)
             {
                 var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
@@ -432,10 +457,36 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
             ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
 
+            // ✅ NEW: Add notes helpers
+            ViewBag.FormatNotes = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.FormatNotesForDisplay(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error formatting notes: {ex.Message}");
+                    return "Error loading notes";
+                }
+            });
+
+            ViewBag.GetNotesTooltip = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.GetNotesTooltip(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error generating tooltip: {ex.Message}");
+                    return "Error loading tooltip";
+                }
+            });
+
+            ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+
             return View("BookingManagement", bookings);
         }
 
-        // GET: Danh sách đơn đã quá hạn
         public ActionResult ExpiredBookings()
         {
             if (Session["admin"] == null)
@@ -445,39 +496,78 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             var expiredBookings = InvoiceRepository.Instance.GetExpiredOrders();
 
+            // Get customer information
+            foreach (var booking in expiredBookings)
+            {
+                var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
+                if (customer != null)
+                {
+                    booking.CustomerName = $"{customer.FirstName} {customer.LastName}";
+                    booking.CustomerPhone = customer.PhoneNumber;
+                }
+            }
+
             ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
             ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
+
+            // ✅ NEW: Add notes helpers
+            ViewBag.FormatNotes = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.FormatNotesForDisplay(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error formatting notes: {ex.Message}");
+                    return "Error loading notes";
+                }
+            });
+
+            ViewBag.GetNotesTooltip = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.GetNotesTooltip(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error generating tooltip: {ex.Message}");
+                    return "Error loading tooltip";
+                }
+            });
+
+            ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
 
             return View(expiredBookings);
         }
 
-        // POST: Cập nhật trạng thái đơn đặt lịch
         [HttpPost]
         public JsonResult UpdateBookingStatus(int id, int newStatus)
         {
             try
             {
-                // CẬP NHẬT: Validate trạng thái mới (0-3)
                 if (newStatus < 0 || newStatus > 3)
                 {
                     return Json(new { success = false, message = "Invalid status value" });
                 }
 
-                // Tạo log message
+                // ✅ Use SQL Server time
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
                 var statusText = GetBookingStatusText(newStatus);
-                var updateLog = $"\n[ADMIN UPDATE] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Status changed to {statusText}";
+                var updateLog = $"\n[ADMIN UPDATE] {sqlServerTime:dd/MM/yyyy HH:mm}: Status changed to {statusText} by admin";
 
-                // Sử dụng method chuyên dụng để update status
                 bool success = InvoiceRepository.Instance.UpdateOrderStatus(id, newStatus, updateLog);
 
                 if (success)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[ADMIN-UPDATE] Booking #{id} status updated to {newStatus} by admin at {sqlServerTime:yyyy-MM-dd HH:mm:ss}");
+
                     return Json(new
                     {
                         success = true,
                         message = "Status updated successfully",
                         newStatusText = statusText,
-                        newStatusClass = GetBookingStatusClass(newStatus)
+                        newStatusClass = GetBookingStatusClass(newStatus),
+                        updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm")
                     });
                 }
                 else
@@ -492,17 +582,16 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-        // GET: Chi tiết đơn đặt lịch
         public ActionResult BookingDetails(int id)
         {
             var booking = InvoiceRepository.Instance.GetById(id);
             if (booking == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy đơn đặt lịch";
+                TempData["ErrorMessage"] = "Booking not found";
                 return RedirectToAction("BookingManagement");
             }
 
-            // Lấy thông tin khách hàng
+            // Get customer information
             var customer = CustomerRepo.Instance.GetCustomerById(booking.Customer_Id);
             if (customer != null)
             {
@@ -513,22 +602,52 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
             ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
 
+            // ✅ NEW: Add notes helpers for detail view
+            ViewBag.FormatNotes = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.FormatNotesForDisplay(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error formatting notes: {ex.Message}");
+                    return "Error loading notes";
+                }
+            });
+
+            ViewBag.GetNotesTooltip = new Func<string, string>((notes) => {
+                try
+                {
+                    return NotesHelper.GetNotesTooltip(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Admin - Error generating tooltip: {ex.Message}");
+                    return "Error loading tooltip";
+                }
+            });
+
+            ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+
             return View(booking);
         }
 
-        // POST: Chạy auto-update đơn quá hạn
         [HttpPost]
         public JsonResult RunAutoUpdateExpired()
         {
             try
             {
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
                 int updatedCount = InvoiceRepository.Instance.AutoUpdateExpiredOrders();
+
+                System.Diagnostics.Debug.WriteLine($"[ADMIN-AUTO-UPDATE] Manual trigger by admin at {sqlServerTime:yyyy-MM-dd HH:mm:ss}, updated {updatedCount} bookings");
 
                 return Json(new
                 {
                     success = true,
                     message = $"Updated {updatedCount} expired orders",
-                    updatedCount = updatedCount
+                    updatedCount = updatedCount,
+                    updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm")
                 });
             }
             catch (Exception ex)
@@ -537,12 +656,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-        // GET: Thống kê đơn đặt lịch - CẬP NHẬT
         public ActionResult BookingStatistics()
         {
-            // CẬP NHẬT: Chỉ lấy active bookings
+            var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
             var allBookings = InvoiceRepository.Instance.GetAll()
-                .Where(b => b.Invoice_Type == 1 && b.Status == 1) // Chỉ active bookings
+                .Where(b => b.Status == 1) // Only active bookings
                 .ToList();
 
             var stats = new
@@ -550,29 +668,56 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 TotalBookings = allBookings.Count,
                 PendingBookings = allBookings.Count(b => b.Order_Status == 0),
                 ConfirmedBookings = allBookings.Count(b => b.Order_Status == 1),
-                PaidBookings = allBookings.Count(b => b.Order_Status == 2), // CẬP NHẬT: Thêm Paid
-                CancelledBookings = allBookings.Count(b => b.Order_Status == 3), // CẬP NHẬT: Cancelled = 3
+                PaidBookings = allBookings.Count(b => b.Order_Status == 2),
+                CancelledBookings = allBookings.Count(b => b.Order_Status == 3),
                 ExpiredBookings = InvoiceRepository.Instance.GetExpiredOrders().Count,
-                TodayBookings = allBookings.Count(b => b.Invoice_Date.Date == DateTime.Today)
+                TodayBookings = allBookings.Count(b => b.Invoice_Date.Date == sqlServerTime.Date), // ✅ Use SQL Server date
+                CurrentSqlTime = sqlServerTime
             };
 
             ViewBag.Statistics = stats;
+            ViewBag.SqlServerTime = sqlServerTime;
             return View();
         }
 
-        // Helper methods - CẬP NHẬT
+        [HttpGet]
+        public JsonResult GetServerTime()
+        {
+            try
+            {
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+
+                return Json(new
+                {
+                    success = true,
+                    serverTime = sqlServerTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    displayTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm:ss"),
+                    timestamp = ((DateTimeOffset)sqlServerTime).ToUnixTimeSeconds()
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    serverTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss") // Fallback
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Helper methods - Updated with better logging
         private string GetBookingStatusText(int status)
         {
             switch (status)
             {
                 case 0: return "Pending";
                 case 1: return "Confirmed";
-                case 2: return "Paid";        // CẬP NHẬT: Thêm Paid
-                case 3: return "Cancelled";   // CẬP NHẬT: Cancelled = 3
+                case 2: return "Paid";
+                case 3: return "Cancelled";
                 default: return "Unknown";
             }
         }
-
         private string GetBookingStatusClass(int status)
         {
             switch (status)

@@ -173,6 +173,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\BarcodeHelper.cs" />
+    <Compile Include="Helpers\LogEntry.cs" />
+    <Compile Include="Helpers\NoteHelpers.cs" />
+    <Compile Include="Helpers\NotesFormat.cs" />
     <Compile Include="Models\Auth\AdminAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\CustomerAuthorizeAttribute.cs" />
     <Compile Include="Models\Auth\EmployeeAuthorizeAttribute.cs" />
@@ -219,6 +222,9 @@
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Service.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
