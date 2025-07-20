@@ -89,6 +89,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             return RedirectToAction("BlogPostList");
         }
+        [Route("admin/Admin_edit_BlogPost")]
         [HttpGet]
         public ActionResult Admin_edit_BlogPost(int id)
         {

@@ -224,9 +224,6 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\sysdiagram.cs">
-      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
@@ -532,6 +529,7 @@
     <Content Include="Content\Client\thumb\medium\100\431\113\products\ve-sinh-rem-cua-298d4.jpg" />
     <Content Include="Content\Client\thumb\pico\100\431\113\themes\826533\assets\evo_block_product_banner_1811e.jpg" />
     <Content Include="Content\Client\thumb\pico\100\431\113\themes\826533\assets\evo_block_product_banner_2811e.jpg" />
+    <Content Include="Content\contact-us.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -610,6 +608,9 @@
     <Content Include="Views\Checkout\PayPackage.cshtml" />
     <Content Include="Views\Checkout\PaymentSuccess.cshtml" />
     <Content Include="Views\Checkout\PaymentFailed.cshtml" />
+    <Content Include="Views\Admin\AdminList.cshtml" />
+    <Content Include="Views\Home\Contact_us.cshtml" />
+    <Content Include="Views\Admin\AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />

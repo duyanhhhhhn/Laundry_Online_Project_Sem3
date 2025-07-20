@@ -37,7 +37,7 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
             }
             else
             {
-                TempData["ErrorMessage"] = "Phone number or password is wrong!.";
+                ViewBag.ErrorMessage = "Phone number or password is wrong!";
                 return View("Login_Employee");
             }
         }

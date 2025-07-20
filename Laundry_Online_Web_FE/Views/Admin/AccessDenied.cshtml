@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "AccessDenied";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-danger">Access Denied</h1>
+    <p class="lead">You do not have permission to access this page.</p>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-primary mt-3">Back to Dashboard</a>
+</div>
+
+<style>
+    .access-denied {
+        padding: 60px 20px;
+        text-align: center;
+    }
+
+        .access-denied h1 {
+            font-size: 50px;
+            color: #dc3545;
+        }
+
+        .access-denied p {
+            font-size: 18px;
+        }
+</style>
+
