@@ -135,19 +135,34 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         }
         [HttpGet]
         [Route("Create")]
-        // GET: Invoice/Create
         public ActionResult Create()
         {
-            var customerList = _customerRepository.GetActiveCustomer();
-            var employeeList = _employeeRepository.All();
-            var customerPackageList = _customerPackageRepository.GetAll();
+            var employeeId = Convert.ToInt32(Session["EmployeeId"]); // ví dụ lấy từ session
+            var employee = _employeeRepository.GetEmployeeById(employeeId);
 
-            ViewBag.CustomerList = customerList;
-            ViewBag.EmployeeList = employeeList;
-            ViewBag.CustomerPackageList = customerPackageList;
+            ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text
+            }).ToList();
 
-            return View();
+            ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text
+            }).ToList();
+
+            var model = new InvoiceForm
+            {
+                Employee_Id = employee.Id,
+                Employee_Name = employee.LastName + " " + employee.FirstName,
+                Pickup_Date = DateTime.Now,
+                Delivery_Date = DateTime.Now.AddDays(1)
+            };
+
+            return View(model);
         }
+
 
         [HttpPost]
         [Route("Create")]
@@ -162,6 +177,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             string customerPackageId = Request.Form["CustomerPackage_Id"];
             string notes = Request.Form["Notes"];
             string shipCost = Request.Form["Ship_Cost"];
+            if (string.IsNullOrEmpty(customerId) || customerId == "0")
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn khách hàng.";
+                return RedirectToAction("Create");
+            }
 
             var newInvoice = new InvoiceView
             {
@@ -834,6 +854,29 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 // Log error nếu cần
                 Console.WriteLine($"Error updating invoice total: {ex.Message}");
             }
+        }
+
+        [HttpGet]
+        [Route("SearchCustomer")]
+        public ActionResult SearchCustomer(string term)
+        {
+            var customers = _customerRepository.GetAll()
+                .Where(c => c.Active == 1); // Chỉ chọn khách hàng đang hoạt động
+
+            var matched = customers
+                .Where(c =>
+                    (!string.IsNullOrEmpty(c.FirstName + " " + c.LastName) &&
+                     (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())) ||
+                    (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.Contains(term))
+                )
+                .Select(c => new
+                {
+                    Id = c.Id,
+                    Name = c.FirstName + " " + c.LastName,
+                    Phone = c.PhoneNumber
+                }).ToList();
+
+            return Json(matched, JsonRequestBehavior.AllowGet);
         }
 
 

@@ -1,318 +1,131 @@
-﻿
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.DTO.InvoiceForm
+
 @{
     ViewBag.Title = "Create Invoice";
+    var paymentTypes = ViewBag.PaymentTypeList as List<SelectListItem>;
+    var invoiceTypes = ViewBag.InvoiceTypeList as List<SelectListItem>;
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-
 }
 
+<h2>Create Invoice</h2>
 
+@using (Html.BeginForm("Create", "Invoice", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Create New Invoice</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Invoice Management</a></li>
-        <li class="breadcrumb-item active">Create Invoice</li>
-    </ol>
-
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-plus me-1"></i>
-            Create New Invoice
-        </div>
-        <div class="card-body">
-            <form method="post" action="@Url.Action("CreateInvoice")">
-                <div class="row">
-                    <!-- Customer Selection -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Customer_Id" class="form-label">Customer <span class="text-danger">*</span></label>
-                            <select name="Customer_Id" id="Customer_Id" class="form-select" required>
-                                <option value="">Select Customer</option>                   
-                                @if (ViewBag.CustomerList != null)
-                                {
-                                    foreach (var customer in ViewBag.CustomerList)
-                                    {
-                                        <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
-                                    }
-                                }
-
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Employee Selection -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Employee_Id" class="form-label">Employee</label>
-                            <select name="Employee_Id" id="Employee_Id" class="form-select">
-                                <option value="">Select Employee</option>
-                                @if (ViewBag.EmployeeList != null)
-                                {
-                                    foreach (var employee in ViewBag.EmployeeList)
-                                    {
-                                        <option value="@employee.Id">@employee.FirstName @employee.LastName</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Delivery Date -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Delivery_Date" class="form-label">Delivery Date <span class="text-danger">*</span></label>
-                            <input type="date" name="Delivery_Date" id="Delivery_Date" class="form-control"
-                                   value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" >
-                        </div>
-                    </div>
-
-                    <!-- Pickup Date -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Pickup_Date" class="form-label">Pickup Date <span class="text-danger">*</span></label>
-                            <input type="date" name="Pickup_Date" id="Pickup_Date" class="form-control"
-                                   value="@DateTime.Now.AddDays(3).ToString("yyyy-MM-dd")" >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Payment Type -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Payment_Type" class="form-label">Payment Type</label>
-                            <select name="Payment_Type" id="Payment_Type" class="form-select">
-                                <option value="1">Cash</option>
-                                <option value="2">VNPay</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Invoice Type -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Invoice_Type" class="form-label">Invoice Type</label>
-                            <select name="Invoice_Type" id="Invoice_Type" class="form-select">
-                                <option value="1">Regular Invoice</option>
-                                <option value="2">VIP Invoice</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Customer Package -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="CustomerPackage_Id" class="form-label">Customer Package</label>
-                            <select name="CustomerPackage_Id" id="CustomerPackage_Id" class="form-select">
-                                <option value="">No Package</option>
-                            </select>
-
-                        </div>
-                    </div>
-
-                    <!-- Ship Cost -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="Ship_Cost" class="form-label">Shipping Cost</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" name="Ship_Cost" id="Ship_Cost" class="form-control"
-                                       value="0" min="0" step="0.01">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notes -->
-                <div class="mb-3">
-                    <label for="Notes" class="form-label">Notes</label>
-                    <textarea name="Notes" id="Notes" class="form-control" rows="3"
-                              placeholder="Enter any additional notes..."></textarea>
-                </div>
-
-                <!-- Service Items Section -->
-                <!--<div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="mb-0">Invoice Items</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="serviceItems">
-                            <div class="row service-item">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label">Service</label>
-                                        <select name="ServiceId[]" class="form-select service-select">
-                                            <option value="">Select Item</option>-->
-                                            <!-- Services will be populated here -->
-                                        <!--</select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="mb-3">
-                                        <label class="form-label">Quantity</label>
-                                        <input type="number" name="Quantity[]" class="form-control quantity-input"
-                                               value="1" min="1">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="mb-3">
-                                        <label class="form-label">Unit Price</label>
-                                        <input type="number" name="UnitPrice[]" class="form-control unit-price-input"
-                                               value="0" step="0.01" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="mb-3">
-                                        <label class="form-label">Sub Total</label>
-                                        <input type="number" name="SubTotal[]" class="form-control sub-total-input"
-                                               value="0" step="0.01" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="mb-3">
-                                        <label class="form-label">Action</label>
-                                        <button type="button" class="btn btn-danger btn-sm remove-item d-block">
-                                            <i class="fas fa-trash"></i> Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" id="addServiceItem" class="btn btn-secondary">
-                            <i class="fas fa-plus"></i> Add Service Item
-                        </button>
-                    </div>
-                </div>-->
-
-                <!-- Total Section -->
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 offset-md-6">
-                                <div class="d-flex justify-content-between">
-                                    <strong>Subtotal:</strong>
-                                    <span id="subtotal">$0.00</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <strong>Shipping:</strong>
-                                    <span id="shipping">$0.00</span>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <strong>Total:</strong>
-                                    <strong id="total">$0.00</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-between">
-                    <a href="@Url.Action("Index")" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to List
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Create Invoice
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Customer_Id, "Customer", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-6 position-relative">
+        @Html.TextBox("CustomerSearch", null, new { @class = "form-control", @placeholder = "Nhập tên hoặc SĐT khách hàng...", autocomplete = "off" })
+        @Html.HiddenFor(model => model.Customer_Id)
+        <div id="customer-suggestions" class="list-group"></div>
+        @Html.ValidationMessageFor(model => model.Customer_Id, "", new { @class = "text-danger" })
     </div>
 </div>
 
-@section scripts {
+    <div class="form-group">
+        @Html.LabelFor(model => model.Employee_Id, "Employee", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.TextBoxFor(model => model.Employee_Name, new { @class = "form-control", @readonly = "readonly" })
+            @Html.HiddenFor(model => model.Employee_Id)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Delivery_Date, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.TextBoxFor(model => model.Delivery_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Pickup_Date, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.TextBoxFor(model => model.Pickup_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @Value = DateTime.Now.ToString("yyyy-MM-dd") })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Invoice_Type, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(model => model.Invoice_Type, invoiceTypes, "-- Select Invoice Type --", new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Payment_Type, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.DropDownListFor(model => model.Payment_Type, paymentTypes, "-- Select Payment Type --", new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Ship_Cost, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.TextBoxFor(model => model.Ship_Cost, new { @class = "form-control", @type = "number", step = "0.01", min = "0" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Notes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-6">
+            @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", rows = 3 })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-6">
+            <input type="submit" value="Create Invoice" class="btn btn-primary" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
     <script>
-        $(document).ready(function() {
-            // Add service item functionality
-            $('#addServiceItem').click(function() {
-                var newItem = $('.service-item:first').clone();
-                newItem.find('input').val('');
-                newItem.find('select').val('');
-                $('#serviceItems').append(newItem);
-            });
-
-            // Remove service item functionality
-            $(document).on('click', '.remove-item', function() {
-                if ($('.service-item').length > 1) {
-                    $(this).closest('.service-item').remove();
-                    calculateTotal();
+        $(document).ready(function () {
+            $("#CustomerSearch").on("input", function () {
+                var query = $(this).val();
+                if (query.length < 2) {
+                    $("#customer-suggestions").empty();
+                    return;
                 }
-            });
 
-            // Calculate subtotal when quantity or unit price changes
-            $(document).on('input', '.quantity-input, .unit-price-input', function() {
-                var row = $(this).closest('.service-item');
-                var quantity = parseFloat(row.find('.quantity-input').val()) || 0;
-                var unitPrice = parseFloat(row.find('.unit-price-input').val()) || 0;
-                var subTotal = quantity * unitPrice;
-                row.find('.sub-total-input').val(subTotal.toFixed(2));
-                calculateTotal();
-            });
-
-            // Calculate total when shipping cost changes
-            $('#Ship_Cost').on('input', function() {
-                calculateTotal();
-            });
-
-            // Service selection change
-            $(document).on('change', '.service-select', function() {
-                var serviceId = $(this).val();
-                var row = $(this).closest('.service-item');
-
-                if (serviceId) {
-                    // Here you would typically fetch the service price via AJAX
-                    // For now, we'll set a default price
-                    row.find('.unit-price-input').val('10.00');
-                    row.find('.quantity-input').trigger('input');
-                } else {
-                    row.find('.unit-price-input').val('0');
-                    row.find('.sub-total-input').val('0');
-                    calculateTotal();
-                }
-            });
-
-            function calculateTotal() {
-                var subtotal = 0;
-                $('.sub-total-input').each(function() {
-                    subtotal += parseFloat($(this).val()) || 0;
+                $.getJSON('/Admin/Invoice/SearchCustomer', { term: query }, function (data) {
+                    var suggestions = $("#customer-suggestions").empty();
+                    $.each(data, function (i, customer) {
+                        suggestions.append(
+                            $('<a href="#" class="list-group-item list-group-item-action">')
+                                .text(customer.Name)
+                                .data("id", customer.Id)
+                        );
+                    });
                 });
+            });
 
-                var shipping = parseFloat($('#Ship_Cost').val()) || 0;
-                var total = subtotal + shipping;
+            $(document).on("click", "#customer-suggestions a", function (e) {
+                e.preventDefault();
+                var selectedId = $(this).data("id");
+                var displayText = $(this).text();
 
-                $('#subtotal').text('$' + subtotal.toFixed(2));
-                $('#shipping').text('$' + shipping.toFixed(2));
-                $('#total').text('$' + total.toFixed(2));
-            }
-
-            // Initialize total calculation
-            calculateTotal();
+                $("#CustomerSearch").val(displayText);
+                $("#Customer_Id").val(selectedId);
+                $("#customer-suggestions").empty();
+            });
         });
-        // Khi chọn khách hàng, load lại gói của họ
-$('#Customer_Id').on('change', function () {
-    var customerId = $(this).val();
-    if (customerId) {
-        $.ajax({
-            url: '/Invoice/GetCustomerPackages',
-            data: { customerId: customerId },
-            success: function (data) {
-                var $select = $('#CustomerPackage_Id');
-                $select.empty();
-                $select.append('<option value="">No Package</option>');
-                $.each(data, function (i, item) {
-                    $select.append('<option value="' + item.Id + '">' + item.Name + '</option>');
-                });
-            }
-        });
-    }
-});
-
-
     </script>
 }
+<style>
+    #customer-suggestions {
+        position: absolute;
+        z-index: 1000;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+        #customer-suggestions a {
+            cursor: pointer;
+        }
+</style>
