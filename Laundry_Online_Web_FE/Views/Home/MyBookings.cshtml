@@ -154,6 +154,12 @@
                                         }
                                     </td>
                                     <td>
+                                        @if (booking.Payment_Type == 2 && booking.Order_Status == 1 && string.IsNullOrEmpty(booking.Payment_Id))
+                                        {
+                                            <a href="@Url.Action("PayInvoice","Checkout", new { invoiceId = booking.Id })" class="btn btn-success btn-sm" title="Process Payment">
+                                                <i class="fas fa-credit-card"></i>
+                                            </a>
+                                        }
                                         @if (ViewBag.CanEdit(booking))
                                         {
                                             <a href="@Url.Action("EditBooking", "Home", new { id = booking.Id })"
