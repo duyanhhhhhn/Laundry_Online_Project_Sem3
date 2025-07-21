@@ -54,10 +54,20 @@
                                     <a href="@Url.Action("Admin_edit_employee", new {Id = emp.Id } )">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="javascript:void(0);" class="btn-toggle-active"
-                                       data-id="@emp.Id" data-name="@emp.FirstName">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+
+                                    @if (emp.Role != 1) // Chỉ hiển thị nút nếu không phải admin
+                                    {
+                                        <a href="javascript:void(0);" class="btn-toggle-active"
+                                           data-id="@emp.Id" data-name="@emp.FirstName">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted" title="Không thể thay đổi trạng thái Admin">
+                                            <i class="bi bi-lock-fill"></i>
+                                        </span>
+                                    }
                                 </td>
                             </tr>
                             i++;

@@ -117,6 +117,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             ViewBag.Data = listEmp;
             return View();
         }
+
         public ActionResult AdminList ()
         {
             HashSet<EmployeeView> listEmp = new HashSet<EmployeeView>();
@@ -256,13 +257,14 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
             });
         }
+        [HttpPost]
         public JsonResult ChangeEmployeeActiveStatus(int id)
         {
             var success = EmployeeRepo.Instance.ToggleEmployee(id);
             return Json(new
             {
                 status = success ? "success" : "error",
-                message = success ? "Trạng thái đã được cập nhật." : "Cập nhật thất bại."
+                message = success ? "Status has been updated." : "Update failed."
             });
         } // trả về true/false
         public ActionResult ServiceList()
