@@ -50,12 +50,32 @@
                 </div>
             </div>
 
+            <!-- THÊM: Thông báo quy tắc đặt lịch -->
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <h5><i class="fas fa-exclamation-triangle"></i> Booking Rules & Important Information</h5>
+                <ul class="mb-0">
+                    <li><strong>Advance booking:</strong> Appointments must be scheduled at least <strong>2 hours</strong> in advance</li>
+                    <li><strong>Editing time:</strong> You can modify your booking up to <strong>12 hours</strong> before the appointment</li>
+                    <li><strong>Auto-cancellation:</strong> Unconfirmed bookings will be automatically cancelled <strong>1 hour</strong> after the scheduled time</li>
+                    <li><strong>Confirmation required:</strong> Please visit our store to confirm your appointment</li>
+                </ul>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
             <form role="form" method="post" id="ant-booking-form" action="@Url.Action("SubmitBooking", "Home")">
                 <!-- STEP 1: Date and Time Selection -->
                 <div class="row setup-content" id="step-1">
                     <div class="col-md-6 col-sm-12 col-12">
                         <div class="time-selection-panel">
                             <h3>Select Time</h3>
+
+                            <!-- THÊM: Reminder về quy tắc 2 tiếng -->
+                            <div class="alert alert-info alert-sm mb-3">
+                                <i class="fas fa-clock"></i>
+                                <small><strong>Reminder:</strong> Please select a time at least 2 hours from now</small>
+                            </div>
 
                             <!-- Time Selection -->
                             <div class="form-group">
@@ -89,6 +109,8 @@
                                 <div class="info-box">
                                     <p><strong>Date:</strong> <span id="selected-date">Not selected</span></p>
                                     <p><strong>Time:</strong> <span id="selected-time">Not selected</span></p>
+                                    <!-- THÊM: Hiển thị thời gian còn lại -->
+                                    <p id="time-remaining" style="display: none;"><strong>Time until appointment:</strong> <span id="time-diff" class="text-info"></span></p>
                                 </div>
                             </div>
                         </div>
@@ -98,6 +120,13 @@
                         <!-- Custom Calendar -->
                         <div class="calendar-panel">
                             <h3>Select Date</h3>
+
+                            <!-- THÊM: Thông báo về ngày -->
+                            <div class="alert alert-info alert-sm mb-3">
+                                <i class="fas fa-calendar-alt"></i>
+                                <small><strong>Note:</strong> You can only select dates from today onwards</small>
+                            </div>
+
                             <div class="custom-calendar">
                                 <div class="calendar-header">
                                     <button type="button" class="calendar-nav prev" onclick="changeMonth(-1)">‹</button>
@@ -135,6 +164,8 @@
                             <div class="summary-content">
                                 <p><strong>Date:</strong> <span id="summary-date"></span></p>
                                 <p><strong>Time:</strong> <span id="summary-time"></span></p>
+                                <!-- THÊM: Hiển thị thời gian còn lại trong summary -->
+                                <p id="summary-time-remaining"><strong>Time until appointment:</strong> <span id="summary-time-diff" class="text-info"></span></p>
                             </div>
                         </div>
 
@@ -156,6 +187,12 @@
                             <div class="form-group">
                                 <label>Notes for booking</label>
                                 <textarea name="Notes" id="notes" class="form-control" rows="6" placeholder="Enter notes if any (optional)"></textarea>
+                            </div>
+
+                            <!-- THÊM: Reminder trong step 2 -->
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Important:</strong> Please visit our store to confirm your booking. Unconfirmed appointments will be automatically cancelled 1 hour after the scheduled time.
                             </div>
 
                             <div class="step-buttons">
@@ -273,6 +310,12 @@
         border-radius: 15px;
     }
 
+    /* THÊM: Style cho alert nhỏ */
+    .alert-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
     /* Calendar Styles */
     .custom-calendar {
         border: 1px solid #ddd;
@@ -297,9 +340,9 @@
         border-radius: 4px;
     }
 
-    .calendar-nav:hover {
-        background-color: #f0f0f0;
-    }
+        .calendar-nav:hover {
+            background-color: #f0f0f0;
+        }
 
     .calendar-title {
         font-weight: bold;
@@ -336,32 +379,32 @@
         transition: all 0.2s;
     }
 
-    .calendar-day:hover {
-        background-color: #e3f2fd;
-        border-color: #2196f3;
-    }
+        .calendar-day:hover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
 
-    .calendar-day.selected {
-        background-color: #2196f3;
-        color: white;
-        font-weight: bold;
-    }
+        .calendar-day.selected {
+            background-color: #2196f3;
+            color: white;
+            font-weight: bold;
+        }
 
-    .calendar-day.today {
-        background-color: #fff3cd;
-        border-color: #ffc107;
-    }
+        .calendar-day.today {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
 
-    .calendar-day.other-month {
-        color: #ccc;
-        cursor: not-allowed;
-    }
+        .calendar-day.other-month {
+            color: #ccc;
+            cursor: not-allowed;
+        }
 
-    .calendar-day.past-date {
-        color: #999;
-        cursor: not-allowed;
-        text-decoration: line-through;
-    }
+        .calendar-day.past-date {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
 
     /* Form Panels */
     .time-selection-panel,
@@ -400,9 +443,9 @@
         margin-top: 20px;
     }
 
-    .step-buttons .btn {
-        margin-right: 10px;
-    }
+        .step-buttons .btn {
+            margin-right: 10px;
+        }
 
     /* Next Button */
     .ant-button {
@@ -459,6 +502,16 @@
         border-left: 4px solid #17a2b8;
     }
 
+    /* THÊM: Style cho danh sách trong alert */
+    .alert ul {
+        padding-left: 1.2rem;
+        margin-bottom: 0;
+    }
+
+    .alert li {
+        margin-bottom: 0.25rem;
+    }
+
     /* Responsive Design */
     @@media (max-width: 768px) {
         .stepwizard-step p {
@@ -476,7 +529,7 @@
         }
 
         .alert {
-            text-align: center;
+            text-align: left;
         }
 
         .store-info .alert {
@@ -485,10 +538,31 @@
     }
 </style>
 
-<!-- JavaScript -->
+<!-- Thay thế toàn bộ phần JavaScript cũ bằng script mới: -->
 <script>
     let currentDate = new Date();
     let selectedDate = null;
+    let serverTime = null;
+
+    // ✅ Function để lấy thời gian server
+    async function getServerTime() {
+        try {
+            const response = await fetch('@Url.Action("GetServerTime", "Home")');
+            const data = await response.json();
+
+            if (data.success) {
+                serverTime = new Date(data.serverTime);
+                console.log('Server time loaded:', data.displayTime);
+                return serverTime;
+            } else {
+                console.warn('Failed to get server time, using local time');
+                return new Date();
+            }
+        } catch (error) {
+            console.error('Error getting server time:', error);
+            return new Date(); // Fallback to local time
+        }
+    }
 
     // Initialize calendar
     function initCalendar() {
@@ -501,15 +575,12 @@
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        // Update title
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'];
         document.getElementById('calendar-title').textContent = `${monthNames[month]} - ${year}`;
 
-        // Generate days
         const firstDay = new Date(year, month, 1);
         const startDate = new Date(firstDay);
-        // Set to Monday of the week containing the first day
         startDate.setDate(startDate.getDate() - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
 
         const calendarDays = document.getElementById('calendar-days');
@@ -523,7 +594,6 @@
             dayElement.className = 'calendar-day';
             dayElement.textContent = date.getDate().toString().padStart(2, '0');
 
-            // Add classes
             if (date.getMonth() !== month) {
                 dayElement.classList.add('other-month');
             }
@@ -549,13 +619,11 @@
         }
     }
 
-    // Change month
     function changeMonth(direction) {
         currentDate.setMonth(currentDate.getMonth() + direction);
         updateCalendar();
     }
 
-    // Select date
     function selectDate(date) {
         selectedDate = new Date(date);
         const year = selectedDate.getFullYear();
@@ -566,7 +634,58 @@
         updateSelectedInfo();
     }
 
-    // Update selected info display
+    // ✅ CẬP NHẬT: Function để tính toán với server time
+    async function calculateTimeRemaining() {
+        const serviceTime = document.getElementById('serviceTime').value;
+        const serviceDate = document.getElementById('serviceDate').value;
+
+        if (serviceTime && serviceDate) {
+            const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
+            const currentServerTime = await getServerTime();
+            const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
+
+            if (hoursDiff > 0) {
+                const hours = Math.floor(hoursDiff);
+                const minutes = Math.floor((hoursDiff - hours) * 60);
+                let timeText = '';
+
+                if (hours > 24) {
+                    const days = Math.floor(hours / 24);
+                    const remainingHours = hours % 24;
+                    timeText = `${days} day${days > 1 ? 's' : ''} ${remainingHours} hour${remainingHours !== 1 ? 's' : ''}`;
+                } else if (hours > 0) {
+                    timeText = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                } else {
+                    timeText = `${Math.floor(hoursDiff * 60)} minute${Math.floor(hoursDiff * 60) !== 1 ? 's' : ''}`;
+                }
+
+                document.getElementById('time-diff').textContent = timeText;
+                document.getElementById('time-remaining').style.display = 'block';
+
+                if (document.getElementById('summary-time-diff')) {
+                    document.getElementById('summary-time-diff').textContent = timeText;
+                }
+
+                // Add warning if less than 2 hours
+                if (hoursDiff < 2) {
+                    document.getElementById('time-diff').className = 'text-danger';
+                    if (document.getElementById('summary-time-diff')) {
+                        document.getElementById('summary-time-diff').className = 'text-danger';
+                    }
+                } else {
+                    document.getElementById('time-diff').className = 'text-info';
+                    if (document.getElementById('summary-time-diff')) {
+                        document.getElementById('summary-time-diff').className = 'text-info';
+                    }
+                }
+            } else {
+                document.getElementById('time-remaining').style.display = 'none';
+            }
+        } else {
+            document.getElementById('time-remaining').style.display = 'none';
+        }
+    }
+
     function updateSelectedInfo() {
         const timeValue = document.getElementById('serviceTime').value;
         const timeSelect = document.getElementById('serviceTime');
@@ -576,44 +695,13 @@
             selectedDate ? selectedDate.toLocaleDateString('en-US') : 'Not selected';
         document.getElementById('selected-time').textContent =
             timeValue ? timeText : 'Not selected';
+
+        // ✅ CẬP NHẬT: Tính toán thời gian còn lại với server time
+        calculateTimeRemaining();
     }
 
-    // Step navigation function
-    function goToStep(stepNumber) {
-        // Validate current step before proceeding
-        if (stepNumber === 2 && !validateStep1()) {
-            return false;
-        }
-        if (stepNumber === 3 && !validateStep2()) {
-            return false;
-        }
-
-        // Hide all steps
-        document.getElementById('step-1').style.display = 'none';
-        document.getElementById('step-2').style.display = 'none';
-        document.getElementById('step-3').style.display = 'none';
-
-        // Show target step
-        document.getElementById('step-' + stepNumber).style.display = 'block';
-
-        // Update step indicators
-        updateStepIndicators(stepNumber);
-
-        // Update summary when going to step 2
-        if (stepNumber === 2) {
-            updateBookingSummary();
-        }
-
-        // Submit form and show final summary when going to step 3
-        if (stepNumber === 3) {
-            submitBooking();
-        }
-
-        return true;
-    }
-
-    // Validate Step 1
-    function validateStep1() {
+    // ✅ CẬP NHẬT: Validate với server time
+    async function validateStep1() {
         const serviceTime = document.getElementById('serviceTime').value;
         const serviceDate = document.getElementById('serviceDate').value;
 
@@ -622,25 +710,51 @@
             return false;
         }
 
-        // Check if selected time is at least 2 hours from now
         const selectedDateTime = new Date(serviceDate + 'T' + serviceTime);
-        const now = new Date();
-        const hoursDiff = (selectedDateTime - now) / (1000 * 60 * 60);
+        const currentServerTime = await getServerTime();
+        const hoursDiff = (selectedDateTime - currentServerTime) / (1000 * 60 * 60);
 
         if (hoursDiff < 2) {
-            alert('Please select a time at least 2 hours from now!');
+            alert('Please select a time at least 2 hours from server time!\n\n' +
+                  'Current server time: ' + currentServerTime.toLocaleString() +
+                  '\nSelected time: ' + selectedDateTime.toLocaleString() +
+                  '\nTime difference: ' + hoursDiff.toFixed(1) + ' hours');
             return false;
         }
 
         return true;
     }
 
-    // Validate Step 2
     function validateStep2() {
         return true;
     }
 
-    // Update step indicators
+    async function goToStep(stepNumber) {
+        if (stepNumber === 2 && !(await validateStep1())) {
+            return false;
+        }
+        if (stepNumber === 3 && !validateStep2()) {
+            return false;
+        }
+
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'none';
+        document.getElementById('step-3').style.display = 'none';
+        document.getElementById('step-' + stepNumber).style.display = 'block';
+
+        updateStepIndicators(stepNumber);
+
+        if (stepNumber === 2) {
+            updateBookingSummary();
+        }
+
+        if (stepNumber === 3) {
+            submitBooking();
+        }
+
+        return true;
+    }
+
     function updateStepIndicators(currentStep) {
         for (let i = 1; i <= 3; i++) {
             const stepBtn = document.getElementById('step-' + i + '-btn');
@@ -653,7 +767,6 @@
         }
     }
 
-    // Update booking summary
     function updateBookingSummary() {
         const timeSelect = document.getElementById('serviceTime');
         const timeText = timeSelect.options[timeSelect.selectedIndex].text;
@@ -661,20 +774,20 @@
         document.getElementById('summary-date').textContent =
             selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
         document.getElementById('summary-time').textContent = timeText;
+
+        // ✅ CẬP NHẬT: Update time remaining in summary với server time
+        calculateTimeRemaining();
     }
 
-    // Submit booking
     function submitBooking() {
         const timeSelect = document.getElementById('serviceTime');
         const timeText = timeSelect.options[timeSelect.selectedIndex].text;
         const notesValue = document.getElementById('notes').value;
 
-        // Update final summary
         document.getElementById('final-date').textContent =
             selectedDate ? selectedDate.toLocaleDateString('en-US') : '';
         document.getElementById('final-time').textContent = timeText;
 
-        // Handle notes display
         if (notesValue && notesValue.trim() !== '') {
             document.getElementById('final-notes').textContent = notesValue;
             document.getElementById('final-notes-wrapper').style.display = 'block';
@@ -682,7 +795,6 @@
             document.getElementById('final-notes-wrapper').style.display = 'none';
         }
 
-        // Submit form to server
         const formData = new FormData(document.getElementById('ant-booking-form'));
 
         fetch('@Url.Action("SubmitBooking", "Home")', {
@@ -706,12 +818,12 @@
         });
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function () {
+    // ✅ Initialize when page loads
+    document.addEventListener('DOMContentLoaded', async function () {
+        await getServerTime(); // Lấy server time ngay khi load page
         initCalendar();
         updateStepIndicators(1);
 
-        // Add event listener for time selection
         document.getElementById('serviceTime').addEventListener('change', function () {
             updateSelectedInfo();
         });

@@ -1,161 +1,810 @@
 ﻿@model List<Laundry_Online_Web_FE.Models.ModelViews.InvoiceView>
 @{
-    ViewBag.Title = "Order Management";
+    ViewBag.Title = "Booking Management";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <h2>Order Management</h2>
+            <h2><i class="fas fa-tasks"></i> Booking Management</h2>
 
-            <!-- Filter buttons -->
-            <div class="mb-3">
-                <a href="@Url.Action("BookingManagement")" class="btn btn-primary">All</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 0 })" class="btn btn-warning">Pending</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 1 })" class="btn btn-success">Confirmed</a>
-                <a href="@Url.Action("BookingsByStatus", new { status = 2 })" class="btn btn-danger">Cancelled</a>
-                <button class="btn btn-info" onclick="runAutoUpdate()">Auto Update</button>
+            <!-- Server Time Display -->
+            <div class="alert alert-light border-left-primary mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-clock text-primary mr-2"></i>
+                    <div>
+                        <strong>Current Server Time:</strong>
+                        <span id="server-time" class="text-primary font-weight-bold">@ViewBag.SqlServerTime.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        <small class="text-muted ml-2">
+                            <i class="fas fa-info-circle"></i>
+                            All booking operations use server time for accuracy
+                        </small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary ml-auto" onclick="refreshServerTime()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-search"></i> Search & Filter Bookings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Search Box -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text"
+                                       id="searchKeyword"
+                                       class="form-control"
+                                       placeholder="Search by ID, customer name, phone, or notes..."
+                                       autocomplete="off">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" onclick="performSearch()">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                    <button class="btn btn-secondary" type="button" onclick="clearSearch()" id="clearBtn" style="display: none;">
+                                        <i class="fas fa-times"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Search in: Booking ID, Customer Name, Phone Number, Notes, Payment ID
+                            </small>
+                            <!-- Loading indicator -->
+                            <div id="searchLoading" class="text-center mt-2" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Searching...
+                            </div>
+                        </div>
+
+                        <!-- Quick Filter Buttons -->
+                        <div class="col-md-6">
+                            <div class="btn-toolbar justify-content-end" role="toolbar">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-outline-primary active" onclick="filterByStatus('all')" id="filterAll">
+                                        <i class="fas fa-list"></i> All Bookings
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="filterByStatus(0)" id="filterPending">
+                                        <i class="fas fa-hourglass-half"></i> Pending
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="filterByStatus(3)" id="filterCancelled">
+                                        <i class="fas fa-times-circle"></i> Cancelled
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Results Info -->
+                    <div id="searchResultsInfo" class="row mt-3" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Search Results:</strong>
+                                <span id="searchResultText"></span>
+                                <button class="btn btn-link alert-link ml-2 p-0" onclick="clearSearch()">
+                                    <i class="fas fa-arrow-left"></i> View All Bookings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4" id="summaryCards">
+                <!-- Summary cards will be updated via AJAX -->
             </div>
 
             <!-- Bookings table -->
             <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+                <table class="table table-striped table-hover" id="bookingsTable">
+                    <thead class="thead-dark">
                         <tr>
-                            <th>Customer</th>
-                            <th>Phone Number</th>
-                            <th>Appointment Date</th>
-                            <th>Appointment Time</th>
-                            <th>Status</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Customer</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-clock"></i> Time</th>
+                            <th><i class="fas fa-info-circle"></i> Status</th>
+                            <th><i class="fas fa-sticky-note"></i> Notes</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var booking in Model)
-                        {
-                            <tr>
-                                <td>@(booking.CustomerName ?? $"ID: {booking.Customer_Id}")</td>
-                                <td>@(booking.CustomerPhone ?? "N/A")</td>
-                                <td>@booking.Invoice_Date.ToString("dd/MM/yyyy")</td>
-                                <td>@booking.Invoice_Date.ToString("HH:mm")</td>
-                                <td>
-                                    @if (booking.Order_Status == 0)
-                                    {
-                                        <span class="badge" style="background-color: #ffc107; color: #000;">Pending</span>
-                                    }
-                                    else if (booking.Order_Status == 1)
-                                    {
-                                        <span class="badge" style="background-color: #28a745; color: #fff;">Confirmed</span>
-                                    }
-                                    else if (booking.Order_Status == 2)
-                                    {
-                                        <span class="badge" style="background-color: #dc3545; color: #fff;">Cancelled</span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(booking.Notes))
-                                    {
-                                        <span title="@booking.Notes">
-                                            @(booking.Notes.Length > 30 ? booking.Notes.Substring(0, 30) + "..." : booking.Notes)
-                                        </span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="@Url.Action("BookingDetails", new { id = booking.Id })" class="btn btn-sm btn-info">Details</a>
-
-                                        @if (booking.Order_Status == 0)
-                                        {
-                                            <button class="btn btn-sm btn-success" onclick="updateStatus(@booking.Id, 1)">Confirm</button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
-                                        }
-                                        else if (booking.Order_Status == 1)
-                                        {
-                                            <button class="btn btn-sm btn-warning" onclick="updateStatus(@booking.Id, 0)">Set Pending</button>
-                                            <button class="btn btn-sm btn-danger" onclick="updateStatus(@booking.Id, 2)">Cancel</button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
+                    <tbody id="bookingsTableBody">
+                        <!-- Content will be populated via AJAX -->
                     </tbody>
                 </table>
             </div>
 
-            @if (Model.Count == 0)
-            {
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No orders found.
+            <!-- No results message -->
+            <div id="noResultsMessage" class="alert alert-info text-center" style="display: none;">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <h4 id="noResultsTitle">No Results Found</h4>
+                <p id="noResultsText">No bookings found.</p>
+                <button class="btn btn-primary" onclick="clearSearch()">
+                    <i class="fas fa-list"></i> View All Bookings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal fade" id="adminNotesModal" tabindex="-1" role="dialog" aria-labelledby="adminNotesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adminNotesModalLabel">
+                        <i class="fas fa-sticky-note"></i> Booking Notes & History
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            }
+                <div class="modal-body">
+                    <div id="adminNotesContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function updateStatus(bookingId, newStatus) {
-        if (confirm('Are you sure you want to update the status?')) {
-            $.ajax({
-                url: '@Url.Action("UpdateBookingStatus")',
-                type: 'POST',
-                data: { id: bookingId, newStatus: newStatus },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('An error occurred while updating status');
-                }
-            });
+// Global variables
+let currentSearchKeyword = '';
+let currentFilter = 'all';
+let allBookingsData = [];
+
+$(document).ready(function () {
+    console.log('Admin BookingManagement loaded');
+
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Load initial data
+    loadBookings();
+
+    // Search on Enter key
+    $('#searchKeyword').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            performSearch();
         }
+    });
+
+    // Search as you type (with debounce)
+    let searchTimeout;
+    $('#searchKeyword').on('input', function() {
+        clearTimeout(searchTimeout);
+        const keyword = $(this).val().trim();
+
+        if (keyword.length >= 2 || keyword.length === 0) {
+            searchTimeout = setTimeout(() => {
+                performSearch(keyword);
+            }, 500); // 500ms delay
+        }
+    });
+
+    // Auto-refresh server time every 30 seconds
+    setInterval(refreshServerTime, 30000);
+
+    // Modal close event handlers
+    $('#adminNotesModal').on('hidden.bs.modal', function () {
+        $('#adminNotesContent').empty();
+    });
+});
+
+// Load bookings via AJAX
+function loadBookings(keyword = '') {
+    console.log('loadBookings called with keyword:', keyword);
+    showLoading(true);
+
+    // Add debug info
+    const ajaxData = { keyword: keyword };
+    console.log('AJAX data:', ajaxData);
+    console.log('AJAX URL:', '@Url.Action("SearchBookingsAjax", "Admin")');
+
+    $.ajax({
+        url: '@Url.Action("SearchBookingsAjax", "Admin")',
+        type: 'POST',
+        data: ajaxData,
+        dataType: 'json',
+        success: function(response) {
+            console.log('AJAX Success Response:', response);
+
+            if (response && response.success) {
+                allBookingsData = response.data;
+                currentSearchKeyword = keyword;
+
+                renderBookings(response.data);
+                updateSummaryCards(response.stats);
+                updateSearchInfo(keyword, response.stats.Total);
+                updateServerTime(response.serverTime);
+
+                console.log(`Loaded ${response.data.length} bookings`);
+            } else {
+                console.error('Response indicates failure:', response);
+                showAlert('error', response.message || 'Unknown error occurred');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error Details:', {
+                xhr: xhr,
+                status: status,
+                error: error,
+                responseText: xhr.responseText,
+                readyState: xhr.readyState,
+                statusText: xhr.statusText
+            });
+
+            let errorMessage = 'Failed to load bookings. ';
+            if (xhr.responseText) {
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    errorMessage += errorResponse.message || 'Please try again.';
+                } catch (e) {
+                    errorMessage += `Server error: ${xhr.status} ${xhr.statusText}`;
+                }
+            } else {
+                errorMessage += `Network error: ${error}`;
+            }
+
+            showAlert('error', errorMessage);
+        },
+        complete: function() {
+            showLoading(false);
+        }
+    });
+}
+
+// Perform search
+function performSearch(keyword = null) {
+    if (keyword === null) {
+        keyword = $('#searchKeyword').val().trim();
     }
 
-    function runAutoUpdate() {
-        if (confirm('Do you want to run auto-update to check for expired orders?')) {
-            // Disable button to prevent multiple clicks
-            $('button:contains("Auto Update")').prop('disabled', true).text('Updating...');
+    loadBookings(keyword);
+}
 
-            $.ajax({
-                url: '@Url.Action("RunAutoUpdateExpired")',
-                type: 'POST',
-                success: function(response) {
-                    if (response.success) {
-                        if (response.updatedCount > 0) {
-                            alert(response.message);
-                            location.reload();
-                        } else {
-                            alert('No orders need to be updated.');
+// Clear search
+function clearSearch() {
+    $('#searchKeyword').val('');
+    currentSearchKeyword = '';
+    currentFilter = 'all';
+
+    // Update filter buttons
+    $('.btn-group .btn').removeClass('active');
+    $('#filterAll').addClass('active');
+
+    // Hide clear button and search info
+    $('#clearBtn').hide();
+    $('#searchResultsInfo').hide();
+
+    loadBookings('');
+}
+
+// Filter by status
+function filterByStatus(status) {
+    currentFilter = status;
+
+    // Update active button
+    $('.btn-group .btn').removeClass('active');
+    $(`#filter${status === 'all' ? 'All' : (status === 0 ? 'Pending' : 'Cancelled')}`).addClass('active');
+
+    if (status === 'all') {
+        renderBookings(allBookingsData);
+    } else {
+        const filtered = allBookingsData.filter(booking => booking.Order_Status === status);
+        renderBookings(filtered);
+    }
+}
+
+// Render bookings table
+function renderBookings(bookings) {
+    const tbody = $('#bookingsTableBody');
+    tbody.empty();
+
+    if (bookings.length === 0) {
+        $('#bookingsTable').hide();
+        $('#noResultsMessage').show();
+
+        if (currentSearchKeyword) {
+            $('#noResultsTitle').text('No Search Results Found');
+            $('#noResultsText').text(`No bookings found matching "${currentSearchKeyword}". Try a different search term.`);
+        } else {
+            $('#noResultsTitle').text('No Bookings Found');
+            $('#noResultsText').text('There are no bookings matching your current filter.');
+        }
+        return;
+    }
+
+    $('#bookingsTable').show();
+    $('#noResultsMessage').hide();
+
+    bookings.forEach(booking => {
+        const highlightClass = (booking.MatchesId || booking.MatchesCustomer || booking.MatchesPhone || booking.MatchesNotes) ? 'table-warning' : '';
+
+        const row = `
+            <tr data-booking-id="${booking.Id}" class="${highlightClass}">
+                <td class="text-primary font-weight-bold">
+                    #${booking.Id}
+                    ${booking.MatchesId ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                </td>
+                <td>
+                    <strong>${booking.CustomerName}</strong>
+                    ${booking.MatchesCustomer ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                </td>
+                <td>
+                    ${booking.CustomerPhone ?
+                        `<a href="tel:${booking.CustomerPhone}" class="text-decoration-none">
+                            <i class="fas fa-phone text-success"></i> ${booking.CustomerPhone}
+                            ${booking.MatchesPhone ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                        </a>` :
+                        '<span class="text-muted">N/A</span>'
+                    }
+                </td>
+                <td>
+                    <strong>${booking.Invoice_Date}</strong>
+                    <br>
+                    <small class="text-muted">${booking.TimeText}</small>
+                </td>
+                <td>
+                    <span class="badge badge-light">${booking.Invoice_Time}</span>
+                    <br>
+                    <small class="text-muted">
+                        <span class="${booking.TimeStatus}">${booking.TimeLabel}</span>
+                    </small>
+                </td>
+                <td>
+                    <span class="badge badge-${booking.StatusClass}" id="status-${booking.Id}">
+                        <i class="fas ${booking.StatusIcon}"></i> ${booking.StatusText}
+                    </span>
+                </td>
+                <td class="notes-cell">
+                    ${booking.HasNotes ?
+                        `<button type="button"
+                                class="btn btn-sm btn-info notes-btn ${booking.MatchesNotes ? 'btn-warning' : ''}"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Click to view notes and history${booking.MatchesNotes ? ' - Contains search term' : ''}"
+                                onclick="showNotesModal(${booking.Id}, '${escapeForJs(booking.Notes)}')">
+                            <i class="fas fa-sticky-note"></i>
+                            ${booking.MatchesNotes ? '<i class="fas fa-search"></i>' : ''}
+                        </button>` :
+                        '<span class="text-muted"><i class="fas fa-file-alt"></i></span>'
+                    }
+                </td>
+                <td>
+                    ${renderActionButtons(booking)}
+                </td>
+            </tr>
+        `;
+
+        tbody.append(row);
+    });
+
+    // Reinitialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+}
+
+// Render action buttons based on status
+function renderActionButtons(booking) {
+    let buttons = `
+        <div class="btn-group">
+            <a href="@Url.Action("BookingDetails")?id=${booking.Id}"
+               class="btn btn-sm btn-outline-info" title="View Details">
+                <i class="fas fa-eye"></i>
+            </a>
+    `;
+
+    switch (booking.Order_Status) {
+        case 0: // Pending
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Confirm">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="updateStatus(${booking.Id}, 3)" title="Cancel">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            break;
+        case 1: // Confirmed
+            buttons += `
+                <button class="btn btn-sm btn-success" onclick="updateStatus(${booking.Id}, 2)" title="Mark as Paid">
+                    <i class="fas fa-dollar-sign"></i>
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="updateStatus(${booking.Id}, 0)" title="Set Pending">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="updateStatus(${booking.Id}, 3)" title="Cancel">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            break;
+        case 2: // Paid
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Set Confirmed">
+                    <i class="fas fa-check-circle"></i>
+                </button>
+            `;
+            break;
+        case 3: // Cancelled
+            buttons += `
+                <button class="btn btn-sm btn-info" onclick="updateStatus(${booking.Id}, 1)" title="Reactivate">
+                    <i class="fas fa-redo"></i>
+                </button>
+            `;
+            break;
+    }
+
+    buttons += '</div>';
+    return buttons;
+}
+
+// Update summary cards
+function updateSummaryCards(stats) {
+    const summaryHtml = `
+        <div class="col-md-4">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary">${stats.Total}</h3>
+                    <p class="card-text">${currentSearchKeyword ? 'Search Results' : 'Total Active'}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning">${stats.Pending}</h3>
+                    <p class="card-text">Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-danger">
+                <div class="card-body">
+                    <h3 class="text-danger">${stats.Cancelled}</h3>
+                    <p class="card-text">Cancelled</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    $('#summaryCards').html(summaryHtml);
+}
+
+// Update search info
+function updateSearchInfo(keyword, resultCount) {
+    if (keyword && keyword.trim() !== '') {
+        $('#searchResultText').text(`Found ${resultCount} booking(s) for keyword "${keyword}"`);
+        $('#searchResultsInfo').show();
+        $('#clearBtn').show();
+    } else {
+        $('#searchResultsInfo').hide();
+        $('#clearBtn').hide();
+    }
+}
+
+// Show/hide loading
+function showLoading(show) {
+    if (show) {
+        $('#searchLoading').show();
+        $('#bookingsTable').css('opacity', '0.5');
+    } else {
+        $('#searchLoading').hide();
+        $('#bookingsTable').css('opacity', '1');
+    }
+}
+
+// Update server time
+function updateServerTime(serverTime) {
+    $('#server-time').text(serverTime);
+}
+
+// Escape string for JavaScript
+function escapeForJs(str) {
+    if (!str) return '';
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\r?\n/g, '\\n');
+}
+
+// Enhanced: Update status with AJAX refresh
+function updateStatus(bookingId, newStatus) {
+    const statusNames = {
+        0: 'Pending',
+        1: 'Confirmed',
+        2: 'Paid',
+        3: 'Cancelled'
+    };
+
+    const statusName = statusNames[newStatus] || 'Unknown';
+
+    if (confirm(`Are you sure you want to update booking #${bookingId} status to "${statusName}"?`)) {
+        const statusElement = document.getElementById(`status-${bookingId}`);
+        const originalContent = statusElement.innerHTML;
+        statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+        $.ajax({
+            url: '@Url.Action("UpdateBookingStatus")',
+            type: 'POST',
+            data: { id: bookingId, newStatus: newStatus },
+            success: function(response) {
+                if (response.success) {
+                    statusElement.className = `badge badge-${response.newStatusClass}`;
+                    statusElement.innerHTML = `<i class="fas ${getStatusIcon(newStatus)}"></i> ${response.newStatusText}`;
+
+                    showAlert('success', `${response.message} (Server time: ${response.updateTime})`);
+
+                    // If confirming order (STATUS = 1), redirect to edit invoice
+                    if (response.redirectToEdit && response.editUrl) {
+                        if (response.confirmMessage) {
+                            showAlert('info', response.confirmMessage);
                         }
+                        setTimeout(() => {
+                            window.location.href = response.editUrl;
+                        }, 2000);
                     } else {
-                        alert('Error: ' + response.message);
+                        // Refresh data after status update
+                        setTimeout(() => {
+                            performSearch(currentSearchKeyword);
+                        }, 1500);
                     }
-                },
-                error: function() {
-                    alert('An error occurred while running auto-update');
-                },
-                complete: function() {
-                    // Re-enable button
-                    $('button:contains("Updating...")').prop('disabled', false).text('Auto Update');
+                } else {
+                    statusElement.innerHTML = originalContent;
+                    showAlert('error', response.message);
                 }
-            });
-        }
+            },
+            error: function(xhr, status, error) {
+                statusElement.innerHTML = originalContent;
+                showAlert('error', `Error updating status: ${error}`);
+                console.error('AJAX Error:', { xhr, status, error });
+            }
+        });
     }
+}
+
+// Show admin notes modal
+function showNotesModal(bookingId, notes) {
+    try {
+        $('#adminNotesModalLabel').html('<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Notes & History');
+
+        if (!notes || notes.trim() === '') {
+            $('#adminNotesContent').html('<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>');
+        } else {
+            const formattedNotes = parseAndFormatNotes(notes);
+            $('#adminNotesContent').html(formattedNotes);
+        }
+
+        $('#adminNotesModal').modal('show');
+    } catch (error) {
+        console.error('Error in showNotesModal:', error);
+        alert('Error displaying notes: ' + error.message);
+    }
+}
+
+// Refresh server time
+function refreshServerTime() {
+    $.ajax({
+        url: '@Url.Action("GetServerTime")',
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                $('#server-time').text(response.displayTime);
+                console.log('Server time refreshed:', response.displayTime);
+            } else {
+                console.error('Failed to get server time:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error refreshing server time:', { xhr, status, error });
+        }
+    });
+}
+
+function getStatusIcon(status) {
+    const icons = {
+        0: 'fa-hourglass-half',
+        1: 'fa-check-circle',
+        2: 'fa-money-bill-wave',
+        3: 'fa-times-circle'
+    };
+    return icons[status] || 'fa-question-circle';
+}
+
+function showAlert(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' :
+                      type === 'error' ? 'alert-danger' : 'alert-info';
+
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+
+    $('.container-fluid .row .col-md-12').prepend(alertHtml);
+
+    setTimeout(() => {
+        $('.alert').fadeOut();
+    }, 5000);
+}
+
+// Notes parsing functions
+function parseAndFormatNotes(notes) {
+    try {
+        const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
+        const userNotes = [];
+        const systemLogs = [];
+
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('[') && trimmedLine.includes(']')) {
+                const logEntry = parseSystemLogEntry(trimmedLine);
+                if (logEntry) {
+                    systemLogs.push(logEntry);
+                }
+            } else if (trimmedLine !== '') {
+                userNotes.push(trimmedLine);
+            }
+        });
+
+        let html = '';
+
+        if (userNotes.length > 0) {
+            html += '<div class="notes-section mb-4">';
+            html += '<h6><i class="fas fa-user-edit text-primary"></i> Customer Notes:</h6>';
+            html += '<div class="user-notes-container">';
+            userNotes.forEach(note => {
+                html += '<div class="user-note-item"><i class="fas fa-quote-left"></i> ' + escapeHtml(note) + '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        if (systemLogs.length > 0) {
+            html += '<div class="notes-section">';
+            html += '<h6><i class="fas fa-history text-info"></i> System History:</h6>';
+            html += '<div class="timeline">';
+
+            systemLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            systemLogs.forEach((log) => {
+                const iconClass = getLogIcon(log.action);
+                const colorClass = getLogColor(log.action);
+
+                html += '<div class="timeline-item">';
+                html += '<div class="timeline-marker ' + colorClass + '">';
+                html += '<i class="fas ' + iconClass + '"></i>';
+                html += '</div>';
+                html += '<div class="timeline-content">';
+                html += '<div class="timeline-header">';
+                html += '<span class="timeline-title">' + getFriendlyActionName(log.action) + '</span>';
+                html += '<span class="timeline-date">' + formatDate(log.date) + '</span>';
+                html += '</div>';
+                if (log.message && log.message !== '') {
+                    html += '<div class="timeline-message">' + escapeHtml(log.message) + '</div>';
+                }
+                html += '</div>';
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        }
+
+        if (html === '') {
+            html = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes or history available.</div>';
+        }
+
+        return html;
+    } catch (error) {
+        console.error('Error parsing notes:', error);
+        return '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Error displaying notes.</div>';
+    }
+}
+
+function parseSystemLogEntry(logLine) {
+    try {
+        const regex = /\[([^\]]+)\]\s*(\d{2}\/\d{2}\/\d{4}\s*\d{2}:\d{2}):\s*(.+)/;
+        const match = logLine.match(regex);
+        if (match) {
+            return {
+                action: match[1].trim(),
+                date: match[2].trim(),
+                message: match[3].trim()
+            };
+        }
+    } catch (error) {
+        console.error('Error parsing log entry:', error);
+    }
+    return null;
+}
+
+function getFriendlyActionName(action) {
+    const actionMap = {
+        'CREATED': 'Booking Created',
+        'UPDATED': 'Customer Update',
+        'AUTO-CANCELLED': 'Auto-Cancelled',
+        'AUTO CANCELLED': 'Auto-Cancelled',
+        'ADMIN UPDATE': 'Admin Update'
+    };
+    return actionMap[action.toUpperCase()] || action.replace(/-/g, ' ');
+}
+
+function getLogIcon(action) {
+    const iconMap = {
+        'CREATED': 'fa-plus-circle',
+        'UPDATED': 'fa-edit',
+        'AUTO-CANCELLED': 'fa-times-circle',
+        'AUTO CANCELLED': 'fa-times-circle',
+        'ADMIN UPDATE': 'fa-user-cog'
+    };
+    return iconMap[action.toUpperCase()] || 'fa-info-circle';
+}
+
+function getLogColor(action) {
+    const colorMap = {
+        'CREATED': 'text-success',
+        'UPDATED': 'text-warning',
+        'AUTO-CANCELLED': 'text-danger',
+        'AUTO CANCELLED': 'text-danger',
+        'ADMIN UPDATE': 'text-info'
+    };
+    return colorMap[action.toUpperCase()] || 'text-secondary';
+}
+
+function formatDate(dateStr) {
+    try {
+        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);
+        if (parts) {
+            const [, day, month, year, hour, minute] = parts;
+            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}`);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+        return dateStr;
+    } catch (e) {
+        console.error('Error formatting date:', e);
+        return dateStr;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 </script>
 
 <style>
+    .border-left-primary {
+        border-left: 4px solid #007bff !important;
+    }
+
     .btn-group .btn {
         margin-right: 2px;
     }
 
     .table th {
-        background-color: #f8f9fa;
+        background-color: #343a40;
+        color: white;
         font-weight: 600;
+        border-color: #454d55;
     }
 
     .badge {
@@ -166,5 +815,161 @@
     .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,123,255,0.1);
+    }
+
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .alert {
+        border-radius: 8px;
+    }
+
+    .font-weight-bold {
+        font-weight: 600 !important;
+    }
+
+    .notes-cell {
+        text-align: center;
+        width: 80px;
+    }
+
+    .notes-btn {
+        width: 36px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        padding: 0;
+    }
+
+    .notes-btn:hover {
+        transform: scale(1.1);
+        transition: transform 0.2s;
+    }
+
+    .notes-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 4px solid #007bff;
+    }
+
+    .user-notes-container {
+        margin-top: 10px;
+    }
+
+    .user-note-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        font-style: italic;
+        color: #495057;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+    }
+
+    .timeline-marker.text-success {
+        border-color: #28a745;
+        color: #28a745;
+    }
+
+    .timeline-marker.text-warning {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
+
+    .timeline-marker.text-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .timeline-marker.text-info {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .timeline-content {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 12px;
+        margin-left: 10px;
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .timeline-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    @@media (max-width: 768px) {
+        .btn-toolbar .btn-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-cell {
+            width: auto;
+        }
     }
 </style>

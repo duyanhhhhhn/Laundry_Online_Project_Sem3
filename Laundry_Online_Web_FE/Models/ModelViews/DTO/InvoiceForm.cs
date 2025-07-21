@@ -3,36 +3,32 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web; 
+using System.Web;
+
 
 namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
 {
     public class InvoiceForm
     {
         public int Id { get; set; } = 0;
-
-        // Thêm property này để fix lỗi trong view
         public int Invoice_Id { get; set; } = 0;
 
-        [Required(ErrorMessage = "Please select a customer")]
         [Display(Name = "Customer")]
         public int Customer_Id { get; set; } = 0;
 
         [Display(Name = "Employee")]
         public int Employee_Id { get; set; } = 0;
 
-        [Required(ErrorMessage = "Please select delivery date")]
         [Display(Name = "Delivery Date")]
         [DataType(DataType.Date)]
         public DateTime Delivery_Date { get; set; } = DateTime.Now.AddDays(1);
 
-        [Required(ErrorMessage = "Please select pickup date")]
         [Display(Name = "Pickup Date")]
         [DataType(DataType.Date)]
         public DateTime Pickup_Date { get; set; } = DateTime.Now.AddDays(3);
 
         [Display(Name = "Payment Type")]
-        public int Payment_Type { get; set; } = 1; // 1: Cash, 2: VNPay
+        public int Payment_Type { get; set; } = 1;
 
         [Display(Name = "Invoice Type")]
         public int Invoice_Type { get; set; } = 1;
@@ -41,20 +37,19 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public int? CustomerPackage_Id { get; set; }
 
         [Display(Name = "Notes")]
-        [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
+        [StringLength(500)]
         public string Notes { get; set; } = "";
 
         [Display(Name = "Shipping Cost")]
-        [Range(0, double.MaxValue, ErrorMessage = "Shipping cost must be >= 0")]
         public decimal Ship_Cost { get; set; } = 0m;
 
-        [Display(Name = "Service List")]
-        public List<InvoiceItemView> InvoiceItems { get; set; } = new List<InvoiceItemView>();
+        [Display(Name = "Item List")]
+        public List<InvoiceItemForm> InvoiceItems { get; set; } = new List<InvoiceItemForm>();
 
         [Display(Name = "Total Amount")]
-        public decimal Total_Amount => InvoiceItems.Sum(x => x.SubTotal) + Ship_Cost;
-
-        // Display properties for views
+        public decimal Total_Amount => InvoiceItems.Sum(x => x.Sub_Total) + Ship_Cost;
+        public decimal TotalAmountFromDb { get; set; }
+        public decimal TotalAmountInvoice { get; set; }
         public string Customer_Name { get; set; } = "";
         public string Employee_Name { get; set; } = "";
         public DateTime Invoice_Date { get; set; } = DateTime.Now;
@@ -62,8 +57,9 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public int Delivery_Status { get; set; } = 1;
         public int Status { get; set; } = 1;
         public string Payment_Id { get; set; } = "";
-
+        public string Service_name { get; set; } = "";
         // Helper methods for dropdown lists
+
         public static List<SelectListItem> GetPaymentTypes()
         {
             return new List<SelectListItem>
@@ -77,8 +73,9 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
-                new SelectListItem { Value = "1", Text = "Regular Invoice" },
-                new SelectListItem { Value = "2", Text = "VIP Invoice" }
+                new SelectListItem { Value = "0", Text = "Kg" },
+                new SelectListItem { Value = "1", Text = "Piece" },
+                new SelectListItem { Value = "2", Text = "Pair" }
             };
         }
 
@@ -86,10 +83,10 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
+                new SelectListItem { Value = "0", Text = "Scheduled" },
                 new SelectListItem { Value = "1", Text = "Pending" },
                 new SelectListItem { Value = "2", Text = "Paid" },
-                new SelectListItem { Value = "3", Text = "Processing" },
-                new SelectListItem { Value = "4", Text = "Completed" },
+                new SelectListItem { Value = "3", Text = "Cancelled" },
                 new SelectListItem { Value = "5", Text = "Cancelled" }
             };
         }
@@ -98,6 +95,8 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
+
+                new SelectListItem { Value = "0", Text = "No Delivery" },
                 new SelectListItem { Value = "1", Text = "Pending Delivery" },
                 new SelectListItem { Value = "2", Text = "In Transit" },
                 new SelectListItem { Value = "3", Text = "Delivered" },
@@ -116,3 +115,4 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         }
     }
 }
+

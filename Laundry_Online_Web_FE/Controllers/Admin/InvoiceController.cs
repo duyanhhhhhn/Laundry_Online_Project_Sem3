@@ -8,6 +8,8 @@ using Laundry_Online_Web_FE.Models.ModelViews;
 using Laundry_Online_Web_FE.Models.Repositories;
 using Newtonsoft.Json;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.Entities;
+
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
@@ -19,9 +21,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         private readonly EmployeeRepo _employeeRepository;
         private readonly CustomerPackageRepository _customerPackageRepository;
         private readonly PackageRepository _packageRepository;
-        private readonly InvoiceItemRepo _invoiceItemRepository; // Assuming you have this
-        private readonly ServiceRepository _serviceRepository; // Assuming you have this
-       // private readonly VnPayPaymentService _paymentService = new VnPayPaymentService();
+        private readonly InvoiceItemRepo _invoiceItemRepository;
+        private readonly ServiceRepository _serviceRepository;
+        // private readonly VnPayPaymentService _paymentService = new VnPayPaymentService();
 
         public InvoiceController()
         {
@@ -38,16 +40,16 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         [HttpGet]
         [Route("")]
         // GET: Invoice
-        public ActionResult Index(int? status)
+        public ActionResult Index(int? orderStatus)
         {
             var invoiceList = _invoiceRepository.GetAll();
             var customerList = _customerRepository.GetAll();
             var employeeList = _employeeRepository.All();
 
             // Filter by status if provided
-            if (status.HasValue)
+            if (orderStatus.HasValue)
             {
-                invoiceList = invoiceList.Where(i => i.Status == status.Value).ToHashSet();
+                invoiceList = invoiceList.Where(i => i.Order_Status == orderStatus.Value).ToHashSet();
             }
 
             var invoiceViewList = new List<InvoiceForm>();
@@ -69,7 +71,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         Invoice_Date = invoice.Invoice_Date,
                         Delivery_Date = (DateTime)invoice.Delivery_Date,
                         Pickup_Date = (DateTime)invoice.Pickup_Date,
-                        //Total_
                         Payment_Type = invoice.Payment_Type,
                         Order_Status = invoice.Order_Status,
                         Invoice_Type = invoice.Invoice_Type,
@@ -78,7 +79,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         Notes = invoice.Notes,
                         Ship_Cost = invoice.Ship_Cost,
                         Delivery_Status = invoice.Delivery_Status,
-                        Payment_Id = invoice.Payment_Id
+                        Payment_Id = invoice.Payment_Id,
+                        TotalAmountFromDb = invoice.Total_Amount
+
                     };
 
                     invoiceViewList.Add(viewModel);
@@ -86,10 +89,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
 
             ViewBag.Data = invoiceViewList;
-            ViewBag.CurrentStatus = status;
+            ViewBag.CurrentStatus = orderStatus;
 
             return View();
         }
+
         [HttpGet]
         [Route("Details/{id:int}")]
         // GET: Invoice/Details/5
@@ -102,228 +106,533 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 return RedirectToAction("Index");
             }
 
+            // Get customer and employee info
             var customer = _customerRepository.GetCustomerById(invoice.Customer_Id);
             var employee = _employeeRepository.GetEmployeeById((int)invoice.Employee_Id);
+
+            // Get invoice items
+            var invoiceItems = _invoiceItemRepository.GetItemsByInvoiceId(id);
+            var services = _serviceRepository.All().ToDictionary(s => s.Id, s => s);
 
             var invoiceDetail = new InvoiceForm
             {
                 Id = invoice.Id,
                 Customer_Id = invoice.Customer_Id,
                 Employee_Id = (int)invoice.Employee_Id,
-                Customer_Name = customer != null ? $"{customer.FirstName} {customer.LastName}" : "Not Found",
-                Employee_Name = employee != null ? $"{employee.FirstName} {employee.LastName}" : "Not Found",
-                Invoice_Date = invoice.Invoice_Date,
-                Delivery_Date = (DateTime)invoice.Delivery_Date,
-                Pickup_Date = (DateTime)invoice.Pickup_Date,
 
+                // Handle null values - set to "Unknown" if null or empty
+                Customer_Name = customer != null
+                    ? (!string.IsNullOrEmpty(customer.FirstName) || !string.IsNullOrEmpty(customer.LastName)
+                        ? $"{customer.FirstName} {customer.LastName}".Trim()
+                        : "Unknown")
+                    : "Unknown",
+
+                Employee_Name = employee != null
+                    ? (!string.IsNullOrEmpty(employee.FirstName) || !string.IsNullOrEmpty(employee.LastName)
+                        ? $"{employee.FirstName} {employee.LastName}".Trim()
+                        : "Unknown")
+                    : "Unknown",
+
+                Invoice_Date = invoice.Invoice_Date,
+                Delivery_Date = invoice.Delivery_Date ?? DateTime.MinValue,
+                Pickup_Date = invoice.Pickup_Date ?? DateTime.MinValue,
                 Payment_Type = invoice.Payment_Type,
                 Order_Status = invoice.Order_Status,
                 Invoice_Type = invoice.Invoice_Type,
                 CustomerPackage_Id = invoice.CustomerPackage_Id,
                 Status = invoice.Status,
-                Notes = invoice.Notes,
+                Notes = string.IsNullOrEmpty(invoice.Notes) ? "Unknown" : invoice.Notes,
                 Ship_Cost = invoice.Ship_Cost,
                 Delivery_Status = invoice.Delivery_Status,
-                Payment_Id = invoice.Payment_Id
+                Payment_Id = string.IsNullOrEmpty(invoice.Payment_Id) ? "Unknown" : invoice.Payment_Id,
+                TotalAmountFromDb = invoice.Total_Amount,
+
+                // Load invoice items with barcode
+                InvoiceItems = invoiceItems.Select(i => new InvoiceItemForm
+                {
+                    Id = i.Id,
+                    ItemName = string.IsNullOrEmpty(i.ItemName) ? "Unknown" : i.ItemName,
+                    Quantity = (int)i.Quantity,
+                    Unit_Price = i.UnitPrice,                 
+                    Service_Id = i.ServiceId,
+                    BarCode = string.IsNullOrEmpty(i.BarCode) ? "Unknown" : i.BarCode,
+                    Service_Name = services.ContainsKey(i.ServiceId)
+                        ? (string.IsNullOrEmpty(services[i.ServiceId].Title) ? "Unknown" : services[i.ServiceId].Title)
+                        : "Unknown"
+                }).ToList()
             };
 
             return View(invoiceDetail);
         }
         [HttpGet]
         [Route("Create")]
-        // GET: Invoice/Create
         public ActionResult Create()
-        {
-            var customerList = _customerRepository.GetActiveCustomer();
-            var employeeList = _employeeRepository.All();
-            var customerPackageList = _customerPackageRepository.GetAll();
-
-            ViewBag.CustomerList = customerList;
-            ViewBag.EmployeeList = employeeList;
-            ViewBag.CustomerPackageList = customerPackageList;
-
-            return View();
-        }
-
-        [HttpPost]
-        [Route("Create")]
-        public ActionResult CreateInvoice()
-        {
-            string customerId = Request.Form["Customer_Id"];
-            string employeeId = Request.Form["Employee_Id"];
-            string deliveryDate = Request.Form["Delivery_Date"];
-            string pickupDate = Request.Form["Pickup_Date"];
-            string paymentType = Request.Form["Payment_Type"];
-            string invoiceType = Request.Form["Invoice_Type"];
-            string customerPackageId = Request.Form["CustomerPackage_Id"];
-            string notes = Request.Form["Notes"];
-            string shipCost = Request.Form["Ship_Cost"];
-
-            var newInvoice = new InvoiceView
-            {
-                Customer_Id = string.IsNullOrEmpty(customerId) ? 0 : Convert.ToInt32(customerId),
-                Employee_Id = string.IsNullOrEmpty(employeeId) ? 0 : Convert.ToInt32(employeeId),
-                Invoice_Date = DateTime.Now,
-                Delivery_Date = string.IsNullOrEmpty(deliveryDate) ? DateTime.Now.AddDays(1) : Convert.ToDateTime(deliveryDate),
-                Pickup_Date = string.IsNullOrEmpty(pickupDate) ? DateTime.Now.AddDays(3) : Convert.ToDateTime(pickupDate),
-                Total_Amount = 0, // Will be calculated based on invoice items
-                Payment_Type = string.IsNullOrEmpty(paymentType) ? 1 : Convert.ToInt32(paymentType),
-                Order_Status = 1, // Pending
-                Invoice_Type = string.IsNullOrEmpty(invoiceType) ? 1 : Convert.ToInt32(invoiceType),
-                CustomerPackage_Id = string.IsNullOrEmpty(customerPackageId) ? (int?)null : Convert.ToInt32(customerPackageId),
-                Status = 1, // Active
-                Notes = notes ?? "",
-                Ship_Cost = string.IsNullOrEmpty(shipCost) ? 0 : Convert.ToDecimal(shipCost),
-                Delivery_Status = 1, // Pending
-                Payment_Id = ""
-            };
-
-            bool created = _invoiceRepository.Add(newInvoice);
-
-            if (created)
-                TempData["SuccessMessage"] = "Invoice created successfully!";
-            else
-                TempData["ErrorMessage"] = "Failed to create invoice!";
-
-            return RedirectToAction("Index");
-        }
-        [HttpGet]
-        [Route("Edit/{id:int}")]
-
-        // GET: Invoice/Edit/5
-        public ActionResult Edit(int id)
-        {
-            var invoice = _invoiceRepository.GetById(id);
-            if (invoice == null)
-            {
-                TempData["ErrorMessage"] = "Invoice not found.";
-                return RedirectToAction("Index");
-            }
-
-            var customerList = _customerRepository.GetActiveCustomer();
-            var employeeList = _employeeRepository.All();
-
-            ViewBag.CustomerList = customerList;
-            ViewBag.EmployeeList = employeeList;
-
-            // Map to InvoiceForm for editing
-            var invoiceForm = new InvoiceForm
-            {
-                Id = invoice.Id,
-                Customer_Id = invoice.Customer_Id,
-                Employee_Id = (int)invoice.Employee_Id,
-                Invoice_Date = invoice.Invoice_Date,
-                Delivery_Date = (DateTime)invoice.Delivery_Date,
-                Pickup_Date = (DateTime)invoice.Pickup_Date,
-
-                Payment_Type = invoice.Payment_Type,
-                Order_Status = invoice.Order_Status,
-                Invoice_Type = invoice.Invoice_Type,
-                CustomerPackage_Id = invoice.CustomerPackage_Id,
-                Status = invoice.Status,
-                Notes = invoice.Notes,
-                Ship_Cost = invoice.Ship_Cost,
-                Delivery_Status = invoice.Delivery_Status,
-                Payment_Id = invoice.Payment_Id
-            };
-
-            return View(invoiceForm);
-        }
-
-        // POST: Invoice/Edit/5
-        [HttpPost]
-        [Route("Edit/{id:int}")]
-        public ActionResult EditInvoice(int id)
         {
             try
             {
-                string customerId = Request.Form["Customer_Id"];
-                string employeeId = Request.Form["Employee_Id"];
-                string deliveryDate = Request.Form["Delivery_Date"];
-                string pickupDate = Request.Form["Pickup_Date"];
-                string paymentType = Request.Form["Payment_Type"];
-                string invoiceType = Request.Form["Invoice_Type"];
-                string customerPackageId = Request.Form["CustomerPackage_Id"];
-                string notes = Request.Form["Notes"];
-                string shipCost = Request.Form["Ship_Cost"];
-                string orderStatus = Request.Form["Order_Status"];
-                string deliveryStatus = Request.Form["Delivery_Status"];
-                string status = Request.Form["Status"];
-                string invoiceItemsJson = Request.Form["InvoiceItems"];
+                var employeeId = Convert.ToInt32(Session["EmployeeId"]);
+                var employee = _employeeRepository.GetEmployeeById(employeeId);
 
-                var existingInvoice = _invoiceRepository.GetById(id);
-                if (existingInvoice == null)
+                if (employee == null)
                 {
-                    return Json(new { success = false, message = "Invoice not found." });
+                    TempData["ErrorMessage"] = "Employee not found. Please log in again.";
+                    return RedirectToAction("Index");
                 }
 
-                // Calculate total amount from invoice items
-                decimal totalAmount = 0;
-                if (!string.IsNullOrEmpty(invoiceItemsJson))
+                ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
                 {
-                    try
-                    {
-                        var invoiceItems = JsonConvert.DeserializeObject<List<dynamic>>(invoiceItemsJson);
-                        totalAmount = invoiceItems.Sum(item => (decimal)item.subTotal);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle JSON parsing error
-                        System.Diagnostics.Debug.WriteLine("JSON parsing error: " + ex.Message);
-                    }
-                }
+                    Value = x.Value,
+                    Text = x.Text
+                }).ToList();
 
-                // Add shipping cost to total
-                decimal shippingCost = string.IsNullOrEmpty(shipCost) ? 0 : Convert.ToDecimal(shipCost);
-                totalAmount += shippingCost;
-
-                var updatedInvoice = new InvoiceView
+                ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
                 {
-                    Id = id,
-                    Customer_Id = string.IsNullOrEmpty(customerId) ? 0 : Convert.ToInt32(customerId),
-                    Employee_Id = string.IsNullOrEmpty(employeeId) ? 0 : Convert.ToInt32(employeeId),
-                    Invoice_Date = existingInvoice.Invoice_Date, // Keep original invoice date
-                    Delivery_Date = string.IsNullOrEmpty(deliveryDate) ? DateTime.Now.AddDays(1) : Convert.ToDateTime(deliveryDate),
-                    Pickup_Date = string.IsNullOrEmpty(pickupDate) ? DateTime.Now.AddDays(3) : Convert.ToDateTime(pickupDate),
-                    Total_Amount = totalAmount,
-                    Payment_Type = string.IsNullOrEmpty(paymentType) ? 1 : Convert.ToInt32(paymentType),
-                    Invoice_Type = string.IsNullOrEmpty(invoiceType) ? 1 : Convert.ToInt32(invoiceType),
-                    CustomerPackage_Id = string.IsNullOrEmpty(customerPackageId) ? 0 : Convert.ToInt32(customerPackageId),
-                    Notes = notes ?? "",
-                    Ship_Cost = shippingCost,
-                    Order_Status = string.IsNullOrEmpty(orderStatus) ? 1 : Convert.ToInt32(orderStatus),
-                    Delivery_Status = string.IsNullOrEmpty(deliveryStatus) ? 1 : Convert.ToInt32(deliveryStatus),
-                    Status = string.IsNullOrEmpty(status) ? 1 : Convert.ToInt32(status),
-                    Payment_Id = existingInvoice.Payment_Id // Keep existing payment ID
+                    Value = x.Value,
+                    Text = x.Text
+                }).ToList();
+
+                var model = new InvoiceForm
+                {
+                    Employee_Id = employee.Id,
+                    Employee_Name = $"{employee.FirstName} {employee.LastName}".Trim(),
+                    Pickup_Date = DateTime.Now,
+                    Delivery_Date = DateTime.MinValue, // Default to 3 days later
+                    Ship_Cost = 0
                 };
 
-                bool result = _invoiceRepository.Update(updatedInvoice);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while loading the create form.";
+                return RedirectToAction("Index");
+            }
+        }
 
-                if (result)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Create")]
+        public ActionResult Create(InvoiceForm model)
+        {
+            try
+            {
+                // Validate required fields
+                if (model.Customer_Id <= 0)
                 {
-                    //Handle invoice items if repository exists
-                    // This is where you would save invoice items to database
-                     if (_invoiceItemRepository != null && !string.IsNullOrEmpty(invoiceItemsJson))
-                    {
-                        SaveInvoiceItems(id, invoiceItemsJson);
-                    }
+                    TempData["ErrorMessage"] = "Vui lòng chọn khách hàng.";
+                    return RedirectToAction("Create");
+                }
 
-                    return Json(new { success = true, message = "Invoice updated successfully!" });
+                if (model.Employee_Id <= 0)
+                {
+                    TempData["ErrorMessage"] = "Employee information is missing.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate dates
+                if (model.Delivery_Date <= model.Pickup_Date)
+                {
+                    TempData["ErrorMessage"] = "Delivery date must be after pickup date.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate customer exists
+                var customer = _customerRepository.GetCustomerById(model.Customer_Id);
+                if (customer == null)
+                {
+                    TempData["ErrorMessage"] = "Selected customer not found.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate employee exists
+                var employee = _employeeRepository.GetEmployeeById(model.Employee_Id);
+                if (employee == null)
+                {
+                    TempData["ErrorMessage"] = "Employee not found.";
+                    return RedirectToAction("Create");
+                }
+
+                var newInvoice = new InvoiceView
+                {
+                    Customer_Id = model.Customer_Id,
+                    Employee_Id = model.Employee_Id,
+                    Invoice_Date = DateTime.Now,
+                    Delivery_Date = model.Delivery_Date,
+                    Pickup_Date = model.Pickup_Date,
+                    Total_Amount = model.Ship_Cost, // Initially only shipping cost
+                    Payment_Type = model.Payment_Type,
+                    Order_Status = 1, // Pending
+                    Invoice_Type = model.Invoice_Type,
+                    CustomerPackage_Id = model.CustomerPackage_Id == 0 ? (int?)null : model.CustomerPackage_Id,
+                    Status = 1, // Active
+                    Notes = model.Notes?.Trim() ?? "",
+                    Ship_Cost = model.Ship_Cost,
+                    Delivery_Status = 1, // Pending
+                    Payment_Id = "" // Will be set when payment is processed
+                };
+
+                bool created = _invoiceRepository.Add(newInvoice);
+
+                if (created)
+                {
+                    // Get the created invoice ID to redirect to edit page for adding items
+                    var createdInvoice = _invoiceRepository.GetAll()
+                        .OrderByDescending(i => i.Id)
+                        .FirstOrDefault(i => i.Customer_Id == model.Customer_Id &&
+                                           i.Employee_Id == model.Employee_Id);
+
+                    if (createdInvoice != null)
+                    {
+                        TempData["SuccessMessage"] = "Invoice created successfully! You can now add items to the invoice.";
+                        return RedirectToAction("Edit", new { id = createdInvoice.Id });
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "Invoice created successfully!";
+                        return RedirectToAction("Index");
+                    }
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Failed to update invoice!" });
+                    TempData["ErrorMessage"] = "Failed to create invoice. Please try again.";
+                    return RedirectToAction("Create");
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                // Log the error if you have logging
+                System.Diagnostics.Debug.WriteLine($"Error creating invoice: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                TempData["ErrorMessage"] = "An error occurred while creating the invoice. Please try again.";
+                return RedirectToAction("Create");
             }
         }
 
+        // Keep your existing SearchCustomer method - it looks correct
+        [HttpGet]
+        [Route("SearchCustomer")]
+        public ActionResult SearchCustomer(string term)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+                {
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                }
+
+                var customers = _customerRepository.GetAll()
+                    .Where(c => c.Active == 1) // Only active customers
+                    .Where(c =>
+                        (!string.IsNullOrEmpty(c.FirstName + " " + c.LastName) &&
+                         (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())) ||
+                        (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.Contains(term))
+                    )
+                    .Select(c => new
+                    {
+                        Id = c.Id,
+                        Name = $"{c.FirstName} {c.LastName}".Trim(),
+                        Phone = c.PhoneNumber ?? ""
+                    })
+                    .Take(10) // Limit results to prevent performance issues
+                    .ToList();
+
+                return Json(customers, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error searching customers: {ex.Message}");
+                return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("Edit/{id:int}")]
+        public ActionResult Edit(int id)
+        {
+            var invoice = _invoiceRepository.GetById(id);
+            if (invoice == null) return RedirectToAction("Index");
+
+            var items = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
+            var customer = _customerRepository.GetCustomerById(invoice.Customer_Id);
+            var employee = _employeeRepository.GetEmployeeById((int)invoice.Employee_Id);
+            var services = _serviceRepository.All().ToDictionary(s => s.Id, s => s);
+
+            var validPackages = CustomerPackageRepository.Instance.GetValidPackagesByCustomerId(invoice.Customer_Id);
+            var allPackages = _packageRepository.GetAll().ToList();
+            var customerPackageSelectList = (from cp in validPackages
+                                             join p in allPackages on cp.Package_Id equals p.Id
+                                             select new SelectListItem
+                                             {
+                                                 Value = cp.Id.ToString(),
+                                                 Text = p.Package_Name
+                                             }).ToList();
+
+            if (!customerPackageSelectList.Any())
+            {
+                customerPackageSelectList.Add(new SelectListItem
+                {
+                    Value = "0",
+                    Text = "NoPackage"
+                });
+            }
+
+            ViewBag.CustomerPackageList = customerPackageSelectList;
+
+            // Fixed: Đảm bảo selected value được set đúng
+            ViewBag.DeliveryStatusList = InvoiceForm.GetDeliveryStatuses().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text,
+                Selected = x.Value == invoice.Delivery_Status.ToString()
+            }).ToList();
+
+            // Fixed: Set selected value cho Payment Type
+            ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text,
+                Selected = x.Value == invoice.Payment_Type.ToString()
+            }).ToList();
+
+            // Fixed: Set selected value cho Invoice Type  
+            ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text,
+                Selected = x.Value == invoice.Invoice_Type.ToString()
+            }).ToList();
+
+            ViewBag.ValidCustomerPackages = validPackages.Select(p => new SelectListItem
+            {
+                Text = $"Gói #{p.Package_Id} - HSD: {p.Date_End:dd/MM/yyyy} - Còn: {p.Value:N0}đ",
+                Value = p.Id.ToString()
+            }).ToList();
+            var itemTotal = items.Sum(i => i.SubTotal);
+            var totalAmount = itemTotal + invoice.Ship_Cost;
+            var viewModel = new InvoiceForm
+            {
+                Id = invoice.Id,
+                Customer_Id = invoice.Customer_Id,
+                Customer_Name = customer.LastName + " " + customer.FirstName,
+                Employee_Id = (int)invoice.Employee_Id,
+                Employee_Name = employee.LastName + " " + employee.FirstName,
+                Invoice_Date = invoice.Invoice_Date,
+                Delivery_Date = invoice.Delivery_Date ?? DateTime.MinValue,
+                Pickup_Date = invoice.Pickup_Date ?? DateTime.Now,
+                Notes = invoice.Notes ?? "",
+                Order_Status = invoice.Order_Status,
+                Delivery_Status = invoice.Delivery_Status,
+                Ship_Cost = invoice.Ship_Cost,
+                TotalAmountInvoice = totalAmount,
+                // Fixed: Thêm các trường bị thiếu
+                Payment_Type = invoice.Payment_Type,
+                Invoice_Type = invoice.Invoice_Type,
+                Status = invoice.Status,
+                CustomerPackage_Id = invoice.CustomerPackage_Id,
+                Payment_Id = invoice.Payment_Id ?? "",
+
+                InvoiceItems = items.Select(i => new InvoiceItemForm
+                {
+                    Id = i.Id,
+                    ItemName = i.ItemName,
+                    Quantity = (int)i.Quantity,
+                    Unit_Price = i.UnitPrice,
+                    Service_Id = i.ServiceId,
+                    BarCode = i.BarCode ?? "",
+                    SubTotalItem= i.SubTotal,
+                    Service_Name = services.ContainsKey(i.ServiceId) ? services[i.ServiceId].Title : "",
+                }).ToList()
+            };
+
+            ViewBag.ServiceList = _serviceRepository.All()
+                .Select(s => new SelectListItem { Text = s.Title, Value = s.Id.ToString() }).ToList();
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Edit/{id:int}")]
+        public ActionResult Edit(int id, InvoiceForm model)
+        {
+            try
+            {
+                // Log để debug
+                System.Diagnostics.Debug.WriteLine($"Edit Invoice - ID: {id}");
+                System.Diagnostics.Debug.WriteLine($"Model Items Count: {model.InvoiceItems?.Count ?? 0}");
+
+                if (!ModelState.IsValid)
+                {
+                    // Log lỗi validation
+                    foreach (var error in ModelState)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"ModelState Error - {error.Key}: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
+                    }
+
+                    TempData["Error"] = "Please correct the validation errors and try again.";
+                    return RedirectToAction("Edit", new { id });
+                }
+
+                var invoice = _invoiceRepository.GetById(id);
+                if (invoice == null)
+                {
+                    TempData["Error"] = "Invoice not found.";
+                    return RedirectToAction("Index");
+                }
+
+                // Cập nhật thông tin hóa đơn cơ bản
+                invoice.Notes = model.Notes?.Trim();
+                invoice.Pickup_Date = model.Pickup_Date;
+                invoice.Delivery_Date = model.Delivery_Date;
+                invoice.Delivery_Status = model.Delivery_Status;
+                invoice.Ship_Cost = model.Ship_Cost;
+                invoice.Payment_Type = model.Payment_Type;
+                invoice.Invoice_Type = model.Invoice_Type;
+
+                // Xử lý CustomerPackage_Id
+                invoice.CustomerPackage_Id = model.CustomerPackage_Id == 0 ? (int?)null : model.CustomerPackage_Id;
+
+                // Xử lý các mục hóa đơn (InvoiceItems)
+                var existingItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
+                var processedItemIds = new HashSet<int>();
+
+                // Xử lý các items từ model
+                if (model.InvoiceItems != null && model.InvoiceItems.Count > 0)
+                {
+                    foreach (var item in model.InvoiceItems)
+                    {
+                        if (item.Id > 0) // Existing item
+                        {
+                            var existingItem = existingItems.FirstOrDefault(i => i.Id == item.Id);
+                            if (existingItem != null)
+                            {
+                                // Cập nhật item hiện có
+                                existingItem.ItemName = item.ItemName?.Trim();
+                                existingItem.Quantity = item.Quantity;
+                                existingItem.UnitPrice = item.Unit_Price;
+                                existingItem.SubTotal = item.Quantity * item.Unit_Price;
+                                existingItem.ServiceId = item.Service_Id;
+
+                                InvoiceItemRepo.Instance.UpdateInvoiceItem(existingItem);
+                                processedItemIds.Add(existingItem.Id);
+
+                                System.Diagnostics.Debug.WriteLine($"Updated existing item: {existingItem.Id} - {existingItem.ItemName}");
+                            }
+                        }
+                        else // New item (Id = 0 or negative)
+                        {
+                            // Tạo item mới
+                            var newItem = new InvoiceItem
+                            {
+                                invoice_id = id,
+                                item_name = item.ItemName?.Trim(),
+                                quantity = item.Quantity,
+                                unit_price = item.Unit_Price,
+                                sub_total = item.Quantity * item.Unit_Price,
+                                s_id = item.Service_Id,
+                                barcode = item.BarCode
+                            };
+
+                            var newItemId = InvoiceItemRepo.Instance.AddItem(newItem);
+                            System.Diagnostics.Debug.WriteLine($"Added new item: {newItemId} - {newItem.item_name}");
+                        }
+                    }
+                }
+
+                // Xóa các items không còn trong danh sách
+                var itemsToDelete = existingItems.Where(i => !processedItemIds.Contains(i.Id)).ToList();
+                foreach (var itemToDelete in itemsToDelete)
+                {
+                    InvoiceItemRepo.Instance.DeleteInvoiceItem(itemToDelete.Id);
+                    System.Diagnostics.Debug.WriteLine($"Deleted item: {itemToDelete.Id} - {itemToDelete.ItemName}");
+                }
+
+                // Tính lại tổng tiền
+                var updatedInvoiceItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
+                decimal itemsTotal = updatedInvoiceItems?.Sum(i => i.SubTotal) ?? 0;
+                invoice.Total_Amount = itemsTotal + model.Ship_Cost;
+
+                System.Diagnostics.Debug.WriteLine($"Items Total: {itemsTotal}, Ship Cost: {model.Ship_Cost}, Total Amount: {invoice.Total_Amount}");
+
+                // Lưu cập nhật invoice
+                bool updateResult = _invoiceRepository.Update(invoice);
+
+                if (updateResult)
+                {
+                    TempData["Success"] = "Invoice updated successfully.";
+                }
+                else
+                {
+                    TempData["Error"] = "Failed to update invoice. Please try again.";
+                }
+
+                return RedirectToAction("Edit", new { id });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating invoice: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                TempData["Error"] = "An error occurred while updating the invoice. Please try again.";
+                return RedirectToAction("Edit", new { id });
+            }
+        }
+
+
+
+        // POST: Invoice/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Route("Edit/{id:int}")]
+        //public ActionResult EditInvoice(int id, InvoiceForm form)
+        //{
+        //    try
+        //    {
+        //        var existingInvoice = _invoiceRepository.GetById(id);
+        //        if (existingInvoice == null)
+        //            return Json(new { success = false, message = "Invoice not found." });
+
+        //        // Chỉ cập nhật các trường có thể chỉnh sửa
+        //        existingInvoice.Delivery_Date = form.Delivery_Date == DateTime.MinValue ? DateTime.Now.AddDays(1) : form.Delivery_Date;
+        //        existingInvoice.Pickup_Date = form.Pickup_Date;
+        //        existingInvoice.Notes = form.Notes ?? "";
+        //        existingInvoice.Ship_Cost = form.Ship_Cost;
+        //        existingInvoice.Payment_Type = form.Payment_Type;
+        //        existingInvoice.Invoice_Type = form.Invoice_Type;
+        //        existingInvoice.CustomerPackage_Id = form.CustomerPackage_Id ?? 0;
+        //        existingInvoice.Order_Status = form.Order_Status;
+        //        existingInvoice.Delivery_Status = form.Delivery_Status;
+        //        existingInvoice.Status = form.Status;
+        //        existingInvoice.Total_Amount = form.Total_Amount;
+
+        //        bool result = _invoiceRepository.Update(existingInvoice);
+
+        //        if (result)
+        //        {
+        //            if (form.InvoiceItems != null && form.InvoiceItems.Count > 0)
+        //            {
+        //                SaveInvoiceItems(id, form.InvoiceItems);
+        //            }
+
+        //            return Json(new { success = true, message = "Invoice updated successfully!" });
+        //        }
+        //        else
+        //        {
+        //            return Json(new { success = false, message = "Failed to update invoice!" });
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { success = false, message = "Error: " + ex.Message });
+        //    }
+        //}
+
+
         // POST: Invoice/Delete/5
         [HttpPost]
-        [Route("Delete")]   
+        [Route("Delete")]
         public ActionResult Delete()
         {
             int id = Convert.ToInt32(Request.Form["id"]);
@@ -352,74 +661,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             return View("Index", invoices);
         }
 
-        // GET: Invoice/ProcessPayment
-        //public ActionResult ProcessPayment(int id)
-        //{
-        //    var invoice = _invoiceRepository.GetById(id);
-        //    if (invoice == null)
-        //    {
-        //        TempData["ErrorMessage"] = "Invoice not found.";
-        //        return RedirectToAction("Index");
-        //    }
 
-        //    if (!string.IsNullOrEmpty(invoice.Payment_Id) && invoice.Order_Status == 2)
-        //    {
-        //        TempData["InfoMessage"] = "This invoice has already been paid!";
-        //        return RedirectToAction("Edit", new { id });
-        //    }
-
-        //    try
-        //    {
-        //        var invoiceView = new InvoiceView
-        //        {
-        //            Id = invoice.Id,
-        //            Total_Amount = invoice.Total_Amount
-        //        };
-
-        //        string ipAddress = GetIpAddress();
-        //        string paymentUrl = _paymentService.CreatePaymentUrl(invoiceView, ipAddress);
-        //        return Redirect(paymentUrl);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["ErrorMessage"] = "Error processing payment: " + ex.Message;
-        //        return RedirectToAction("Edit", new { id });
-        //    }
-        //}
-
-        //public ActionResult PaymentReturn()
-        //{
-        //    var (isSuccess, message, updatedInvoice) = _paymentService.HandleReturn(Request.QueryString);
-
-        //    if (isSuccess && updatedInvoice != null)
-        //    {
-        //        var invoice = _invoiceRepository.GetById(updatedInvoice.Id);
-        //        if (invoice != null)
-        //        {
-        //            invoice.Payment_Id = updatedInvoice.Payment_Id;
-        //            invoice.Payment_Type = updatedInvoice.Payment_Type;
-        //            invoice.Order_Status = updatedInvoice.Order_Status;
-
-        //            if (_invoiceRepository.Update(invoice))
-        //            {
-        //                TempData["SuccessMessage"] = message;
-        //                return RedirectToAction("Edit", new { id = invoice.Id });
-        //            }
-        //            else
-        //            {
-        //                TempData["ErrorMessage"] = "Payment successful, but invoice update failed.";
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        TempData["ErrorMessage"] = message;
-        //    }
-
-        //    return RedirectToAction("Index");
-        //}
-
-        // AJAX: Get Customer Packages
         [HttpGet]
         public ActionResult GetCustomerPackages(int customerId)
         {
@@ -471,53 +713,310 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-        // Helper method to get IP address
-        private string GetIpAddress()
-        {
-            string ipAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
 
-            if (!string.IsNullOrEmpty(ipAddress))
+
+
+        private void SaveInvoiceItems(int invoiceId, List<InvoiceItemForm> items)
+        {
+            if (items == null || !items.Any()) return;
+
+            // Xoá item cũ
+            var oldItems = _invoiceItemRepository.GetItemsByInvoiceId(invoiceId);
+            foreach (var oldItem in oldItems)
             {
-                string[] addresses = ipAddress.Split(',');
-                if (addresses.Length != 0)
-                {
-                    return addresses[0];
-                }
+                _invoiceItemRepository.DeleteInvoiceItem(oldItem.Id);
             }
 
-            return Request.ServerVariables["REMOTE_ADDR"];
+            // Lưu item mới
+            foreach (var item in items)
+            {
+                var newItem = new InvoiceItemView
+                {
+                    InvoiceId = invoiceId,
+                    ItemName = item.ItemName,
+                    ServiceId = item.Service_Id,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.Unit_Price,
+                    SubTotal = item.Sub_Total,
+                    ItemStatus = item.Item_Status
+                };
+
+                _invoiceItemRepository.AddInvoiceItem(newItem);
+            }
+        }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Update(InvoiceForm model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        // Populate dropdowns lại khi có lỗi validation
+        //        ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes();
+        //        ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes();
+        //        ViewBag.ServiceList = _serviceRepository.All()
+        //            .Select(s => new SelectListItem
+        //            {
+        //                Value = s.Id.ToString(),
+        //                Text = s.Title,
+        //            }).ToList();
+
+        //        return View("Edit", model);
+        //    }
+
+        //    var invoice = _invoiceRepository.GetById(model.Id);
+        //    if (invoice == null)
+        //        return RedirectToAction("Index");
+
+        //    // Cập nhật các thông tin cơ bản
+        //    invoice.Delivery_Date = model.Delivery_Date;
+        //    invoice.Pickup_Date = model.Pickup_Date;
+        //    invoice.Notes = model.Notes;
+        //    invoice.Payment_Type = model.Payment_Type;
+        //    invoice.Invoice_Type = model.Invoice_Type;
+        //    invoice.Delivery_Status = model.Delivery_Status;
+        //    invoice.Ship_Cost = model.Ship_Cost;
+
+        //    _invoiceRepository.Update(invoice);
+
+        //    // Xử lý danh sách InvoiceItems mới được thêm
+        //    foreach (var item in model.InvoiceItems)
+        //    {
+        //        if (item.Id == 0)
+        //        {
+        //            InvoiceItemRepo.Instance.AddItem(new InvoiceItem
+        //            {
+        //                invoice_id = invoice.Id,
+        //                item_name = item.ItemName,
+        //                quantity = item.Quantity,
+        //                unit_price = item.Unit_Price,
+        //                sub_total = item.Sub_Total,
+        //                s_id = item.Service_Id,
+        //                item_status = 1
+        //            });
+        //        }
+        //        else
+        //        {
+        //            // Nếu cần hỗ trợ sửa item cũ thì thêm xử lý update ở đây
+        //        }
+        //    }
+        //    var deletedRaw = Request.Form["DeletedItemIds"];
+        //    if (!string.IsNullOrEmpty(deletedRaw))
+        //    {
+        //        var deletedIds = deletedRaw.Split(',')
+        //            .Where(s => int.TryParse(s, out _))
+        //            .Select(int.Parse)
+        //            .ToList();
+
+        //        foreach (var id in deletedIds)
+        //        {
+        //            var item = InvoiceItemRepo.Instance.GetInvoiceItemById(id);
+        //            if (item != null)
+        //            {
+        //                InvoiceItemRepo.Instance.DeleteInvoiceItem(id); 
+        //            }
+        //        }
+        //    }
+
+        //    return RedirectToAction("Edit", new { id = model.Id });
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("ConfirmPayment/{invoiceId:int}")]
+        public ActionResult ConfirmPayment(int invoiceId)
+        {
+            // chỉ update status
+            var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
+            return RedirectToAction("Index");
         }
 
-        // Helper method to save invoice items (implement based on your InvoiceItemRepository)
-        private void SaveInvoiceItems(int invoiceId, string invoiceItemsJson)
+        // Thêm các method này vào InvoiceController
+
+        [HttpPost]
+        public ActionResult AddInvoiceItem(int invoiceId, string itemName, int quantity, decimal unitPrice, int serviceId)
         {
             try
             {
-                // Parse JSON and save to database
-                var invoiceItems = JsonConvert.DeserializeObject<List<dynamic>>(invoiceItemsJson);
-
-                // Delete existing items first
-                _invoiceItemRepository.DeleteInvoiceItem(invoiceId);
-
-                // Add new items
-                foreach (var item in invoiceItems)
+                var service = _serviceRepository.GetById(serviceId);
+                if (service == null)
                 {
-                    var invoiceItem = new InvoiceItemView
-                    {
-                        InvoiceId = invoiceId,
-                        ServiceId = (int)item.serviceId,
-                        Quantity = (int)item.quantity,
-                        UnitPrice = (decimal)item.unitPrice,
-                        ItemStatus = 1
-                    };
+                    return Json(new { success = false, message = "Service not found" });
+                }
 
-                    _invoiceItemRepository.AddInvoiceItem(invoiceItem);
+                var newItem = new InvoiceItemView
+                {
+                    InvoiceId = invoiceId,
+                    ItemName = itemName,
+                    ServiceId = serviceId,
+                    Quantity = quantity,
+                    UnitPrice = unitPrice,
+                    SubTotal = quantity * unitPrice,
+                    ItemStatus = 1 // Active
+                };
+
+                // Add item to database (this will generate barcode inside the repository)
+                bool isAdded = _invoiceItemRepository.AddInvoiceItem(newItem);
+
+                if (isAdded)
+                {
+                    // Get the newly added item with its ID and barcode
+                    var addedItem = _invoiceItemRepository.GetLatestItemByInvoiceId(invoiceId);
+
+                    // Update total amount của invoice
+                    UpdateInvoiceTotal(invoiceId);
+
+                    return Json(new
+                    {
+                        success = true,
+                        itemId = addedItem.Id, // Return actual item ID
+                        serviceName = service.Title,
+                        subTotal = newItem.SubTotal,
+                        barcode = addedItem.BarCode, // Include barcode in response
+                        message = "Item added successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to add item" });
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error saving invoice items: " + ex.Message);
+                return Json(new { success = false, message = "Error: " + ex.Message });
             }
         }
+
+        [HttpPost]
+        public ActionResult UpdateInvoiceItem(int itemId, string itemName, int quantity, decimal unitPrice, int serviceId)
+        {
+            try
+            {
+                var item = _invoiceItemRepository.GetInvoiceItemById(itemId);
+                if (item == null)
+                {
+                    return Json(new { success = false, message = "Item not found" });
+                }
+
+                var service = _serviceRepository.GetById(serviceId);
+                if (service == null)
+                {
+                    return Json(new { success = false, message = "Service not found" });
+                }
+
+                // Update item properties
+                item.ItemName = itemName;
+                item.Quantity = quantity;
+                item.UnitPrice = unitPrice;
+                item.ServiceId = serviceId;
+                item.SubTotal = quantity * unitPrice;
+
+                bool updated = _invoiceItemRepository.UpdateInvoiceItem(item);
+
+                if (updated)
+                {
+                    // Update total amount của invoice
+                    UpdateInvoiceTotal(item.InvoiceId);
+
+                    return Json(new
+                    {
+                        success = true,
+                        serviceName = service.Title,
+                        subTotal = item.SubTotal,
+                        message = "Item updated successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to update item" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeleteInvoiceItem(int itemId)
+        {
+            try
+            {
+                var item = _invoiceItemRepository.GetInvoiceItemById(itemId);
+                if (item == null)
+                {
+                    return Json(new { success = false, message = "Item not found" });
+                }
+
+                var invoiceId = item.InvoiceId;
+                bool deleted = _invoiceItemRepository.DeleteInvoiceItem(itemId);
+
+                if (deleted)
+                {
+                    // Update total amount của invoice
+                    UpdateInvoiceTotal(invoiceId);
+
+                    return Json(new { success = true, message = "Item deleted successfully" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to delete item" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetInvoiceTotal(int invoiceId)
+        {
+            try
+            {
+                var items = _invoiceItemRepository.GetItemsByInvoiceId(invoiceId);
+                var invoice = _invoiceRepository.GetById(invoiceId);
+
+                var itemTotal = items.Sum(i => i.SubTotal);
+                var shippingCost = invoice?.Ship_Cost ?? 0;
+                var totalAmount = itemTotal + shippingCost;
+
+                return Json(new
+                {
+                    success = true,
+                    itemTotal = itemTotal,
+                    shippingCost = shippingCost,
+                    totalAmount = totalAmount
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error: " + ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        // Helper method để update total amount của invoice
+        private void UpdateInvoiceTotal(int invoiceId)
+        {
+            try
+            {
+                var invoice = _invoiceRepository.GetById(invoiceId);
+                var items = _invoiceItemRepository.GetItemsByInvoiceId(invoiceId);
+
+                if (invoice != null)
+                {
+                    var itemTotal = items.Sum(i => i.SubTotal);
+                    invoice.Total_Amount = itemTotal + (invoice?.Ship_Cost ?? 0);
+                    _invoiceRepository.Update(invoice);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error nếu cần
+                Console.WriteLine($"Error updating invoice total: {ex.Message}");
+            }
+        }
+
+      
+
     }
 }

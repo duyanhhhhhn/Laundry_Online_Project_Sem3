@@ -5,6 +5,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Collections.Generic;
 using System.Web;
+using System.Text.RegularExpressions;
+using System;
 
 
 public class BarcodeHelper
@@ -32,15 +34,36 @@ public class BarcodeHelper
     }
 
     // Lưu ảnh mã vạch vào thư mục ~/Content/Barcodes
+
+
     public static void SaveBarcodeToFile(string barcode, byte[] data)
     {
         string folder = HttpContext.Current.Server.MapPath("~/Content/Barcodes/");
         if (!Directory.Exists(folder))
             Directory.CreateDirectory(folder);
 
-        string path = Path.Combine(folder, barcode + ".png");
+        string safeFileName = Regex.Replace(barcode, @"[^a-zA-Z0-9_\-]", "_");
+        string path = Path.Combine(folder, safeFileName + ".png");
+
+        // Ghi đè nếu file tồn tại
+        if (File.Exists(path))
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (IOException ioEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"Cannot overwrite file {path}: {ioEx.Message}");
+                // Đổi tên tạm thời
+                path = Path.Combine(folder, safeFileName + "_" + Guid.NewGuid() + ".png");
+            }
+        }
+
         File.WriteAllBytes(path, data);
     }
+
+
 
     // Tạo PDF chứa danh sách mã vạch (mỗi trang 1 mã)
     public static string GenerateBarcodePdf(List<string> barcodeList)

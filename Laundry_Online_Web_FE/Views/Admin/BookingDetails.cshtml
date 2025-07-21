@@ -1,79 +1,275 @@
 ﻿@model Laundry_Online_Web_FE.Models.ModelViews.InvoiceView
 @{
-    ViewBag.Title = "Order Details";
+    ViewBag.Title = "Booking Details";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("BookingManagement")">Booking Management</a></li>
+            <li class="breadcrumb-item active">Booking #@Model.Id</li>
+        </ol>
+    </nav>
+
     <div class="row">
+        <!-- Main Content -->
         <div class="col-md-8">
-            <div class="card">
+            <!-- Header -->
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4><i class="fas fa-file-invoice"></i> Booking #@Model.Id</h4>
+                    @{
+                        string statusText = "";
+                        string statusClass = "";
+                        string statusIcon = "";
+                        switch (Model.Order_Status)
+                        {
+                            case 0:
+                                statusText = "Pending";
+                                statusClass = "warning";
+                                statusIcon = "fa-hourglass-half";
+                                break;
+                            case 1:
+                                statusText = "Confirmed";
+                                statusClass = "info";
+                                statusIcon = "fa-check-circle";
+                                break;
+                            case 2:
+                                statusText = "Paid";
+                                statusClass = "success";
+                                statusIcon = "fa-money-bill-wave";
+                                break;
+                            case 3:
+                                statusText = "Cancelled";
+                                statusClass = "danger";
+                                statusIcon = "fa-times-circle";
+                                break;
+                            default:
+                                statusText = "Unknown";
+                                statusClass = "secondary";
+                                statusIcon = "fa-question-circle";
+                                break;
+                        }
+                    }
+                    <span class="badge badge-@statusClass" id="order-status-badge">
+                        <i class="fas @statusIcon"></i> @statusText
+                    </span>
+                </div>
+            </div>
+
+            <!-- Customer & Booking Info -->
+            <div class="card mb-3">
                 <div class="card-header">
-                    <h4>Order Details #@Model.Id</h4>
+                    <h5><i class="fas fa-info-circle"></i> Booking Information</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h5>Basic Information</h5>
-                            <p><strong>Customer:</strong> @(Model.CustomerName ?? $"ID: {Model.Customer_Id}")</p>
-                            <p><strong>Phone Number:</strong> @(Model.CustomerPhone ?? "N/A")</p>
-                            <p><strong>Appointment:</strong> @Model.Invoice_Date.ToString("dd/MM/yyyy HH:mm")</p>
-                            <p>
-                                <strong>Status:</strong>
-                                @if (Model.Order_Status == 0)
-                                {
-                                    <span class="badge" style="background-color: #ffc107; color: #000;">Pending</span>
-                                }
-                                else if (Model.Order_Status == 1)
-                                {
-                                    <span class="badge" style="background-color: #28a745; color: #fff;">Confirmed</span>
-                                }
-                                else if (Model.Order_Status == 2)
-                                {
-                                    <span class="badge" style="background-color: #dc3545; color: #fff;">Cancelled</span>
-                                }
-                            </p>
-                            <p><strong>Invoice Type:</strong> @Model.Invoice_Type</p>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Customer:</strong></td>
+                                    <td>@(Model.CustomerName ?? $"Customer #{Model.Customer_Id}")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phone:</strong></td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model.CustomerPhone))
+                                        {
+                                            <a href="tel:@Model.CustomerPhone">@Model.CustomerPhone</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not provided</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Customer ID:</strong></td>
+                                    <td>#@Model.Customer_Id</td>
+                                </tr>
+                            </table>
                         </div>
                         <div class="col-md-6">
-                            <h5>Additional Information</h5>
-                            <p><strong>Total Amount:</strong> @Model.Total_Amount.ToString("N0") VND</p>
-                            <p><strong>Shipping Cost:</strong> @Model.Ship_Cost.ToString("N0") VND</p>
-                            <p><strong>Delivery Status:</strong> @Model.Delivery_Status</p>
-                            <p><strong>Delivery Date:</strong> @(Model.Delivery_Date?.ToString("dd/MM/yyyy") ?? "Not set")</p>
-                            <p><strong>Pickup Date:</strong> @(Model.Pickup_Date?.ToString("dd/MM/yyyy") ?? "Not set")</p>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <h5>Notes</h5>
-                            <div class="border p-3" style="background-color: #f8f9fa;">
-                                @if (!string.IsNullOrEmpty(Model.Notes))
-                                {
-                                    @Html.Raw(Model.Notes.Replace("\n", "<br />"))
-                                }
-                                else
-                                {
-                                    <em>No notes</em>
-                                }
-                            </div>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Appointment:</strong></td>
+                                    <td>@Model.Invoice_Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        <span class="badge badge-@statusClass">
+                                            <i class="fas @statusIcon"></i> @statusText
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Active:</strong></td>
+                                    <td>
+                                        @if (Model.Status == 1)
+                                        {
+                                            <span class="badge badge-success">Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">No</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <a href="@Url.Action("BookingManagement")" class="btn btn-secondary">Back to List</a>
+            </div>
 
-                    @if (Model.Order_Status == 0)
+            <!-- Notes -->
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-sticky-note"></i> Notes & History</h5>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
                     {
-                        <button class="btn btn-success" onclick="updateStatus(@Model.Id, 1)">Confirm</button>
-                        <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 2)">Cancel</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                onclick="showNotesModal(@Model.Id, '@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.Notes))')">
+                            <i class="fas fa-expand-alt"></i> View Details
+                        </button>
                     }
-                    else if (Model.Order_Status == 1)
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Notes))
                     {
-                        <button class="btn btn-warning" onclick="updateStatus(@Model.Id, 0)">Set Pending</button>
-                        <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 2)">Cancel</button>
+                        <div class="notes-preview" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                            @Html.Raw(Model.Notes.Replace("\n", "<br />"))
+                        </div>
                     }
+                    else
+                    {
+                        <p class="text-muted text-center">No notes available</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="@Url.Action("BookingManagement")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+
+                    <div>
+                        @if (Model.Order_Status == 0) // Pending
+                        {
+                            <button class="btn btn-info mr-2" onclick="updateStatus(@Model.Id, 1)">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                            <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 3)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        }
+                        else if (Model.Order_Status == 1) // Confirmed
+                        {
+                            <button class="btn btn-success mr-2" onclick="updateStatus(@Model.Id, 2)">
+                                <i class="fas fa-dollar-sign"></i> Mark as Paid
+                            </button>
+                            <button class="btn btn-warning mr-2" onclick="updateStatus(@Model.Id, 0)">
+                                <i class="fas fa-undo"></i> Set Pending
+                            </button>
+                            <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 3)">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        }
+                        else if (Model.Order_Status == 2) // Paid
+                        {
+                            <button class="btn btn-info" onclick="updateStatus(@Model.Id, 1)">
+                                <i class="fas fa-check"></i> Set Confirmed
+                            </button>
+                        }
+                        else if (Model.Order_Status == 3) // Cancelled
+                        {
+                            <button class="btn btn-info" onclick="updateStatus(@Model.Id, 1)">
+                                <i class="fas fa-redo"></i> Reactivate
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Quick Stats -->
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h6><i class="fas fa-chart-bar"></i> Quick Stats</h6>
+                </div>
+                <div class="card-body text-center">
+                    <h4 class="text-success">@Model.Total_Amount.ToString("N0") VND</h4>
+                    <p class="text-muted">Total Amount</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Shipping</small>
+                            <h6>@Model.Ship_Cost.ToString("N0") VND</h6>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Type</small>
+                            <h6>@(Model.Invoice_Type == 1 ? "Online" : "Offline")</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Summary -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h6><i class="fas fa-info-circle"></i> Status Summary</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td>Order Status:</td>
+                            <td><span class="badge badge-@statusClass">@statusText</span></td>
+                        </tr>
+                        <tr>
+                            <td>Active:</td>
+                            <td><span class="badge badge-@(Model.Status == 1 ? "success" : "danger")">@(Model.Status == 1 ? "Yes" : "No")</span></td>
+                        </tr>
+                        <tr>
+                            <td>Payment:</td>
+                            <td><span class="badge badge-@(string.IsNullOrEmpty(Model.Payment_Id) ? "warning" : "success")">@(string.IsNullOrEmpty(Model.Payment_Id) ? "Pending" : "Completed")</span></td>
+                        </tr>
+                        <tr>
+                            <td>Created:</td>
+                            <td><small>@Model.Invoice_Date.ToString("dd/MM/yyyy HH:mm")</small></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Enhanced Notes Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notesModalLabel">
+                        <i class="fas fa-sticky-note"></i> Booking Notes & History
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="notesContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
                 </div>
             </div>
         </div>
@@ -81,39 +277,290 @@
 </div>
 
 <script>
-    function updateStatus(bookingId, newStatus) {
-        if (confirm('Are you sure you want to update the status?')) {
-            $.ajax({
-                url: '@Url.Action("UpdateBookingStatus")',
-                type: 'POST',
-                data: { id: bookingId, newStatus: newStatus },
-                success: function(response) {
-                    if (response.success) {
-                        alert(response.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('An error occurred while updating status');
-                }
-            });
+$(document).ready(function () {
+    console.log('BookingDetails page loaded');
+
+    // ✅ Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // ✅ Modal event handlers
+    $('#notesModal').on('hidden.bs.modal', function () {
+        console.log('Modal closed');
+        $('#notesContent').empty();
+    });
+
+    // ✅ Multiple ways to close modal (natural Bootstrap behavior)
+    $(document).on('click', '[data-dismiss="modal"]', function(e) {
+        console.log('Close button clicked');
+        $('#notesModal').modal('hide');
+    });
+
+    // ✅ ESC key to close modal
+    $(document).on('keydown', function(e) {
+        if (e.keyCode === 27 && $('#notesModal').hasClass('show')) {
+            console.log('ESC pressed');
+            $('#notesModal').modal('hide');
         }
+    });
+
+    // ✅ Click outside modal to close (Bootstrap default behavior)
+    $('#notesModal').on('click', function(e) {
+        if (e.target === this) {
+            console.log('Clicked outside modal');
+            $(this).modal('hide');
+        }
+    });
+});
+
+// ✅ Enhanced Notes Modal Function
+function showNotesModal(bookingId, notes) {
+    try {
+        console.log('showNotesModal called with:', { bookingId, notes });
+
+        // Update modal title
+        $('#notesModalLabel').html('<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Detailed Notes & History');
+
+        // Handle empty notes
+        if (!notes || notes.trim() === '') {
+            $('#notesContent').html('<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>');
+        } else {
+            // Parse and format notes
+            const formattedNotes = parseAndFormatNotes(notes);
+            $('#notesContent').html(formattedNotes);
+        }
+
+        // Show modal
+        $('#notesModal').modal('show');
+
+    } catch (error) {
+        console.error('Error in showNotesModal:', error);
+        alert('Error displaying notes: ' + error.message);
     }
+}
+
+function updateStatus(bookingId, newStatus) {
+    const statusNames = { 0: 'Pending', 1: 'Confirmed', 2: 'Paid', 3: 'Cancelled' };
+    const statusName = statusNames[newStatus];
+
+    if (confirm(`Are you sure you want to update the status to "${statusName}"?`)) {
+        const badge = document.getElementById('order-status-badge');
+        const originalContent = badge.innerHTML;
+        badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+        $.ajax({
+            url: '@Url.Action("UpdateBookingStatus")',
+            type: 'POST',
+            data: { id: bookingId, newStatus: newStatus },
+            success: function(response) {
+                if (response.success) {
+                    badge.className = `badge badge-${response.newStatusClass}`;
+                    badge.innerHTML = getStatusIcon(newStatus) + ' ' + response.newStatusText;
+                    showAlert('success', response.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    badge.innerHTML = originalContent;
+                    showAlert('error', response.message);
+                }
+            },
+            error: function() {
+                badge.innerHTML = originalContent;
+                showAlert('error', 'An error occurred while updating status');
+            }
+        });
+    }
+}
+
+function getStatusIcon(status) {
+    const icons = {
+        0: '<i class="fas fa-hourglass-half"></i>',
+        1: '<i class="fas fa-check-circle"></i>',
+        2: '<i class="fas fa-money-bill-wave"></i>',
+        3: '<i class="fas fa-times-circle"></i>'
+    };
+    return icons[status] || '<i class="fas fa-question-circle"></i>';
+}
+
+function showAlert(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show">
+            <i class="fas ${iconClass}"></i> ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+
+    $('.container-fluid').prepend(alertHtml);
+    setTimeout(() => $('.alert').fadeOut(), 5000);
+}
+
+// ✅ Enhanced Notes Parsing Functions
+function parseAndFormatNotes(notes) {
+    try {
+        const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
+        const userNotes = [];
+        const systemLogs = [];
+
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('[') && trimmedLine.includes(']')) {
+                const logEntry = parseSystemLogEntry(trimmedLine);
+                if (logEntry) {
+                    systemLogs.push(logEntry);
+                }
+            } else if (trimmedLine !== '') {
+                userNotes.push(trimmedLine);
+            }
+        });
+
+        let html = '';
+
+        // Display user notes
+        if (userNotes.length > 0) {
+            html += '<div class="notes-section mb-4">';
+            html += '<h6><i class="fas fa-user-edit text-primary"></i> Customer Notes:</h6>';
+            html += '<div class="user-notes-container">';
+            userNotes.forEach(note => {
+                html += '<div class="user-note-item"><i class="fas fa-quote-left"></i> ' + escapeHtml(note) + '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        // Display system logs
+        if (systemLogs.length > 0) {
+            html += '<div class="notes-section">';
+            html += '<h6><i class="fas fa-history text-info"></i> System History:</h6>';
+            html += '<div class="timeline">';
+
+            // Sort logs by date (newest first)
+            systemLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            systemLogs.forEach((log) => {
+                const iconClass = getLogIcon(log.action);
+                const colorClass = getLogColor(log.action);
+
+                html += '<div class="timeline-item">';
+                html += '<div class="timeline-marker ' + colorClass + '">';
+                html += '<i class="fas ' + iconClass + '"></i>';
+                html += '</div>';
+                html += '<div class="timeline-content">';
+                html += '<div class="timeline-header">';
+                html += '<span class="timeline-title">' + getFriendlyActionName(log.action) + '</span>';
+                html += '<span class="timeline-date">' + formatDate(log.date) + '</span>';
+                html += '</div>';
+                if (log.message && log.message !== '') {
+                    html += '<div class="timeline-message">' + escapeHtml(log.message) + '</div>';
+                }
+                html += '</div>';
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        }
+
+        if (html === '') {
+            html = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes or history available.</div>';
+        }
+
+        return html;
+    } catch (error) {
+        console.error('Error parsing notes:', error);
+        return '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Error displaying notes.</div>';
+    }
+}
+
+function parseSystemLogEntry(logLine) {
+    try {
+        const regex = /\[([^\]]+)\]\s*(\d{2}\/\d{2}\/\d{4}\s*\d{2}:\d{2}):\s*(.+)/;
+        const match = logLine.match(regex);
+        if (match) {
+            return {
+                action: match[1].trim(),
+                date: match[2].trim(),
+                message: match[3].trim()
+            };
+        }
+    } catch (error) {
+        console.error('Error parsing log entry:', error);
+    }
+    return null;
+}
+
+function getFriendlyActionName(action) {
+    const actionMap = {
+        'CREATED': 'Booking Created',
+        'UPDATED': 'Customer Update',
+        'AUTO-CANCELLED': 'Auto-Cancelled',
+        'AUTO CANCELLED': 'Auto-Cancelled',
+        'ADMIN UPDATE': 'Admin Update'
+    };
+    return actionMap[action.toUpperCase()] || action.replace(/-/g, ' ');
+}
+
+function getLogIcon(action) {
+    const iconMap = {
+        'CREATED': 'fa-plus-circle',
+        'UPDATED': 'fa-edit',
+        'AUTO-CANCELLED': 'fa-times-circle',
+        'AUTO CANCELLED': 'fa-times-circle',
+        'ADMIN UPDATE': 'fa-user-cog'
+    };
+    return iconMap[action.toUpperCase()] || 'fa-info-circle';
+}
+
+function getLogColor(action) {
+    const colorMap = {
+        'CREATED': 'text-success',
+        'UPDATED': 'text-warning',
+        'AUTO-CANCELLED': 'text-danger',
+        'AUTO CANCELLED': 'text-danger',
+        'ADMIN UPDATE': 'text-info'
+    };
+    return colorMap[action.toUpperCase()] || 'text-secondary';
+}
+
+function formatDate(dateStr) {
+    try {
+        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);
+        if (parts) {
+            const [, day, month, year, hour, minute] = parts;
+            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}`);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+        return dateStr;
+    } catch (e) {
+        console.error('Error formatting date:', e);
+        return dateStr;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 </script>
 
 <style>
     .card {
-        border-radius: 10px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         border: none;
     }
 
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-        border-bottom: 2px solid rgba(0,0,0,0.1);
-        background-color: #f8f9fa;
+    .table td {
+        padding: 0.5rem 0.75rem;
+        border-top: none;
     }
 
     .badge {
@@ -121,7 +568,157 @@
         padding: 0.4em 0.6em;
     }
 
-    .btn {
-        margin-right: 10px;
+    .notes-preview {
+        font-size: 0.9rem;
+        line-height: 1.5;
     }
+
+    .breadcrumb {
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+
+    /* ✅ Enhanced Modal Notes Styles */
+    .notes-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 4px solid #007bff;
+    }
+
+    .user-notes-container {
+        margin-top: 10px;
+    }
+
+    .user-note-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        font-style: italic;
+        color: #495057;
+    }
+
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+    }
+
+        .timeline-marker.text-success {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .timeline-marker.text-warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        .timeline-marker.text-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .timeline-marker.text-info {
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
+
+    .timeline-content {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 12px;
+        margin-left: 10px;
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .timeline-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    /* Modal Enhancement */
+    .modal {
+        outline: none;
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal {
+        z-index: 1050;
+    }
+
+    .close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+        .close:hover {
+            opacity: 0.75;
+        }
+
+        .close:focus {
+            outline: none;
+            opacity: 1;
+        }
 </style>

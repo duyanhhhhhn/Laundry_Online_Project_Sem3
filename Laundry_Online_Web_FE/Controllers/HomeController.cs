@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Laundry_Online_Web_FE.Models.ModelViews.DTO;
-using Laundry_Online_Web_FE.Models.Dao;
-using Laundry_Online_Web_FE.Models.Repositories;
 using Laundry_Online_Web_BE.Models.Repositories;
+using Laundry_Online_Web_FE.Helpers;
+using Laundry_Online_Web_FE.Models.Dao;
 using Laundry_Online_Web_FE.Models.ModelViews;
+using Laundry_Online_Web_FE.Models.ModelViews.DTO;
+using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -41,11 +43,21 @@ namespace Laundry_Online_Web_FE.Controllers
             return View();
         }
 
+        private string FormatNotesForDisplay(string notes)
+        {
+            return NotesHelper.FormatNotesForDisplay(notes);
+        }
+
+        private string GetNotesTooltip(string notes)
+        {
+            return NotesHelper.GetNotesTooltip(notes);
+        }
+
         // Updated MyBookings action
         public ActionResult MyBookings()
         {
             // Run auto-cancel before displaying list
-            AutoCancelExpiredBookings();
+            InvoiceRepository.Instance.AutoUpdateExpiredOrders();
 
             // Check login
             if (Session["customer"] == null)
@@ -56,8 +68,10 @@ namespace Laundry_Online_Web_FE.Controllers
 
             var customer = Session["customer"] as CustomerView;
 
-            // Get all customer bookings
-            var allBookings = InvoiceRepository.Instance.GetByCustomerId(customer.Id);
+            // Get all customer bookings (only active ones)
+            var allBookings = InvoiceRepository.Instance.GetByCustomerId(customer.Id)
+                .Where(b => b.Status == 1) // Only show active bookings
+                .ToList();
 
             // Sort by newest creation date
             var sortedBookings = allBookings.OrderByDescending(b => b.Invoice_Date).ToList();
@@ -67,163 +81,163 @@ namespace Laundry_Online_Web_FE.Controllers
             ViewBag.GetStatusClass = new Func<int, string>(GetBookingStatusClass);
             ViewBag.CanEdit = new Func<InvoiceView, bool>(CanEditBooking);
 
+            // ✅ THÊM: Helper functions cho Notes (kiểm tra null safety)
+            ViewBag.FormatNotes = new Func<string, string>((notes) => {
+                try
+                {
+                    return FormatNotesForDisplay(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error formatting notes: {ex.Message}");
+                    return "Error loading notes";
+                }
+            });
+
+            ViewBag.GetNotesTooltip = new Func<string, string>((notes) => {
+                try
+                {
+                    return GetNotesTooltip(notes);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error generating tooltip: {ex.Message}");
+                    return "Error loading tooltip";
+                }
+            });
+
             return View(sortedBookings);
         }
 
+
+        // Cập nhật helper method CanEditBooking
+        private bool CanEditBooking(InvoiceView booking)
+        {
+            // Sử dụng method từ repository thay vì DateTime.Now
+            return InvoiceRepository.Instance.CanEditBooking(booking.Id);
+        }
+
         [HttpPost]
-        public JsonResult SubmitBooking(string ServiceTime, string ServiceDate, string Notes)
+        public JsonResult SubmitBooking()
         {
             try
             {
-                // Run auto-cancel before creating new booking
-                AutoCancelExpiredBookings();
-
-                // Check login
-                if (Session["customer"] == null)
-                {
-                    return Json(new { success = false, message = "Please login to book a service." });
-                }
-
-                var customer = Session["customer"] as Models.ModelViews.CustomerView;
+                var customer = Session["customer"] as CustomerView;
                 if (customer == null)
                 {
-                    return Json(new { success = false, message = "Customer information not found." });
+                    return Json(new { success = false, message = "Please login first" });
                 }
 
-                // Parse date and time
-                DateTime serviceDateTime;
-                if (!DateTime.TryParse(ServiceDate, out serviceDateTime))
+                string serviceDate = Request.Form["ServiceDate"];
+                string serviceTime = Request.Form["ServiceTime"];
+                string notes = Request.Form["Notes"] ?? "";
+
+                if (string.IsNullOrEmpty(serviceDate) || string.IsNullOrEmpty(serviceTime))
                 {
-                    return Json(new { success = false, message = "Invalid date format" });
+                    return Json(new { success = false, message = "Please select both date and time" });
                 }
 
-                // Combine date and time
-                if (!string.IsNullOrEmpty(ServiceTime))
+                // Parse appointment time
+                if (!DateTime.TryParse($"{serviceDate} {serviceTime}", out DateTime appointmentDateTime))
                 {
-                    if (TimeSpan.TryParse(ServiceTime, out TimeSpan timeSpan))
+                    return Json(new { success = false, message = "Invalid date/time format" });
+                }
+
+                // CẬP NHẬT: Validate với SQL Server time
+                if (!InvoiceRepository.Instance.ValidateBookingTime(appointmentDateTime, 2))
+                {
+                    var sqlSeverTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                    var hoursDiff = (appointmentDateTime - sqlSeverTime).TotalHours;
+
+                    return Json(new
                     {
-                        serviceDateTime = serviceDateTime.Date.Add(timeSpan);
-                    }
+                        success = false,
+                        message = $"Appointment must be at least 2 hours from now. Current server time: {sqlSeverTime:dd/MM/yyyy HH:mm}, Your selection: {appointmentDateTime:dd/MM/yyyy HH:mm}, Difference: {hoursDiff:F1} hours"
+                    });
                 }
 
-                // Check time must be at least 2 hours ahead
-                if (serviceDateTime <= DateTime.Now.AddHours(2))
-                {
-                    return Json(new { success = false, message = "Appointment time must be at least 2 hours from now." });
-                }
+                // ✅ CẬP NHẬT: Format Notes sử dụng helper
+                var sqlTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                var systemLog = $"[CREATED] {sqlTime:dd/MM/yyyy HH:mm}: Online booking created";
+                var formattedNotes = NotesHelper.FormatNotesForSaving(notes, "", systemLog);
 
-                // Create Notes with standard format
-                string bookingNotes = $"[ONLINE BOOKING] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}\n" +
-                                     $"Customer: {customer.FirstName} {customer.LastName}\n" +
-                                     $"Phone: {customer.PhoneNumber}\n" +
-                                     $"Address: {customer.Address}\n" +
-                                     $"Appointment Time: {serviceDateTime.ToString("dd/MM/yyyy HH:mm")}";
-
-                // Add customer notes if provided
-                if (!string.IsNullOrEmpty(Notes) && !string.IsNullOrWhiteSpace(Notes))
-                {
-                    bookingNotes += $"\n[NOTES]: {Notes.Trim()}";
-                }
-
-                // Truncate notes if too long (200 characters)
-                if (bookingNotes.Length > 200)
-                {
-                    bookingNotes = bookingNotes.Substring(0, 200);
-                }
-
-                // Create booking invoice with proper nullable field handling
-                var bookingInvoice = new Models.ModelViews.InvoiceView
+                // Tạo booking mới
+                var newBooking = new InvoiceView
                 {
                     Customer_Id = customer.Id,
-                    Employee_Id = null,
-                    Invoice_Date = serviceDateTime,
-                    Delivery_Date = null,
-                    Pickup_Date = null,
-                    Total_Amount = 0m,
-                    Payment_Type = 0,
-                    Payment_Id = string.Empty,
-                    Order_Status = 0,
-                    Invoice_Type = 1,
-                    CustomerPackage_Id = null,
-                    Status = 0,
-                    Notes = bookingNotes,
-                    Ship_Cost = 0m,
-                    Delivery_Status = 0
+                    Invoice_Date = appointmentDateTime,
+                    Delivery_Date = null, // Will be set to null in database
+                    Pickup_Date = null,   // Will be set to null in database
+                    Total_Amount = 0,
+                    Payment_Type = 1,
+                    Order_Status = 0, // Pending
+                    Invoice_Type = 0, // Online
+                    Status = 1, // Active
+                    Notes = formattedNotes,
+                    Ship_Cost = 0,
+                    Delivery_Status = 1,
+                    Payment_Id = ""
                 };
 
-                System.Diagnostics.Debug.WriteLine($"[SUBMIT-BOOKING] Creating booking: Customer_Id={bookingInvoice.Customer_Id}, Invoice_Date={bookingInvoice.Invoice_Date}");
-
-                bool success = InvoiceRepository.Instance.Add(bookingInvoice);
+                bool success = InvoiceRepository.Instance.Add(newBooking);
 
                 if (success)
                 {
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Booking successful! We will contact you for confirmation as soon as possible.",
-                        bookingInfo = new
-                        {
-                            customerName = customer.FirstName + " " + customer.LastName,
-                            phone = customer.PhoneNumber,
-                            address = customer.Address,
-                            serviceDate = serviceDateTime.ToString("dd/MM/yyyy"),
-                            serviceTime = ServiceTime,
-                            bookingTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm")
-                        }
-                    });
+                    System.Diagnostics.Debug.WriteLine($"[BOOKING-CREATED] Customer #{customer.Id}, Appointment: {appointmentDateTime:yyyy-MM-dd HH:mm}");
+                    return Json(new { success = true, message = "Booking created successfully!" });
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Unable to create booking. Please try again." });
+                    return Json(new { success = false, message = "Failed to create booking. Please try again." });
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Booking error: " + ex.Message);
-                System.Diagnostics.Debug.WriteLine("Stack trace: " + ex.StackTrace);
-                return Json(new { success = false, message = "An error occurred. Please try again later." });
+                System.Diagnostics.Debug.WriteLine($"[SUBMIT-BOOKING] Error: {ex.Message}");
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }
-        // GET: Edit Booking
+
+        // CẬP NHẬT: Thêm method để get booking với SQL Server time validation
+        [HttpGet]
         public ActionResult EditBooking(int id)
         {
-            // Check login
-            if (Session["customer"] == null)
+            try
             {
-                TempData["Message"] = "Please login to edit booking.";
-                return RedirectToAction("Login", "Home");
+                if (Session["customer"] == null)
+                {
+                    TempData["ErrorMessage"] = "Please login first";
+                    return RedirectToAction("Login");
+                }
+
+                var customer = Session["customer"] as CustomerView;
+                var booking = InvoiceRepository.Instance.GetById(id);
+
+                if (booking == null || booking.Customer_Id != customer.Id || booking.Status != 1)
+                {
+                    TempData["ErrorMessage"] = "Booking not found";
+                    return RedirectToAction("MyBookings");
+                }
+
+                // ✅ Kiểm tra có thể edit không với SQL Server time
+                if (!InvoiceRepository.Instance.CanEditBooking(id))
+                {
+                    var sqlTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                    TempData["ErrorMessage"] = $"Cannot edit booking. Either the booking is not pending or the edit window has closed. Current server time: {sqlTime:dd/MM/yyyy HH:mm}";
+                    return RedirectToAction("MyBookings");
+                }
+
+                // ✅ Thêm SQL Server time vào ViewBag để sử dụng trong View
+                ViewBag.SqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+
+                return View(booking);
             }
-
-            var customer = Session["customer"] as CustomerView;
-            var booking = InvoiceRepository.Instance.GetById(id);
-
-            System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING-GET] ID: {id}, Booking found: {booking != null}");
-
-            // Check ownership
-            if (booking == null || booking.Customer_Id != customer.Id)
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Booking not found or you don't have permission to edit.";
+                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING-GET] Error: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred";
                 return RedirectToAction("MyBookings");
             }
-
-            // Check booking must have order_status = 0 (booked)
-            if (booking.Order_Status != 0)
-            {
-                TempData["ErrorMessage"] = "Only unconfirmed bookings can be edited.";
-                return RedirectToAction("MyBookings");
-            }
-
-            // Check if booking can be edited (before 12 hours)
-            if (!CanEditBooking(booking))
-            {
-                TempData["ErrorMessage"] = "This booking cannot be edited. Bookings must be edited at least 12 hours in advance.";
-                return RedirectToAction("MyBookings");
-            }
-
-            // Pass current notes to ViewBag for display in form
-            ViewBag.CurrentNotes = booking.Notes ?? "";
-
-            return View(booking);
         }
 
         [HttpPost]
@@ -232,12 +246,8 @@ namespace Laundry_Online_Web_FE.Controllers
         {
             try
             {
-                // Debug logging
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] POST received - ID: {id}, Date: {ServiceDate}, Time: {ServiceTime}");
-
                 if (Session["customer"] == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Session expired");
                     TempData["ErrorMessage"] = "Session expired.";
                     return RedirectToAction("Login", "Home");
                 }
@@ -245,26 +255,20 @@ namespace Laundry_Online_Web_FE.Controllers
                 var customer = Session["customer"] as CustomerView;
                 var booking = InvoiceRepository.Instance.GetById(id);
 
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Booking found: {booking != null}, Customer match: {booking?.Customer_Id == customer?.Id}");
-
-                if (booking == null || booking.Customer_Id != customer.Id)
+                if (booking == null || booking.Customer_Id != customer.Id || booking.Status != 1)
                 {
-                    System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Booking not found or access denied");
                     TempData["ErrorMessage"] = "Booking not found.";
                     return RedirectToAction("MyBookings");
                 }
 
-                // Check order_status must be 0 (booked)
                 if (booking.Order_Status != 0)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Invalid status: {booking.Order_Status}");
-                    TempData["ErrorMessage"] = "Only unconfirmed bookings can be edited.";
+                    TempData["ErrorMessage"] = "Only pending bookings can be edited.";
                     return RedirectToAction("MyBookings");
                 }
 
                 if (!CanEditBooking(booking))
                 {
-                    System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Cannot edit booking - time restriction");
                     TempData["ErrorMessage"] = "This booking cannot be edited.";
                     return RedirectToAction("MyBookings");
                 }
@@ -273,36 +277,31 @@ namespace Laundry_Online_Web_FE.Controllers
                 DateTime newServiceDateTime;
                 if (!DateTime.TryParse(ServiceDate, out newServiceDateTime))
                 {
-                    System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Invalid date format: {ServiceDate}");
                     TempData["ErrorMessage"] = "Invalid date.";
                     return RedirectToAction("MyBookings");
                 }
 
-                // Combine date and time
                 if (!string.IsNullOrEmpty(ServiceTime))
                 {
                     if (TimeSpan.TryParse(ServiceTime, out TimeSpan timeSpan))
                     {
                         newServiceDateTime = newServiceDateTime.Date.Add(timeSpan);
-                        System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] New datetime: {newServiceDateTime}");
                     }
                 }
 
-                // Check new date must be in the future
-                if (newServiceDateTime <= DateTime.Now.AddHours(12))
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+                if (newServiceDateTime <= sqlServerTime.AddHours(12))
                 {
-                    System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Time too close: {newServiceDateTime} vs {DateTime.Now.AddHours(12)}");
-                    TempData["ErrorMessage"] = "Appointment time must be at least 12 hours from now.";
+                    TempData["ErrorMessage"] = $"Appointment time must be at least 12 hours from now. Current server time: {sqlServerTime:dd/MM/yyyy HH:mm}";
                     return RedirectToAction("MyBookings");
                 }
 
                 // Store old values for logging
                 var oldDateTime = booking.Invoice_Date;
 
-                // Update information - only update necessary fields
+                // Update information
                 booking.Invoice_Date = newServiceDateTime;
 
-                // Ensure nullable fields are handled correctly
                 if (booking.Delivery_Date.HasValue && booking.Delivery_Date.Value == DateTime.MinValue)
                 {
                     booking.Delivery_Date = null;
@@ -312,148 +311,122 @@ namespace Laundry_Online_Web_FE.Controllers
                     booking.Pickup_Date = null;
                 }
 
-                // Handle new Notes - this is the main change
-                string newNotes = Notes ?? ""; // Use notes from form instead of old notes
+                var sqlServerTime2 = InvoiceRepository.Instance.GetSqlServerDateTime();
+                var systemLog = $"[UPDATED] {sqlServerTime2:dd/MM/yyyy HH:mm}: Changed appointment time from {oldDateTime:dd/MM/yyyy HH:mm} to {newServiceDateTime:dd/MM/yyyy HH:mm}";
 
-                // Add time update log
-                var updateLog = $"\n[UPDATED] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Changed appointment time from {oldDateTime.ToString("dd/MM/yyyy HH:mm")} to {newServiceDateTime.ToString("dd/MM/yyyy HH:mm")}";
-                newNotes += updateLog;
+                var formattedNotes = NotesHelper.FormatNotesForSaving(Notes, booking.Notes, systemLog);
 
-                // Truncate notes if too long (200 characters)
-                if (newNotes.Length > 200)
-                {
-                    newNotes = newNotes.Substring(0, 200);
-                }
-
-                booking.Notes = newNotes;
-
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] About to update booking {booking.Id}");
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Values: Invoice_Date={booking.Invoice_Date}, Delivery_Date={booking.Delivery_Date}, Pickup_Date={booking.Pickup_Date}");
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Notes length: {booking.Notes?.Length ?? 0}");
+                // ✅ NO LIMITS: Store notes as-is
+                booking.Notes = formattedNotes;
 
                 bool success = InvoiceRepository.Instance.Update(booking);
-
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Update result: {success}");
 
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Booking updated successfully!";
-                    System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Success - redirecting to MyBookings");
                     return RedirectToAction("MyBookings");
                 }
                 else
                 {
                     TempData["ErrorMessage"] = "An error occurred while updating.";
-                    System.Diagnostics.Debug.WriteLine("[EDIT-BOOKING] Update failed");
                     return RedirectToAction("MyBookings");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Exception: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"[EDIT-BOOKING] Stack trace: {ex.StackTrace}");
+                Debug.WriteLine($"[EDIT-BOOKING] Exception: {ex.Message}");
                 TempData["ErrorMessage"] = "An error occurred. Please try again.";
                 return RedirectToAction("MyBookings");
             }
         }
-        // Helper methods cho booking
-        private bool CanEditBooking(InvoiceView booking)
+
+        private string GetBookingStatusText(int orderStatus)
         {
-            // Chỉ cho phép chỉnh sửa nếu:
-            // 1. Order_Status = 0 (đã đặt lịch)
-            // 2. Lịch hẹn chưa tới (invoice_date > now + 12h)
-
-            if (booking.Order_Status != 0) return false; // Chỉ cho phép edit status = 0
-
-            var appointmentTime = booking.Invoice_Date; // Removed null-coalescing operator
-            return appointmentTime > DateTime.Now.AddHours(12);
-        }
-
-        // Helper method để lấy text trạng thái booking
-        private string GetBookingStatusText(int status)
-        {
-            switch (status)
+            switch (orderStatus)
             {
-                case 0: return "Đã đặt lịch";
-                case 1: return "Đã xác nhận";
-                case 2: return "Đã hủy";
-                default: return "Không xác định";
+                case 0: return "Pending"; // Chờ xác nhận
+                case 1: return "Confirmed"; // Đã xác nhận
+                case 2: return "Paid"; // Đã thanh toán
+                case 3: return "Cancelled"; // Đã hủy
+                default: return "Unknown";
             }
         }
 
-        // Helper method để lấy CSS class cho trạng thái booking
-        private string GetBookingStatusClass(int status)
+        // Helper method để lấy CSS class cho trạng thái booking - CẬP NHẬT
+        private string GetBookingStatusClass(int orderStatus)
         {
-            switch (status)
+            switch (orderStatus)
             {
-                case 0: return "success";
-                case 1: return "info";
-                case 2: return "danger";
+                case 0: return "warning"; // Pending - màu vàng
+                case 1: return "info"; // Confirmed - màu xanh dương
+                case 2: return "success"; // Paid - màu xanh lá
+                case 3: return "danger"; // Cancelled - màu đỏ
                 default: return "secondary";
             }
         }
 
-        /// <summary>
-        /// Auto-cancel expired bookings - cancel after 1 hour
-        /// </summary>
         public void AutoCancelExpiredBookings()
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Starting auto-cancel check at {DateTime.Now}");
-
-                // Get all bookings with order_status = 0 (booked)
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
                 var pendingBookings = InvoiceRepository.Instance.GetAll()
-                    .Where(b => b.Order_Status == 0 && b.Invoice_Type == 1) // Only online bookings
+                    .Where(b => b.Status == 1 && b.Order_Status == 0)
                     .ToList();
-
-                System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Found {pendingBookings.Count} pending bookings");
 
                 int cancelledCount = 0;
                 foreach (var booking in pendingBookings)
                 {
-                    var timeDiff = DateTime.Now - booking.Invoice_Date;
-                    System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Booking {booking.Id}: Invoice_Date={booking.Invoice_Date}, TimeDiff={timeDiff.TotalHours:F2} hours");
-
-                    // Check if appointment is over 1 hour past current time
-                    if (booking.Invoice_Date <= DateTime.Now.AddHours(-1))
+                    if (booking.Invoice_Date <= sqlServerTime.AddHours(-1))
                     {
-                        // Update status to "cancelled"
-                        booking.Order_Status = 2;
+                        booking.Order_Status = 3;
 
-                        // Add log to Notes
-                        var cancelLog = $"\n[AUTO CANCELLED] {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}: Automatically cancelled due to 1 hour past appointment time without confirmation";
-                        string newNotes = (booking.Notes ?? "") + cancelLog;
+                        var cancelLog = $"\n[AUTO CANCELLED] {sqlServerTime:dd/MM/yyyy HH:mm}: Automatically cancelled due to 1 hour past appointment time without confirmation";
 
-                        // Truncate notes if too long (200 characters)
-                        if (newNotes.Length > 200)
-                        {
-                            newNotes = newNotes.Substring(0, 200);
-                        }
+                        // ✅ NO LIMITS: Append notes without any truncation
+                        booking.Notes = (booking.Notes ?? "") + cancelLog;
 
-                        booking.Notes = newNotes;
-
-                        // Update to database
                         bool updateSuccess = InvoiceRepository.Instance.Update(booking);
 
                         if (updateSuccess)
                         {
                             cancelledCount++;
-                            System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Successfully cancelled booking ID: {booking.Id}");
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Failed to cancel booking ID: {booking.Id}");
+                            Debug.WriteLine($"[AUTO-CANCEL] Successfully cancelled booking ID: {booking.Id}");
                         }
                     }
                 }
 
-                System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Completed. Cancelled {cancelledCount} bookings");
+                Debug.WriteLine($"[AUTO-CANCEL] Completed. Cancelled {cancelledCount} bookings");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Error: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"[AUTO-CANCEL] Stack trace: {ex.StackTrace}");
+                Debug.WriteLine($"[AUTO-CANCEL] Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetServerTime()
+        {
+            try
+            {
+                var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
+
+                return Json(new
+                {
+                    success = true,
+                    serverTime = sqlServerTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    displayTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm:ss"),
+                    timestamp = ((DateTimeOffset)sqlServerTime).ToUnixTimeSeconds()
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message,
+                    serverTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss") // Fallback
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -544,7 +517,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = "Register Error. Try again";
+                ViewBag.ErrorMessage =  "Register Error. Try again";
                 return View("Register");
             }
         }

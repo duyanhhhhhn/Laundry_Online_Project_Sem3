@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "Payment Failed";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    // Check if user is admin or client
+    var customer = Session["customer"] as Laundry_Online_Web_FE.Models.ModelViews.CustomerView;
+    var employee = Session["employee"] as Laundry_Online_Web_FE.Models.ModelViews.EmployeeView;
+    bool isAdmin = employee != null;
+    bool isClient = customer != null;
+
+    // Set appropriate layout
+    if (isAdmin)
+    {
+        Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    }
+    else if (isClient)
+    {
+        Layout = "~/Views/Shared/_LayoutClient.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutClient.cshtml";
+    }
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="container py-5" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <!-- Failed Icon -->
+                    <div class="mb-4">
+                        <div class="failed-icon mx-auto">
+                            <i class="fas fa-times-circle text-danger" style="font-size: 5rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Failed Message -->
+                    <h2 class="text-danger mb-3">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Payment Failed!
+                    </h2>
+
+                    <h4 class="text-danger mb-4">Thanh toán thất bại!</h4>
+
+                    <!-- Dynamic Error Message -->
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger border-0 mb-4">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning border-0 mb-4">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Your payment could not be processed. Please try again or contact support.
+                        </div>
+                    }
+
+                    <!-- Payment Details -->
+                    <div class="payment-details mb-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="bg-light p-3 rounded mb-3">
+                                    <p class="mb-2">
+                                        <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                                        <strong>Attempted Date:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-user text-primary mr-2"></i>
+                                        <strong>Customer:</strong>
+                                        @if (isClient)
+                                        {
+                                            <span>@customer.FirstName @customer.LastName</span>
+                                        }
+                                        else if (isAdmin)
+                                        {
+                                            <span>@employee.FirstName @employee.LastName</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Guest Payment</span>
+                                        }
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-times-circle text-danger mr-2"></i>
+                                        <strong>Status:</strong> <span class="text-danger">Failed</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting Tips -->
+                    <div class="troubleshooting mb-4">
+                        <h5 class="text-dark mb-3">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            What went wrong?
+                        </h5>
+                        <div class="text-left">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-muted mr-2"></i>
+                                    Check your payment information
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-muted mr-2"></i>
+                                    Verify your account balance
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-muted mr-2"></i>
+                                    Check internet connection
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-muted mr-2"></i>
+                                    Try a different payment method
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        @if (isAdmin)
+                        {
+                            <a href="@Url.Action("Index", "Invoice")" class="btn btn-danger btn-lg mr-3">
+                                <i class="fas fa-redo mr-2"></i>
+                                Try Again
+                            </a>
+                        }
+                        else if (isClient)
+                        {
+                            <a href="@Url.Action("CustomerDetail", "Home",new { id = customer.Id })" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-box mr-2"></i>
+                                My Packages
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg mr-3">
+                                <i class="fas fa-home mr-2"></i>
+                                Go Home
+                            </a>
+                            <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Login
+                            </a>
+                        }
+                    </div>
+
+                    <!-- Support Contact -->
+                    <div class="mt-4 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-headset mr-1"></i>
+                            Need help? Contact our support team at
+                            <a href="mailto:support@laundryonline.com" class="text-primary">support@laundryonline.com</a>
+                            or call <a href="tel:+841234567890" class="text-primary">+84 123 456 7890</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .failed-icon {
+        animation: shake 0.8s infinite;
+    }
+
+    @@keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+
+    .card {
+        border-radius: 15px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .btn-lg {
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+
+    .payment-details {
+        font-size: 0.95rem;
+    }
+
+    .bg-light {
+        background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%) !important;
+        border: 1px solid #dee2e6;
+    }
+
+    .troubleshooting {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #ffeaa7;
+    }
+
+        .troubleshooting ul li {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+</style>

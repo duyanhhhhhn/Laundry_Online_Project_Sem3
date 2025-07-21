@@ -77,7 +77,31 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error retrieving invoice items with order status: " + ex.Message);
             }
         }
-
+        public List<InvoiceItemView> GetInvoiceItemsByInvoiceId(int invoiceId)
+        {
+            try
+            {
+                return _context.InvoiceItems
+                    .Where(ii => ii.invoice_id == invoiceId)
+                    .Select(item => new InvoiceItemView
+                    {
+                        Id = item.item_id,
+                        InvoiceId = item.invoice_id,
+                        ItemName = item.item_name,
+                        Quantity = item.quantity,
+                        UnitPrice = item.unit_price,
+                        SubTotal = item.sub_total,
+                        BarCode = item.barcode,
+                        ItemStatus = item.item_status ?? 0,
+                        ServiceId = item.s_id ?? 0
+                    })
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving invoice items by invoice ID: " + ex.Message);
+            }
+        }
         public InvoiceItemView GetInvoiceItemById(int id)
         {
             try
@@ -110,6 +134,13 @@ namespace Laundry_Online_Web_FE.Models.Repositories
         {
             try
             {
+                var service = ServiceRepository.Instance.GetById(model.ServiceId);
+                if (service == null)
+                    throw new Exception("Service not found.");
+
+                // Gọi helper để sinh barcode TRƯỚC khi tạo entity
+                BarcodeGeneratorHelper.GenerateBarcodesForItem(model, service);
+
                 var newItem = new InvoiceItem
                 {
                     invoice_id = model.InvoiceId,
@@ -117,18 +148,53 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                     quantity = model.Quantity,
                     unit_price = model.UnitPrice,
                     sub_total = model.SubTotal,
-                    barcode = model.BarCode,
+                    barcode = model.BarCode, // Barcode đã được generate trong helper
                     item_status = model.ItemStatus,
                     s_id = model.ServiceId
                 };
+
                 _context.InvoiceItems.Add(newItem);
                 _context.SaveChanges();
+
+                // Update the model with the generated ID
+                model.Id = newItem.item_id; // Assuming 'id' is the primary key property
+
                 return true;
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi nếu cần
                 throw new Exception("Error adding invoice item: " + ex.Message);
+            }
+        }
+
+        // Add this method to get the latest item (needed for controller)
+        public InvoiceItemView GetLatestItemByInvoiceId(int invoiceId)
+        {
+            try
+            {
+                var item = _context.InvoiceItems
+                    .Where(i => i.invoice_id == invoiceId)
+                    .OrderByDescending(i => i.item_id)
+                    .FirstOrDefault();
+
+                if (item == null) return null;
+
+                return new InvoiceItemView
+                {
+                    Id = item.item_id,
+                    InvoiceId = item.invoice_id,
+                    ItemName = item.item_name,
+                    Quantity = item.quantity,
+                    UnitPrice = item.unit_price,
+                    SubTotal = item.sub_total,
+                    BarCode = item.barcode,
+                    ItemStatus = (int)item.item_status,
+                    ServiceId = (int)item.s_id
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error getting latest item: " + ex.Message);
             }
         }
         public bool UpdateInvoiceItem(InvoiceItemView model)
@@ -164,6 +230,28 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 var item = _context.InvoiceItems.FirstOrDefault(ii => ii.item_id == id);
                 if (item != null)
                 {
+                    // THÊM: Xóa barcode files trước khi xóa item
+                    if (!string.IsNullOrEmpty(item.barcode))
+                    {
+                        var barcodes = item.barcode.Split('|');
+                        foreach (var barcode in barcodes)
+                        {
+                            try
+                            {
+                                var filePath = HttpContext.Current.Server.MapPath($"~/Content/Barcodes/{barcode}.png");
+                                if (System.IO.File.Exists(filePath))
+                                {
+                                    System.IO.File.Delete(filePath);
+                                }
+                            }
+                            catch (Exception fileEx)
+                            {
+                                // Log lỗi nhưng không throw để không block việc xóa item
+                                System.Diagnostics.Debug.WriteLine($"Failed to delete barcode file: {fileEx.Message}");
+                            }
+                        }
+                    }
+
                     _context.InvoiceItems.Remove(item);
                     _context.SaveChanges();
                     return true;
@@ -172,7 +260,6 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi nếu cần
                 throw new Exception("Error deleting invoice item: " + ex.Message);
             }
         }
@@ -227,5 +314,19 @@ namespace Laundry_Online_Web_FE.Models.Repositories
                 throw new Exception("Error retrieving items by invoice ID: " + ex.Message);
             }
         }
+        public bool AddItem(InvoiceItem entity)
+        {
+            try
+            {
+                _context.InvoiceItems.Add(entity);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding invoice item: " + ex.Message);
+            }
+        }
+
     }
 }

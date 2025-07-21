@@ -29,6 +29,51 @@
                 </div>
             }
 
+            <!-- THÊM: Thông báo quy tắc chỉnh sửa -->
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>Booking Rules:</strong>
+                <ul class="mb-0 mt-2">
+                    <li><strong>New bookings:</strong> Must be scheduled at least <strong>2 hours</strong> in advance</li>
+                    <li><strong>Edit bookings:</strong> Can only be modified up to <strong>12 hours</strong> before appointment time</li>
+                    <li><strong>Auto-cancellation:</strong> Pending bookings will be automatically cancelled <strong>1 hour</strong> after appointment time if not confirmed</li>
+                </ul>
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <!-- Booking Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5><i class="fas fa-chart-bar"></i> Booking Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <h4 class="text-warning">@Model.Count(b => b.Order_Status == 0)</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-info">@Model.Count(b => b.Order_Status == 1)</h4>
+                                    <small class="text-muted">Confirmed</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-success">@Model.Count(b => b.Order_Status == 2)</h4>
+                                    <small class="text-muted">Paid</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-danger">@Model.Count(b => b.Order_Status == 3)</h4>
+                                    <small class="text-muted">Cancelled</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if (Model.Count > 0)
             {
                 <div class="table-responsive">
@@ -54,47 +99,71 @@
                                         @{
                                             string statusText = "";
                                             string statusClass = "";
+                                            string statusIcon = "";
                                             switch (booking.Order_Status)
                                             {
                                                 case 0:
                                                     statusText = "Pending";
                                                     statusClass = "warning";
+                                                    statusIcon = "fa-hourglass-half";
                                                     break;
                                                 case 1:
                                                     statusText = "Confirmed";
-                                                    statusClass = "success";
+                                                    statusClass = "info";
+                                                    statusIcon = "fa-check-circle";
                                                     break;
                                                 case 2:
+                                                    statusText = "Paid";
+                                                    statusClass = "success";
+                                                    statusIcon = "fa-money-bill-wave";
+                                                    break;
+                                                case 3:
                                                     statusText = "Cancelled";
                                                     statusClass = "danger";
+                                                    statusIcon = "fa-times-circle";
                                                     break;
                                                 default:
                                                     statusText = "Unknown";
                                                     statusClass = "secondary";
+                                                    statusIcon = "fa-question-circle";
                                                     break;
                                             }
                                         }
                                         <span class="badge badge-@statusClass">
+                                            <i class="fas @statusIcon"></i>
                                             @statusText
                                         </span>
                                     </td>
-                                    <td>
+                                    <td class="notes-cell">
                                         @if (!string.IsNullOrEmpty(booking.Notes))
                                         {
-                                            <span title="@booking.Notes">
-                                                @(booking.Notes.Length > 50 ? booking.Notes.Substring(0, 50) + "..." : booking.Notes)
-                                            </span>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-info notes-btn"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Click to view notes and history"
+                                                    onclick="showNotesModal(@booking.Id, '@Html.Raw(HttpUtility.JavaScriptStringEncode(booking.Notes))')">
+                                                <i class="fas fa-sticky-note"></i>
+                                            </button>
                                         }
                                         else
                                         {
-                                            <em class="text-muted">No notes</em>
+                                            <span class="text-muted">
+                                                <i class="fas fa-file-alt"></i>
+                                            </span>
                                         }
                                     </td>
                                     <td>
+                                        @if (booking.Payment_Type == 2 && booking.Order_Status == 1 && string.IsNullOrEmpty(booking.Payment_Id))
+                                        {
+                                            <a href="@Url.Action("PayInvoice","Checkout", new { invoiceId = booking.Id })" class="btn btn-success btn-sm" title="Process Payment">
+                                                <i class="fas fa-credit-card"></i>
+                                            </a>
+                                        }
                                         @if (ViewBag.CanEdit(booking))
                                         {
                                             <a href="@Url.Action("EditBooking", "Home", new { id = booking.Id })"
-                                               class="btn btn-sm btn-primary">
+                                               class="btn btn-sm btn-primary" title="Edit booking (available until 12 hours before appointment)">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
                                         }
@@ -103,15 +172,19 @@
                                             <span class="text-muted">
                                                 @if (booking.Order_Status == 1)
                                                 {
-                                                    <em>Confirmed</em>
+                                                    <i class="fas fa-check-circle text-info"></i> <em>Confirmed</em>
                                                 }
                                                 else if (booking.Order_Status == 2)
                                                 {
-                                                    <em>Cancelled</em>
+                                                    <i class="fas fa-money-bill-wave text-success"></i> <em>Paid</em>
+                                                }
+                                                else if (booking.Order_Status == 3)
+                                                {
+                                                    <i class="fas fa-times-circle text-danger"></i> <em>Cancelled</em>
                                                 }
                                                 else
                                                 {
-                                                    <em>Cannot edit</em>
+                                                    <i class="fas fa-clock text-muted"></i> <em>Cannot edit (less than 12h remaining)</em>
                                                 }
                                             </span>
                                         }
@@ -136,13 +209,263 @@
                 <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
                     <i class="fas fa-home"></i> Back to Home
                 </a>
-                <a href="@Url.Action("BookService", "Home")" class="btn btn-primary">
+                <a href="@Url.Action("BookService", "Home")" class="btn btn-primary" title="New bookings must be at least 2 hours in advance">
                     <i class="fas fa-calendar-plus"></i> Book New Service
                 </a>
             </div>
         </div>
     </div>
+
+    <!-- ✅ FIXED: Notes Detail Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notesModalLabel">
+                        <i class="fas fa-sticky-note"></i> Booking Notes & History
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="notesContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- ✅ FIXED: Single consolidated script -->
+<script>
+    $(document).ready(function () {
+        console.log('MyBookings page loaded');
+
+        // ✅ Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // ✅ FIXED: Modal close event handlers
+        $('#notesModal').on('hidden.bs.modal', function () {
+            console.log('Modal closed');
+            $('#notesContent').empty();
+        });
+
+        // ✅ FIXED: Multiple ways to close modal
+        $(document).on('click', '[data-dismiss="modal"]', function (e) {
+            console.log('Close button clicked');
+            $('#notesModal').modal('hide');
+        });
+
+        // ✅ ESC key to close modal
+        $(document).on('keydown', function (e) {
+            if (e.keyCode === 27 && $('#notesModal').hasClass('show')) {
+                console.log('ESC pressed');
+                $('#notesModal').modal('hide');
+            }
+        });
+
+        // ✅ Click outside modal to close
+        $('#notesModal').on('click', function (e) {
+            if (e.target === this) {
+                console.log('Clicked outside modal');
+                $(this).modal('hide');
+            }
+        });
+    });
+
+    // ✅ FIXED: Main function to show modal
+    function showNotesModal(bookingId, notes) {
+        try {
+            console.log('showNotesModal called with:', { bookingId, notes });
+
+            // Update modal title
+            document.getElementById('notesModalLabel').innerHTML =
+                '<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Notes & History';
+
+            // Handle empty notes
+            if (!notes || notes.trim() === '') {
+                document.getElementById('notesContent').innerHTML =
+                    '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes available for this booking.</div>';
+            } else {
+                // Parse and format notes
+                const formattedNotes = parseAndFormatNotes(notes);
+                document.getElementById('notesContent').innerHTML = formattedNotes;
+            }
+
+            // ✅ Show modal
+            $('#notesModal').modal('show');
+
+        } catch (error) {
+            console.error('Error in showNotesModal:', error);
+            alert('Error displaying notes: ' + error.message);
+        }
+    }
+
+    // ✅ Close modal function
+    function closeModal() {
+        $('#notesModal').modal('hide');
+    }
+
+    function parseAndFormatNotes(notes) {
+        try {
+            const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
+            const userNotes = [];
+            const systemLogs = [];
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+
+                if (trimmedLine.startsWith('[') && trimmedLine.includes(']')) {
+                    const logEntry = parseSystemLogEntry(trimmedLine);
+                    if (logEntry) {
+                        systemLogs.push(logEntry);
+                    }
+                } else if (trimmedLine !== '') {
+                    userNotes.push(trimmedLine);
+                }
+            });
+
+            let html = '';
+
+            // Display user notes
+            if (userNotes.length > 0) {
+                html += '<div class="notes-section mb-4">';
+                html += '<h6><i class="fas fa-user-edit text-primary"></i> Your Notes:</h6>';
+                html += '<div class="user-notes-container">';
+                userNotes.forEach(note => {
+                    html += '<div class="user-note-item"><i class="fas fa-quote-left"></i> ' + escapeHtml(note) + '</div>';
+                });
+                html += '</div></div>';
+            }
+
+            // Display system logs
+            if (systemLogs.length > 0) {
+                html += '<div class="notes-section">';
+                html += '<h6><i class="fas fa-history text-info"></i> Booking History:</h6>';
+                html += '<div class="timeline">';
+
+                // Sort logs by date (newest first)
+                systemLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                systemLogs.forEach((log, index) => {
+                    const iconClass = getLogIcon(log.action);
+                    const colorClass = getLogColor(log.action);
+
+                    html += '<div class="timeline-item">';
+                    html += '<div class="timeline-marker ' + colorClass + '">';
+                    html += '<i class="fas ' + iconClass + '"></i>';
+                    html += '</div>';
+                    html += '<div class="timeline-content">';
+                    html += '<div class="timeline-header">';
+                    html += '<span class="timeline-title">' + getFriendlyActionName(log.action) + '</span>';
+                    html += '<span class="timeline-date">' + formatDate(log.date) + '</span>';
+                    html += '</div>';
+                    if (log.message && log.message !== '') {
+                        html += '<div class="timeline-message">' + escapeHtml(log.message) + '</div>';
+                    }
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            }
+
+            if (html === '') {
+                html = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No notes or history available.</div>';
+            }
+
+            return html;
+        } catch (error) {
+            console.error('Error parsing notes:', error);
+            return '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Error displaying notes.</div>';
+        }
+    }
+
+    function parseSystemLogEntry(logLine) {
+        try {
+            const regex = /\[([^\]]+)\]\s*(\d{2}\/\d{2}\/\d{4}\s*\d{2}:\d{2}):\s*(.+)/;
+            const match = logLine.match(regex);
+
+            if (match) {
+                return {
+                    action: match[1].trim(),
+                    date: match[2].trim(),
+                    message: match[3].trim()
+                };
+            }
+        } catch (error) {
+            console.error('Error parsing log entry:', error);
+        }
+        return null;
+    }
+
+    function getFriendlyActionName(action) {
+        const actionMap = {
+            'CREATED': 'Booking Created',
+            'UPDATED': 'Booking Updated',
+            'AUTO-CANCELLED': 'Auto-Cancelled',
+            'AUTO CANCELLED': 'Auto-Cancelled',
+            'ADMIN UPDATE': 'Staff Update'
+        };
+        return actionMap[action.toUpperCase()] || action.replace(/-/g, ' ');
+    }
+
+    function getLogIcon(action) {
+        const iconMap = {
+            'CREATED': 'fa-plus-circle',
+            'UPDATED': 'fa-edit',
+            'AUTO-CANCELLED': 'fa-times-circle',
+            'AUTO CANCELLED': 'fa-times-circle',
+            'ADMIN UPDATE': 'fa-user-cog'
+        };
+        return iconMap[action.toUpperCase()] || 'fa-info-circle';
+    }
+
+    function getLogColor(action) {
+        const colorMap = {
+            'CREATED': 'text-success',
+            'UPDATED': 'text-warning',
+            'AUTO-CANCELLED': 'text-danger',
+            'AUTO CANCELLED': 'text-danger',
+            'ADMIN UPDATE': 'text-info'
+        };
+        return colorMap[action.toUpperCase()] || 'text-secondary';
+    }
+
+    function formatDate(dateStr) {
+        try {
+            const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);
+            if (parts) {
+                const [, day, month, year, hour, minute] = parts;
+                const date = new Date(`${year}-${month}-${day}T${hour}:${minute}`);
+
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            }
+            return dateStr;
+        } catch (e) {
+            console.error('Error formatting date:', e);
+            return dateStr;
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
 
 <style>
     .table {
@@ -169,4 +492,210 @@
     .table-hover tbody tr:hover {
         background-color: rgba(0,123,255,0.1);
     }
+
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .alert-info ul {
+        padding-left: 1.2rem;
+    }
+
+    .alert-info li {
+        margin-bottom: 0.25rem;
+    }
+
+    /* ✅ UPDATED NOTES STYLES - Simple button only */
+    .notes-cell {
+        text-align: center;
+        width: 80px;
+    }
+
+    .notes-btn {
+        width: 36px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        padding: 0;
+    }
+
+        .notes-btn:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s;
+        }
+
+    /* Modal Notes Styles */
+    .notes-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 4px solid #007bff;
+    }
+
+    .user-notes-container {
+        margin-top: 10px;
+    }
+
+    .user-note-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 8px;
+        font-style: italic;
+        color: #495057;
+    }
+
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+    }
+
+        .timeline-marker.text-success {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .timeline-marker.text-warning {
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        .timeline-marker.text-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .timeline-marker.text-info {
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
+
+    .timeline-content {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 12px;
+        margin-left: 10px;
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #6c757d;
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .timeline-message {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    /* Tooltip Styles */
+    .tooltip-inner {
+        max-width: 300px;
+        text-align: left;
+        font-size: 0.875rem;
+        white-space: pre-line;
+    }
+
+    /* ✅ FIXED: Enhanced modal styles */
+    .modal {
+        outline: none;
+    }
+
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    .modal {
+        z-index: 1050;
+    }
+
+    .close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+        .close:hover {
+            opacity: 0.75;
+        }
+
+        .close:focus {
+            outline: none;
+            opacity: 1;
+        }
 </style>

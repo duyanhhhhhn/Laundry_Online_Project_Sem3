@@ -11,7 +11,7 @@ using Laundry_Online_Web_FE.Models.Repositories;
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
 {
-    
+    [RoutePrefix("Admin/package")]
     public class PackageController : Controller
     {
         private readonly PackageRepository _packageRepository;
@@ -21,6 +21,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             _packageRepository = PackageRepository.Instance;
         }
         // GET: Package
+        [Route("")]
         public ActionResult Index()
         {
             HashSet<PackageView> packageSet = new HashSet<PackageView>();
@@ -45,7 +46,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View(package);
         }
-        [Route("Admin/Package/AdminDetail")]
+        [Route("AdminDetail")]
         public ActionResult AdminDetail(int id)
         {
             var package = PackageRepository.Instance.GetById(id);
@@ -56,6 +57,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
             return View(package);
         }
+        [Route("Create")]
         // GET: Package/Create
         public ActionResult Create()
         {
@@ -132,6 +134,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
 
         // GET: Package/Edit/5
+        [Route("Edit")]
+
+
         public ActionResult Edit(int id)
         {
             var package = PackageRepository.Instance.GetById(id);

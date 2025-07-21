@@ -101,16 +101,16 @@ namespace Laundry_Online_Web_FE
     //    // Thêm các url hợp lệ nếu cần
     //};
 
-    //            if (role == 0) // Là nhân viên thường
-    //            {
-    //                if (!allowedForEmployee.Contains(currentPath))
-    //                {
-    //                    context.Response.RedirectToRoute(new { controller = "Admin", action = "AccessDenied" });
-    //                    return;
-    //                }
-    //            }
-    //        }
+                //if (role == 0) // Là nhân viên thường
+                //{
+                //    if (!allowedForEmployee.Contains(currentPath))
+                //    {
+                //        context.Response.RedirectToRoute(new { controller = "Admin", action = "AccessDenied" });
+                //        return;
+                //    }
+                //}
+            }
 
     //    }
     }
-}
+
