@@ -612,6 +612,7 @@
     <Content Include="Views\Admin\AdminList.cshtml" />
     <Content Include="Views\Home\Contact_us.cshtml" />
     <Content Include="Views\Admin\AccessDenied.cshtml" />
+    <Content Include="Views\Invoice\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />

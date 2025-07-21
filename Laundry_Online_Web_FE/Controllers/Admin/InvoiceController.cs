@@ -106,48 +106,94 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 return RedirectToAction("Index");
             }
 
+            // Get customer and employee info
             var customer = _customerRepository.GetCustomerById(invoice.Customer_Id);
             var employee = _employeeRepository.GetEmployeeById((int)invoice.Employee_Id);
+
+            // Get invoice items
+            var invoiceItems = _invoiceItemRepository.GetItemsByInvoiceId(id);
+            var services = _serviceRepository.All().ToDictionary(s => s.Id, s => s);
 
             var invoiceDetail = new InvoiceForm
             {
                 Id = invoice.Id,
                 Customer_Id = invoice.Customer_Id,
                 Employee_Id = (int)invoice.Employee_Id,
-                Customer_Name = customer != null ? $"{customer.FirstName} {customer.LastName}" : "Not Found",
-                Employee_Name = employee != null ? $"{employee.FirstName} {employee.LastName}" : "Not Found",
-                Invoice_Date = invoice.Invoice_Date,
-                Delivery_Date = (DateTime)invoice.Delivery_Date,
-                Pickup_Date = (DateTime)invoice.Pickup_Date,
 
+                // Handle null values - set to "Unknown" if null or empty
+                Customer_Name = customer != null
+                    ? (!string.IsNullOrEmpty(customer.FirstName) || !string.IsNullOrEmpty(customer.LastName)
+                        ? $"{customer.FirstName} {customer.LastName}".Trim()
+                        : "Unknown")
+                    : "Unknown",
+
+                Employee_Name = employee != null
+                    ? (!string.IsNullOrEmpty(employee.FirstName) || !string.IsNullOrEmpty(employee.LastName)
+                        ? $"{employee.FirstName} {employee.LastName}".Trim()
+                        : "Unknown")
+                    : "Unknown",
+
+                Invoice_Date = invoice.Invoice_Date,
+                Delivery_Date = invoice.Delivery_Date ?? DateTime.MinValue,
+                Pickup_Date = invoice.Pickup_Date ?? DateTime.MinValue,
                 Payment_Type = invoice.Payment_Type,
                 Order_Status = invoice.Order_Status,
                 Invoice_Type = invoice.Invoice_Type,
                 CustomerPackage_Id = invoice.CustomerPackage_Id,
                 Status = invoice.Status,
-                Notes = invoice.Notes,
+                Notes = string.IsNullOrEmpty(invoice.Notes) ? "Unknown" : invoice.Notes,
                 Ship_Cost = invoice.Ship_Cost,
                 Delivery_Status = invoice.Delivery_Status,
-                Payment_Id = invoice.Payment_Id
+                Payment_Id = string.IsNullOrEmpty(invoice.Payment_Id) ? "Unknown" : invoice.Payment_Id,
+                TotalAmountFromDb = invoice.Total_Amount,
+
+                // Load invoice items with barcode
+                InvoiceItems = invoiceItems.Select(i => new InvoiceItemForm
+                {
+                    Id = i.Id,
+                    ItemName = string.IsNullOrEmpty(i.ItemName) ? "Unknown" : i.ItemName,
+                    Quantity = (int)i.Quantity,
+                    Unit_Price = i.UnitPrice,                 
+                    Service_Id = i.ServiceId,
+                    BarCode = string.IsNullOrEmpty(i.BarCode) ? "Unknown" : i.BarCode,
+                    Service_Name = services.ContainsKey(i.ServiceId)
+                        ? (string.IsNullOrEmpty(services[i.ServiceId].Title) ? "Unknown" : services[i.ServiceId].Title)
+                        : "Unknown"
+                }).ToList()
             };
 
             return View(invoiceDetail);
         }
         [HttpGet]
         [Route("Create")]
-        // GET: Invoice/Create
         public ActionResult Create()
         {
-            var customerList = _customerRepository.GetActiveCustomer();
-            var employeeList = _employeeRepository.All();
-            var customerPackageList = _customerPackageRepository.GetAll();
+            var employeeId = Convert.ToInt32(Session["EmployeeId"]); // ví dụ lấy từ session
+            var employee = _employeeRepository.GetEmployeeById(employeeId);
 
-            ViewBag.CustomerList = customerList;
-            ViewBag.EmployeeList = employeeList;
-            ViewBag.CustomerPackageList = customerPackageList;
+            ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text
+            }).ToList();
 
-            return View();
+            ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text
+            }).ToList();
+
+            var model = new InvoiceForm
+            {
+                Employee_Id = employee.Id,
+                Employee_Name = employee.LastName + " " + employee.FirstName,
+                Pickup_Date = DateTime.Now,
+                Delivery_Date = DateTime.MinValue,
+            };
+
+            return View(model);
         }
+
 
         [HttpPost]
         [Route("Create")]
@@ -162,6 +208,11 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             string customerPackageId = Request.Form["CustomerPackage_Id"];
             string notes = Request.Form["Notes"];
             string shipCost = Request.Form["Ship_Cost"];
+            if (string.IsNullOrEmpty(customerId) || customerId == "0")
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn khách hàng.";
+                return RedirectToAction("Create");
+            }
 
             var newInvoice = new InvoiceView
             {
@@ -834,6 +885,29 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 // Log error nếu cần
                 Console.WriteLine($"Error updating invoice total: {ex.Message}");
             }
+        }
+
+        [HttpGet]
+        [Route("SearchCustomer")]
+        public ActionResult SearchCustomer(string term)
+        {
+            var customers = _customerRepository.GetAll()
+                .Where(c => c.Active == 1); // Chỉ chọn khách hàng đang hoạt động
+
+            var matched = customers
+                .Where(c =>
+                    (!string.IsNullOrEmpty(c.FirstName + " " + c.LastName) &&
+                     (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())) ||
+                    (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.Contains(term))
+                )
+                .Select(c => new
+                {
+                    Id = c.Id,
+                    Name = c.FirstName + " " + c.LastName,
+                    Phone = c.PhoneNumber
+                }).ToList();
+
+            return Json(matched, JsonRequestBehavior.AllowGet);
         }
 
 

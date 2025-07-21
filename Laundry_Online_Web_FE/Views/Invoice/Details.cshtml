@@ -1,0 +1,316 @@
+﻿@model Laundry_Online_Web_FE.Models.ModelViews.DTO.InvoiceForm
+@{
+    ViewBag.Title = "Invoice Details";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Invoice Details #@Model.Id</h2>
+                <div>
+                    <a href="@Url.Action("Edit", "Invoice", new { id = Model.Id })" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit Invoice
+                    </a>
+                    <a href="@Url.Action("Index", "Invoice")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+
+            <!-- Invoice Information Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-invoice"></i> Invoice Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Customer:</label>
+                                <p class="form-control-plaintext">@Model.Customer_Name</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Employee:</label>
+                                <p class="form-control-plaintext">@Model.Employee_Name</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Date:</label>
+                                <p class="form-control-plaintext">@Model.Invoice_Date.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Delivery Date:</label>
+                                <p class="form-control-plaintext">@Model.Delivery_Date.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Pickup Date:</label>
+                                <p class="form-control-plaintext">@Model.Pickup_Date.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Shipping Cost:</label>
+                                <p class="form-control-plaintext">@Model.Ship_Cost.ToString("0.00") VND</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Information Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Status Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Payment Type:</label>
+                                <p class="form-control-plaintext">
+                                    @switch (Model.Payment_Type)
+                                    {
+                                        case 1:<span class="badge bg-primary">Cash</span> break;
+                                        case 2: <span class="badge bg-success">Card</span> break;
+                                        case 3: <span class="badge bg-info">Transfer</span> break;
+                                        default: <span class="badge bg-secondary">Unknown</span>break;
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Invoice Type:</label>
+                                <p class="form-control-plaintext">
+                                    @switch (Model.Invoice_Type)
+                                    {
+                                        case 1:<span class="badge bg-primary">Regular</span> break;
+                                        case 2: <span class="badge bg-warning">Express</span> break;
+                                        default: <span class="badge bg-secondary">Unknown</span>break;
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Order Status:</label>
+                                <p class="form-control-plaintext">
+                                    @switch (Model.Order_Status)
+                                    {
+                                        case 1:<span class="badge bg-warning">Pending</span> break;
+                                        case 2: <span class="badge bg-success">Paid</span> break;
+                                        case 3: <span class="badge bg-danger">Cancelled</span> break;
+                                        default: <span class="badge bg-secondary">Unknown</span>break;
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Delivery Status:</label>
+                                <p class="form-control-plaintext">
+                                    @switch (Model.Delivery_Status)
+                                    {
+                                        case 1:<span class="badge bg-warning">Pending</span> break;
+                                        case 2: <span class="badge bg-info">In Progress</span> break;
+                                        case 3: <span class="badge bg-success">Delivered</span> break;
+                                        default: <span class="badge bg-secondary">Unknown</span>break;
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.CustomerPackage_Id.HasValue && Model.CustomerPackage_Id > 0)
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Customer Package:</label>
+                                    <p class="form-control-plaintext">Package ID: @Model.CustomerPackage_Id</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Notes:</label>
+                                    <div class="border rounded p-3 bg-light">
+                                        @Model.Notes
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Invoice Items Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Invoice Items</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.InvoiceItems != null && Model.InvoiceItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>Service</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Sub Total</th>
+                                        <th>Barcode</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.InvoiceItems)
+                                    {
+                                        <tr>
+                                            <td>@item.ItemName</td>
+                                            <td>
+                                                <span class="badge bg-primary">@item.Service_Name</span>
+                                            </td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.Unit_Price.ToString("0.00") VND</td>
+                                            <td class="fw-bold">@item.Sub_Total.ToString("0.00") VND</td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(item.BarCode))
+                                                {
+                                                    var barcodes = item.BarCode.Split('|');
+                                                    foreach (var code in barcodes)
+                                                    {
+                                                        <img src="@Url.Content("~/Content/Barcodes/" + code + ".png")"
+                                                             alt="@code"
+                                                             style="width:120px; height:auto; display:block; margin-bottom:5px;"
+                                                             class="border rounded" />
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No barcode</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i> No items found for this invoice.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Total Amount Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-calculator"></i> Invoice Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8"></div>
+                        <div class="col-md-4">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold">Items Total:</td>
+                                    <td class="text-end">@(Model.InvoiceItems?.Sum(i => i.Sub_Total).ToString("0.00") ?? "0.00") VND</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Shipping Cost:</td>
+                                    <td class="text-end">@Model.Ship_Cost.ToString("0.00") VND</td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td class="fw-bold fs-5">Total Amount:</td>
+                                    <td class="text-end fw-bold fs-5 text-success">@Model.TotalAmountFromDb.ToString("0.00") VND</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2 mb-4">
+                <a href="@Url.Action("Index", "Invoice")" class="btn btn-secondary px-4">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <a href="@Url.Action("Edit", "Invoice", new { id = Model.Id })" class="btn btn-warning px-4">
+                    <i class="fas fa-edit"></i> Edit Invoice
+                </a>
+                @if (Model.Order_Status == 2)
+                {
+                    <button class="btn btn-success px-4" disabled>
+                        <i class="fas fa-check-circle"></i> Paid
+                    </button>
+                }
+                else
+                {
+                    <span class="badge bg-warning fs-6 px-3 py-2">Payment Pending</span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .form-control-plaintext {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        margin-bottom: 0;
+    }
+
+    .badge {
+        font-size: 0.875em;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.075);
+    }
+
+    .border-top {
+        border-top: 2px solid #dee2e6 !important;
+    }
+</style>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
