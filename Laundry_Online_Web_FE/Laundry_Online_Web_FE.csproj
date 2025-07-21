@@ -615,6 +615,7 @@
     <Content Include="Views\Checkout\PayPackage.cshtml" />
     <Content Include="Views\Checkout\PaymentSuccess.cshtml" />
     <Content Include="Views\Checkout\PaymentFailed.cshtml" />
+    <Content Include="Views\Invoice\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutAdmin.cshtml" />

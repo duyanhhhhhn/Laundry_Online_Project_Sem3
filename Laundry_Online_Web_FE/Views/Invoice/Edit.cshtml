@@ -204,7 +204,7 @@
         </button>
         @if (isPaid != 2)
         {
-            <button type="button" class="btn btn-warning px-4" onclick="confirmPayment(@Model.Id)">
+            <button type="button" class="btn btn-warning px-4" onclick="validateBeforeConfirmPayment(@Model.Id)">
                 <i class="fas fa-check"></i> Confirm Payment
             </button>
         }
@@ -801,16 +801,10 @@ function getServiceNameById(serviceId) {
                     return false;
                 }
 
-            // Check date logic
-            //if (deliveryDate && pickupDate && pickupDate <= deliveryDate) {
-            //    showNotification('Pickup date must be after delivery date.', 'error');
-            //    return false;
-            //}
-
-            // Check required fields
+      
             const requiredFields = [
                 { name: 'Payment_Type', label: 'Payment Type', disallowZero: true },
-                { name: 'Invoice_Type', label: 'Invoice Type', disallowZero: true },
+                { name: 'Invoice_Type', label: 'Invoice Type', disallowZero: false },
                 { name: 'Delivery_Status', label: 'Delivery Status', disallowZero: false }
             ];
 
