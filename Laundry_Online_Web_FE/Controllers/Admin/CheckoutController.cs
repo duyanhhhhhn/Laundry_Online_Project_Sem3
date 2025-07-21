@@ -94,7 +94,7 @@ namespace Laundry_Online_Web_FE.Controllers
                         Service_Name = service.Title ?? "",
                         Service_Description = service?.Description ?? "",
                         Service_Price = service?.Price ?? 0,
-                        ItemUnit = service?.Unit ?? ""
+                        ItemUnit = service?.Unit ?? ""                        
                     };
                 }).ToList();
 

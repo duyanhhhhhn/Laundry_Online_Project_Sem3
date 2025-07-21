@@ -465,6 +465,18 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
 
         }
+        public bool UpdateOrderStatus(int invoiceId, int newStatus)
+        {
+          
+            {
+                var invoice = _context.Invoices.Find(invoiceId);
+                if (invoice == null)
+                    return false;
+
+                invoice.order_status = newStatus;
+                return _context.SaveChanges() > 0;
+            }
+        }
 
         // Thêm method để lấy thời gian hiện tại từ SQL Server
         public DateTime GetSqlServerDateTime()

@@ -49,7 +49,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         [Display(Name = "Total Amount")]
         public decimal Total_Amount => InvoiceItems.Sum(x => x.Sub_Total) + Ship_Cost;
         public decimal TotalAmountFromDb { get; set; }
-
+        public decimal TotalAmountInvoice { get; set; }
         public string Customer_Name { get; set; } = "";
         public string Employee_Name { get; set; } = "";
         public DateTime Invoice_Date { get; set; } = DateTime.Now;
