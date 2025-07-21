@@ -40,7 +40,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             var package = PackageRepository.Instance.GetById(id);
             if (package == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy gói.";
+                TempData["ErrorMessage"] = "Not found package.";
                 return RedirectToAction("Index");
             }
             return View(package);
@@ -137,7 +137,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             var package = PackageRepository.Instance.GetById(id);
             if (package == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy gói.";
+                TempData["ErrorMessage"] = "Not found package.";
                 return RedirectToAction("Index");
             }
             return View(package);
@@ -152,7 +152,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
                 if (existingPackage == null)
                 {
-                    ModelState.AddModelError("", "gói không tồn tại.");
+                    ModelState.AddModelError("", "The package does not exist..");
                     return View("Edit", model);
                 }
 
@@ -198,7 +198,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 {
                     Debug.WriteLine(ex.Message);
                     System.IO.File.WriteAllText(Server.MapPath("~/Content/log.txt"), ex.ToString());
-                    ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật package: " + ex.Message);
+                    ModelState.AddModelError("", "An error occurred while updating the package: " + ex.Message);
                 }
             }
             return View("Edit", model);
@@ -233,19 +233,21 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         //    return RedirectToAction("Index");
         //}
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             var result = _packageRepository.Delete(id);
             if (result)
             {
-                TempData["SuccessMessage"] = "Xóa gói dịch vụ thành công!";
+                TempData["SuccessMessage"] = "Package deleted successfully!";
             }
             else
             {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa gói dịch vụ!";
+                TempData["ErrorMessage"] = "An error occurred while deleting the package!";
             }
             return RedirectToAction("Index");
         }
+
 
     }
 }

@@ -101,6 +101,32 @@ namespace Laundry_Online_Web_FE.Models.Repositories.RepoBackup
             }
             return null; // Return null if no customer found or an error occurred
         }
+        public bool UpdateCusClient(CustomerView customer)
+        {
+            try
+            {
+                using (var en = new OnlineLaundryEntities())
+                {
+                    var existingCustomer = en.Customers.FirstOrDefault(c => c.phone_number == customer.PhoneNumber);
+                    if (existingCustomer == null)
+                    {
+                        return false; // Customer not found
+                    }
+                    existingCustomer.first_name = customer.FirstName;
+                    existingCustomer.last_name = customer.LastName;
+                    existingCustomer.password = BCrypt.Net.BCrypt.HashPassword(customer.Password); // Hash the password before saving
+                    existingCustomer.address = customer.Address;
+                    existingCustomer.registration_date = customer.RegistrationDate;
+                    en.SaveChanges();
+                    return true; // Update successful
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Update Error: " + ex.Message);
+                return false; // An error occurred
+            }
+        }
         public bool UpdateCustomer(CustomerView customer)
         {
             try

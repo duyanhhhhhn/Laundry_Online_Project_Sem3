@@ -76,9 +76,7 @@
                                                     @Html.ActionLink("Chi tiết", "Detail", new { id = item.Id }, new { @class = "btn btn-info btn-sm" })
                                                     @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-warning btn-sm" })
                                                     <button type="button"
-                                                            class="btn btn-danger btn-sm"
-                                                            data-toggle="modal"
-                                                            data-target="#deleteModal"
+                                                            class="btn btn-danger btn-sm btn-delete-package"
                                                             data-id="@item.Id">
                                                         Xóa
                                                     </button>
@@ -128,11 +126,10 @@
 @section scripts {
     <script>
         $(document).ready(function () {
-            $('#deleteModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var modal = $(this);
-                modal.find('#deletePackageId').val(id);
+            $('.btn-delete-package').click(function () {
+                var id = $(this).data('id');                  
+                $('#deletePackageId').val(id);                
+                $('#deleteModal').modal('show');              
             });
         });
     </script>

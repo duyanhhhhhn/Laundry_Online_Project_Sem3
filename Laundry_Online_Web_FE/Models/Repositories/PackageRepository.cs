@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
@@ -120,7 +121,11 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 _context.SaveChanges();
                 return true;
             }
-            catch { return false; }
+            catch (DbUpdateException ex)
+            {
+                var inner = ex.InnerException?.InnerException?.Message;
+                throw new Exception("Chi tiết lỗi: " + inner);
+            }
         }
 
         public bool Delete(int id)

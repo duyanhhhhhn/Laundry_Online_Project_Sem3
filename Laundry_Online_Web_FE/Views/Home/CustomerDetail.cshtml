@@ -3,7 +3,16 @@
     ViewBag.Title = "CustomerDetail";
     Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
+@{
+    var message = TempData["Message"] as string;
+}
 
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-warning" role="alert">
+        @message
+    </div>
+}
 @model Laundry_Online_Web_FE.Models.ModelViews.DTO.CustomerDetailModel
 @if (Model != null)
 {
@@ -16,8 +25,11 @@
                     <div class="panel-body text-center">
 
                         <div class="card mb-3 shadow-sm">
-                            <div class="card-header bg-secondary text-white">
+                            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">@Model.Customer.FirstName @Model.Customer.LastName</h5>
+                                <a href="@Url.Action("EditCustomer","Home", new { id = Model.Customer.Id })" class="btn btn-sm btn-light text-dark">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
                             </div>
                             <div class="card-body">
                                 <div class="row mb-2">
@@ -30,6 +42,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -105,32 +118,40 @@
                                     <th>Delivery Date</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach (var iv in Model.Invoices)
-                                {
-                                    <tr>
-                                        <td>@j</td>
-                                        <td>@iv.Invoice_Date.ToString("dd/MM/yyyy")</td>
-                                        <td>@iv.Pickup_Date</td>
-                                        <td>@iv.Total_Amount</td>
-                                        <td>
-                                            @foreach (var cp in Model.CustomerPackages)
-                                            {
-                                                if (cp.Id == iv.CustomerPackage_Id)
+                                <tbody>
+                                    @foreach (var iv in Model.Invoices)
+                                    {
+                                        <tr>
+                                            <td>@j</td>
+                                            <td>@iv.Invoice_Date.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @if (iv.Pickup_Date.HasValue && iv.Pickup_Date.Value != DateTime.MinValue)
                                                 {
-                                                    @cp.Package_Name
-                                                    break;
+                                                    @iv.Pickup_Date.Value.ToString("dd/MM/yyyy")
                                                 }
-                                            }
-                                        </td>
-                                        <td>@iv.Status</td>
-                                        <td>
-                                            @iv.Delivery_Date
-                                        </td>
-                                    </tr>
-                                    j++;
-                                }
-                            </tbody>
+                                            </td>
+                                            <td>@iv.Total_Amount</td>
+                                            <td>
+                                                @foreach (var cp in Model.CustomerPackages)
+                                                {
+                                                    if (cp.Id == iv.CustomerPackage_Id)
+                                                    {
+                                                        @cp.Package_Name
+                                                        break;
+                                                    }
+                                                }
+                                            </td>
+                                            <td>@iv.Status</td>
+                                            <td>
+                                                @if (iv.Delivery_Date.HasValue && iv.Delivery_Date.Value != DateTime.MinValue)
+                                                {
+                                                    @iv.Delivery_Date.Value.ToString("dd/MM/yyyy")
+                                                }
+                                            </td>
+                                        </tr>
+                                        j++;
+                                    }
+                                </tbody>
                         </table>
                     </div>
                 </div>

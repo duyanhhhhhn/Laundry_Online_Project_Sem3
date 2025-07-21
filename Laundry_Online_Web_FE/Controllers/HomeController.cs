@@ -14,7 +14,7 @@ namespace Laundry_Online_Web_FE.Controllers
 {
     public class HomeController : Controller
     {
-        
+
         public ActionResult Index()
         {
             var services = ServiceRepository.Instance.All();
@@ -482,7 +482,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            
+
             ViewBag.Message = TempData["Message"];
             return View();
         }
@@ -499,7 +499,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Index");
             }
-            
+
             return View();
         }
         [HttpPost]
@@ -527,7 +527,7 @@ namespace Laundry_Online_Web_FE.Controllers
 
                 try
                 {
-                  
+
                     var smsService = new eSmsService();
                     string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
 
@@ -551,7 +551,7 @@ namespace Laundry_Online_Web_FE.Controllers
 
         public ActionResult DetailService(int id)
         {
-            
+
             var service = ServiceRepository.Instance.GetById(id);
             if (service == null)
             {
@@ -573,7 +573,7 @@ namespace Laundry_Online_Web_FE.Controllers
         }
         public ActionResult DetailPackage(int id)
         {
-            
+
             var package = PackageRepository.Instance.GetById(id);
             if (package == null)
             {
@@ -610,13 +610,50 @@ namespace Laundry_Online_Web_FE.Controllers
         {
             if (Session["customer"] == null)
             {
-                TempData["Message"] = "Bạn cần đăng nhập để xem thông tin khách hàng.";
+                TempData["Message"] = "You need to log in to view customer information.";
                 return RedirectToAction("Login");
             }
             var customer = CustomerRepo.Instance.GetCustomerDetailById(id);
             if (customer == null)
             {
                 return HttpNotFound();
+            }
+            return View(customer);
+        }
+        public ActionResult EditCustomer(int id)
+        {
+            if (Session["customer"] == null)
+            {
+                TempData["Message"] = "You need to log in to edit customer information.";
+                return RedirectToAction("Login");
+            }
+            var customer = CustomerRepo.Instance.GetCustomerById(id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            return View(customer);
+        }
+        [HttpPost]
+        public ActionResult EditCustomer(CustomerView customer)
+        {
+            if (Session["customer"] == null)
+            {
+                TempData["Message"] = "You need to log in to edit customer information.";
+                return RedirectToAction("Login");
+            }
+            if (ModelState.IsValid)
+            {
+                var result = CustomerRepo.Instance.UpdateCusClient(customer);
+                if (result)
+                {
+                    TempData["Message"] = "Customer information updated successfully.";
+                    return RedirectToAction("CustomerDetail", new { id = customer.Id });
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Error updating customer information. Please try again.");
+                }
             }
             return View(customer);
         }

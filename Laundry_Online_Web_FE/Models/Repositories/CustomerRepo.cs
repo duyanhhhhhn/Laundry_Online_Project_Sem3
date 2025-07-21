@@ -97,5 +97,9 @@ namespace Laundry_Online_Web_FE.Models.Repositories
         {
             return CustomerDAO.Instance.GetCustomerDetail(id);
         }
+        public bool UpdateCusClient(CustomerView entity)
+        {
+            return CustomerDAO.Instance.UpdateCusClient(entity);
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
             else
             {
                 // Nếu đăng nhập không thành công, hiển thị thông báo lỗi
-                ViewBag.ErrorMessage = "Phone number or password is wrong!";
+                TempData["ErrorMessage"] = "Phone number or password is wrong!";
                 return RedirectToAction("Login","Home");
             }
         }

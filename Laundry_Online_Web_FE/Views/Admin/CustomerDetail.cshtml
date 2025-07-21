@@ -64,9 +64,6 @@
                                         <td>@cp.Value</td>
                                         <td>@cp.Unite</td>
                                         <td>
-                                            <a href="@Url.Action("", new { Id = cp.Id })">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
                                         </td>
                                     </tr>
                                     i++;
@@ -106,7 +103,12 @@
                                     <tr>
                                         <td>@j</td>
                                         <td>@iv.Invoice_Date.ToString("dd/MM/yyyy")</td>
-                                        <td>@iv.Pickup_Date</td>
+                                        <td>
+                                            @if (iv.Pickup_Date.HasValue && iv.Pickup_Date.Value != DateTime.MinValue)
+                                            {
+                                                @iv.Pickup_Date.Value.ToString("dd/MM/yyyy")
+                                            }
+                                        </td>
                                         <td>@iv.Total_Amount</td>
                                         <td>
                                             @foreach (var cp in Model.CustomerPackages)
@@ -120,7 +122,10 @@
                                         </td>
                                         <td>@iv.Status</td>
                                         <td>
-                                            @iv.Delivery_Date
+                                            @if (iv.Delivery_Date.HasValue && iv.Delivery_Date.Value != DateTime.MinValue)
+                                            {
+                                                @iv.Delivery_Date.Value.ToString("dd/MM/yyyy")
+                                            }
                                         </td>
                                         <th>
                                             <a href="@Url.RouteUrl("Admin_ItemDetail", new { invoiceId = iv.Id })">
