@@ -168,79 +168,182 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         [Route("Create")]
         public ActionResult Create()
         {
-            var employeeId = Convert.ToInt32(Session["EmployeeId"]); // ví dụ lấy từ session
-            var employee = _employeeRepository.GetEmployeeById(employeeId);
-
-            ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
+            try
             {
-                Value = x.Value,
-                Text = x.Text
-            }).ToList();
+                var employeeId = Convert.ToInt32(Session["EmployeeId"]);
+                var employee = _employeeRepository.GetEmployeeById(employeeId);
 
-            ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
+                if (employee == null)
+                {
+                    TempData["ErrorMessage"] = "Employee not found. Please log in again.";
+                    return RedirectToAction("Index");
+                }
+
+                ViewBag.PaymentTypeList = InvoiceForm.GetPaymentTypes().Select(x => new SelectListItem
+                {
+                    Value = x.Value,
+                    Text = x.Text
+                }).ToList();
+
+                ViewBag.InvoiceTypeList = InvoiceForm.GetInvoiceTypes().Select(x => new SelectListItem
+                {
+                    Value = x.Value,
+                    Text = x.Text
+                }).ToList();
+
+                var model = new InvoiceForm
+                {
+                    Employee_Id = employee.Id,
+                    Employee_Name = $"{employee.FirstName} {employee.LastName}".Trim(),
+                    Pickup_Date = DateTime.Now,
+                    Delivery_Date = DateTime.MinValue, // Default to 3 days later
+                    Ship_Cost = 0
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
             {
-                Value = x.Value,
-                Text = x.Text
-            }).ToList();
-
-            var model = new InvoiceForm
-            {
-                Employee_Id = employee.Id,
-                Employee_Name = employee.LastName + " " + employee.FirstName,
-                Pickup_Date = DateTime.Now,
-                Delivery_Date = DateTime.MinValue,
-            };
-
-            return View(model);
+                TempData["ErrorMessage"] = "An error occurred while loading the create form.";
+                return RedirectToAction("Index");
+            }
         }
 
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("Create")]
-        public ActionResult CreateInvoice()
+        public ActionResult Create(InvoiceForm model)
         {
-            string customerId = Request.Form["Customer_Id"];
-            string employeeId = Request.Form["Employee_Id"];
-            string deliveryDate = Request.Form["Delivery_Date"];
-            string pickupDate = Request.Form["Pickup_Date"];
-            string paymentType = Request.Form["Payment_Type"];
-            string invoiceType = Request.Form["Invoice_Type"];
-            string customerPackageId = Request.Form["CustomerPackage_Id"];
-            string notes = Request.Form["Notes"];
-            string shipCost = Request.Form["Ship_Cost"];
-            if (string.IsNullOrEmpty(customerId) || customerId == "0")
+            try
             {
-                TempData["ErrorMessage"] = "Vui lòng chọn khách hàng.";
+                // Validate required fields
+                if (model.Customer_Id <= 0)
+                {
+                    TempData["ErrorMessage"] = "Vui lòng chọn khách hàng.";
+                    return RedirectToAction("Create");
+                }
+
+                if (model.Employee_Id <= 0)
+                {
+                    TempData["ErrorMessage"] = "Employee information is missing.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate dates
+                if (model.Delivery_Date <= model.Pickup_Date)
+                {
+                    TempData["ErrorMessage"] = "Delivery date must be after pickup date.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate customer exists
+                var customer = _customerRepository.GetCustomerById(model.Customer_Id);
+                if (customer == null)
+                {
+                    TempData["ErrorMessage"] = "Selected customer not found.";
+                    return RedirectToAction("Create");
+                }
+
+                // Validate employee exists
+                var employee = _employeeRepository.GetEmployeeById(model.Employee_Id);
+                if (employee == null)
+                {
+                    TempData["ErrorMessage"] = "Employee not found.";
+                    return RedirectToAction("Create");
+                }
+
+                var newInvoice = new InvoiceView
+                {
+                    Customer_Id = model.Customer_Id,
+                    Employee_Id = model.Employee_Id,
+                    Invoice_Date = DateTime.Now,
+                    Delivery_Date = model.Delivery_Date,
+                    Pickup_Date = model.Pickup_Date,
+                    Total_Amount = model.Ship_Cost, // Initially only shipping cost
+                    Payment_Type = model.Payment_Type,
+                    Order_Status = 1, // Pending
+                    Invoice_Type = model.Invoice_Type,
+                    CustomerPackage_Id = model.CustomerPackage_Id == 0 ? (int?)null : model.CustomerPackage_Id,
+                    Status = 1, // Active
+                    Notes = model.Notes?.Trim() ?? "",
+                    Ship_Cost = model.Ship_Cost,
+                    Delivery_Status = 1, // Pending
+                    Payment_Id = "" // Will be set when payment is processed
+                };
+
+                bool created = _invoiceRepository.Add(newInvoice);
+
+                if (created)
+                {
+                    // Get the created invoice ID to redirect to edit page for adding items
+                    var createdInvoice = _invoiceRepository.GetAll()
+                        .OrderByDescending(i => i.Id)
+                        .FirstOrDefault(i => i.Customer_Id == model.Customer_Id &&
+                                           i.Employee_Id == model.Employee_Id);
+
+                    if (createdInvoice != null)
+                    {
+                        TempData["SuccessMessage"] = "Invoice created successfully! You can now add items to the invoice.";
+                        return RedirectToAction("Edit", new { id = createdInvoice.Id });
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "Invoice created successfully!";
+                        return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to create invoice. Please try again.";
+                    return RedirectToAction("Create");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error if you have logging
+                System.Diagnostics.Debug.WriteLine($"Error creating invoice: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                TempData["ErrorMessage"] = "An error occurred while creating the invoice. Please try again.";
                 return RedirectToAction("Create");
             }
+        }
 
-            var newInvoice = new InvoiceView
+        // Keep your existing SearchCustomer method - it looks correct
+        [HttpGet]
+        [Route("SearchCustomer")]
+        public ActionResult SearchCustomer(string term)
+        {
+            try
             {
-                Customer_Id = string.IsNullOrEmpty(customerId) ? 0 : Convert.ToInt32(customerId),
-                Employee_Id = string.IsNullOrEmpty(employeeId) ? 0 : Convert.ToInt32(employeeId),
-                Invoice_Date = DateTime.Now,
-                Delivery_Date = string.IsNullOrEmpty(deliveryDate) ? DateTime.Now.AddDays(1) : Convert.ToDateTime(deliveryDate),
-                Pickup_Date = string.IsNullOrEmpty(pickupDate) ? DateTime.Now.AddDays(3) : Convert.ToDateTime(pickupDate),
-                Total_Amount = 0, // Will be calculated based on invoice items
-                Payment_Type = string.IsNullOrEmpty(paymentType) ? 1 : Convert.ToInt32(paymentType),
-                Order_Status = 1, // Pending
-                Invoice_Type = string.IsNullOrEmpty(invoiceType) ? 1 : Convert.ToInt32(invoiceType),
-                CustomerPackage_Id = string.IsNullOrEmpty(customerPackageId) ? (int?)null : Convert.ToInt32(customerPackageId),
-                Status = 1, // Active
-                Notes = notes ?? "",
-                Ship_Cost = string.IsNullOrEmpty(shipCost) ? 0 : Convert.ToDecimal(shipCost),
-                Delivery_Status = 1, // Pending
-                Payment_Id = ""
-            };
+                if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+                {
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                }
 
-            bool created = _invoiceRepository.Add(newInvoice);
+                var customers = _customerRepository.GetAll()
+                    .Where(c => c.Active == 1) // Only active customers
+                    .Where(c =>
+                        (!string.IsNullOrEmpty(c.FirstName + " " + c.LastName) &&
+                         (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())) ||
+                        (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.Contains(term))
+                    )
+                    .Select(c => new
+                    {
+                        Id = c.Id,
+                        Name = $"{c.FirstName} {c.LastName}".Trim(),
+                        Phone = c.PhoneNumber ?? ""
+                    })
+                    .Take(10) // Limit results to prevent performance issues
+                    .ToList();
 
-            if (created)
-                TempData["SuccessMessage"] = "Invoice created successfully!";
-            else
-                TempData["ErrorMessage"] = "Failed to create invoice!";
-
-            return RedirectToAction("Index");
+                return Json(customers, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error searching customers: {ex.Message}");
+                return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+            }
         }
 
 
@@ -913,29 +1016,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-        [HttpGet]
-        [Route("SearchCustomer")]
-        public ActionResult SearchCustomer(string term)
-        {
-            var customers = _customerRepository.GetAll()
-                .Where(c => c.Active == 1); // Chỉ chọn khách hàng đang hoạt động
-
-            var matched = customers
-                .Where(c =>
-                    (!string.IsNullOrEmpty(c.FirstName + " " + c.LastName) &&
-                     (c.FirstName + " " + c.LastName).ToLower().Contains(term.ToLower())) ||
-                    (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.Contains(term))
-                )
-                .Select(c => new
-                {
-                    Id = c.Id,
-                    Name = c.FirstName + " " + c.LastName,
-                    Phone = c.PhoneNumber
-                }).ToList();
-
-            return Json(matched, JsonRequestBehavior.AllowGet);
-        }
-
+      
 
     }
 }

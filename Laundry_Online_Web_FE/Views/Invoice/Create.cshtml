@@ -13,15 +13,32 @@
 {
     @Html.AntiForgeryToken()
 
-<div class="form-group">
-    @Html.LabelFor(model => model.Customer_Id, "Customer", htmlAttributes: new { @class = "control-label col-md-2" })
-    <div class="col-md-6 position-relative">
-        @Html.TextBox("CustomerSearch", null, new { @class = "form-control", @placeholder = "Nhập tên hoặc SĐT khách hàng...", autocomplete = "off" })
-        @Html.HiddenFor(model => model.Customer_Id)
-        <div id="customer-suggestions" class="list-group"></div>
-        @Html.ValidationMessageFor(model => model.Customer_Id, "", new { @class = "text-danger" })
+    <div class="form-group">
+        <label class="control-label col-md-2">Customer *</label>
+        <div class="col-md-6 customer-search-container">
+            <input type="text"
+                   id="CustomerSearch"
+                   class="form-control search-input"
+                   placeholder="Nhập tên hoặc SĐT khách hàng..."
+                   autocomplete="off"
+                   required>
+            <input type="hidden" id="Customer_Id" name="Customer_Id" required>
+            <div id="customer-suggestions"></div>
+            <div id="customer-validation" class="text-danger" style="display: none;">
+                Vui lòng chọn khách hàng từ danh sách gợi ý
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Display selected customer info -->
+    <div class="form-group" id="selected-customer-info" style="display: none;">
+        <div class="col-md-offset-2 col-md-6">
+            <div class="alert alert-info">
+                <strong>Khách hàng đã chọn:</strong> <span id="selected-customer-name"></span><br>
+                <strong>Số điện thoại:</strong> <span id="selected-customer-phone"></span>
+            </div>
+        </div>
+    </div>
 
     <div class="form-group">
         @Html.LabelFor(model => model.Employee_Id, "Employee", htmlAttributes: new { @class = "control-label col-md-2" })
@@ -32,37 +49,42 @@
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.Delivery_Date, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor(model => model.Pickup_Date, "Pickup Date *", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-6">
-            @Html.TextBoxFor(model => model.Delivery_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+            @Html.TextBoxFor(model => model.Pickup_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+            @Html.ValidationMessageFor(model => model.Pickup_Date, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.Pickup_Date, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor(model => model.Delivery_Date, "Delivery Date *", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-6">
-            @Html.TextBoxFor(model => model.Pickup_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @Value = DateTime.Now.ToString("yyyy-MM-dd") })
+            @Html.TextBoxFor(model => model.Delivery_Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+            @Html.ValidationMessageFor(model => model.Delivery_Date, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.Invoice_Type, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor(model => model.Invoice_Type, "Invoice Type *", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-6">
-            @Html.DropDownListFor(model => model.Invoice_Type, invoiceTypes, "-- Select Invoice Type --", new { @class = "form-control" })
+            @Html.DropDownListFor(model => model.Invoice_Type, invoiceTypes, "-- Select Invoice Type --", new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.Invoice_Type, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.Payment_Type, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor(model => model.Payment_Type, "Payment Type *", htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-6">
-            @Html.DropDownListFor(model => model.Payment_Type, paymentTypes, "-- Select Payment Type --", new { @class = "form-control" })
+            @Html.DropDownListFor(model => model.Payment_Type, paymentTypes, "-- Select Payment Type --", new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.Payment_Type, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="form-group">
         @Html.LabelFor(model => model.Ship_Cost, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-6">
-            @Html.TextBoxFor(model => model.Ship_Cost, new { @class = "form-control", @type = "number", step = "0.01", min = "0" })
+            @Html.TextBoxFor(model => model.Ship_Cost, new { @class = "form-control", @type = "number", step = "0.01", min = "0", @Value = "0" })
+            @Html.ValidationMessageFor(model => model.Ship_Cost, "", new { @class = "text-danger" })
         </div>
     </div>
 
@@ -75,7 +97,8 @@
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-6">
-            <input type="submit" value="Create Invoice" class="btn btn-primary" />
+            <input type="submit" value="Create Invoice" class="btn btn-primary" id="submitBtn" />
+            <a href="@Url.Action("Index", "Invoice")" class="btn btn-default">Cancel</a>
         </div>
     </div>
 }
@@ -85,47 +108,180 @@
 
     <script>
         $(document).ready(function () {
+            let searchTimeout;
+            let selectedCustomer = null;
+
+            // Customer search functionality
             $("#CustomerSearch").on("input", function () {
-                var query = $(this).val();
+                var query = $(this).val().trim();
+                clearTimeout(searchTimeout);
+
                 if (query.length < 2) {
-                    $("#customer-suggestions").empty();
+                    $("#customer-suggestions").hide().empty();
+                    clearSelectedCustomer();
                     return;
                 }
 
-                $.getJSON('/Admin/Invoice/SearchCustomer', { term: query }, function (data) {
-                    var suggestions = $("#customer-suggestions").empty();
-                    $.each(data, function (i, customer) {
-                        suggestions.append(
-                            $('<a href="#" class="list-group-item list-group-item-action">')
-                                .text(customer.Name)
-                                .data("id", customer.Id)
-                        );
+                searchTimeout = setTimeout(function () {
+                    $.getJSON('/Admin/Invoice/SearchCustomer', { term: query }, function (data) {
+                        displaySuggestions(data);
+                    }).fail(function () {
+                        console.error("Failed to search customers");
                     });
-                });
+                }, 300);
             });
 
+            // Handle customer selection
             $(document).on("click", "#customer-suggestions a", function (e) {
                 e.preventDefault();
-                var selectedId = $(this).data("id");
-                var displayText = $(this).text();
-
-                $("#CustomerSearch").val(displayText);
-                $("#Customer_Id").val(selectedId);
-                $("#customer-suggestions").empty();
+                selectCustomer($(this));
             });
+
+            // Form validation
+            $("form").on("submit", function (e) {
+                if (!selectedCustomer || $("#Customer_Id").val() === "") {
+                    e.preventDefault();
+                    alert("Vui lòng chọn khách hàng từ danh sách gợi ý");
+                    $("#CustomerSearch").focus();
+                    return false;
+                }
+
+          
+                // Disable submit button to prevent double submission
+                $("#submitBtn").prop('disabled', true).val('Creating...');
+                return true;
+            });
+
+            // Clear search when clicking outside
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest('.customer-search-container').length) {
+                    $("#customer-suggestions").hide();
+                }
+            });
+
+            // Set default delivery date (3 days after pickup)
+            $("#Pickup_Date").on("change", function () {
+                var pickupDate = new Date($(this).val());
+                if (!isNaN(pickupDate)) {
+                    pickupDate.setDate(pickupDate.getDate() + 3);
+                    var deliveryDateStr = pickupDate.toISOString().split('T')[0];
+                    $("#Delivery_Date").val(deliveryDateStr);
+                }
+            });
+
+            function displaySuggestions(customers) {
+                var suggestions = $("#customer-suggestions");
+                suggestions.empty();
+
+                if (customers.length === 0) {
+                    suggestions.append('<div class="no-results p-2 text-muted">Không tìm thấy khách hàng</div>');
+                    suggestions.show();
+                    return;
+                }
+
+                $.each(customers, function (i, customer) {
+                    var suggestionItem = $('<a href="#" class="list-group-item list-group-item-action">')
+                        .data("id", customer.Id)
+                        .data("name", customer.Name)
+                        .data("phone", customer.Phone)
+                        .html(`
+                        <div>
+                            <strong>${customer.Name}</strong><br>
+                            <small class="text-muted">${customer.Phone}</small>
+                        </div>
+                        `);
+
+                    suggestions.append(suggestionItem);
+                });
+
+                suggestions.show();
+            }
+
+            function selectCustomer($selectedItem) {
+                var customerId = $selectedItem.data("id");
+                var customerName = $selectedItem.data("name");
+                var customerPhone = $selectedItem.data("phone");
+
+                $("#CustomerSearch").val(customerName);
+                $("#Customer_Id").val(customerId);
+
+                selectedCustomer = {
+                    id: customerId,
+                    name: customerName,
+                    phone: customerPhone
+                };
+
+                $("#customer-suggestions").hide();
+
+                // Show selected customer info
+                $("#selected-customer-name").text(customerName);
+                $("#selected-customer-phone").text(customerPhone);
+                $("#selected-customer-info").show();
+
+                // Hide validation message
+                $("#customer-validation").hide();
+            }
+
+            function clearSelectedCustomer() {
+                if (selectedCustomer) {
+                    $("#Customer_Id").val('');
+                    selectedCustomer = null;
+                    $("#selected-customer-info").hide();
+                }
+            }
         });
     </script>
 }
+
 <style>
+    .customer-search-container {
+        position: relative;
+    }
+
     #customer-suggestions {
         position: absolute;
         z-index: 1000;
         width: 100%;
         max-height: 200px;
         overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: none;
     }
 
         #customer-suggestions a {
             cursor: pointer;
+            padding: 10px 15px;
+            display: block;
+            text-decoration: none;
+            color: #333;
+            border-bottom: 1px solid #eee;
         }
+
+            #customer-suggestions a:hover {
+                background-color: #f8f9fa;
+                text-decoration: none;
+            }
+
+            #customer-suggestions a:last-child {
+                border-bottom: none;
+            }
+
+    .search-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .no-results {
+        padding: 10px 15px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .required-field::after {
+        content: " *";
+        color: red;
+    }
 </style>
