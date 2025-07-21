@@ -12,7 +12,7 @@ using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews.Payments;
 using System.Linq;
-using Laundry_Online_Web_FE.Models.ModelViews.DTO.Laundry_Online_Web_FE.Models.ModelViews;
+
 
 namespace Laundry_Online_Web_FE.Controllers
 {
@@ -113,7 +113,9 @@ namespace Laundry_Online_Web_FE.Controllers
                 CustomerPackage_Id = invoice.CustomerPackage_Id,
                 Ship_Cost = invoice.Ship_Cost,
                 Notes = invoice.Notes,
-                Order_Status = invoice.Order_Status
+                Order_Status = invoice.Order_Status,
+                TotalAmountFromDb=invoice.Total_Amount,
+
             };
 
             Session["invoice"] = model;
@@ -310,7 +312,7 @@ namespace Laundry_Online_Web_FE.Controllers
             catch (Exception ex)
             {
                 // Log error and return 0 as fallback
-                // Logger.LogError(ex, "Error calculating matching unit quantity for invoice {InvoiceId}, unit {Unit}", invoiceId, packageUnit);
+                Console.WriteLine(ex.Message);
                 return 0;
             }
         }

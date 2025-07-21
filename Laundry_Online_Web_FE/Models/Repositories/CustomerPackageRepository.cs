@@ -127,8 +127,39 @@ namespace Laundry_Online_Web_FE.Models.Repositories
             }
             catch { return false; }
         }
+
+        public List<CustomerPackageView> GetValidPackagesByCustomerId(int customerId)
+        {
+            try
+            {
+                var today = DateTime.Now;
+
+                var validPackages = _context.Customer_package
+                    .Where(cp => cp.cus_id == customerId
+                                 && cp.date_end >= today
+                                 && cp.current_value > 0)
+                    .Select(cp => new CustomerPackageView
+                    {
+                        Id = cp.cp_id,
+                        Customer_Id = cp.cus_id ?? 0,
+                        Package_Id = cp.p_id ?? 0,
+                        Date_Start = cp.date_start ?? today,
+                        Date_End = cp.date_end ?? today,
+                        Value = cp.current_value ?? 0,
+                        Payment_Id = cp.payment_id ?? ""
+                    })
+                    .ToList();
+
+                return validPackages;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetValidPackagesByCustomerId Error: " + ex.Message);
+                return new List<CustomerPackageView>();
+            }
+        }
+
+
+
     }
-
-
-
 }

@@ -199,6 +199,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 // ✅ NO LIMITS: Store notes as-is
                 invoice.notes = model.Notes;
 
+                // Ghi nhận ship cost và delivery status
                 invoice.ship_cost = model.Ship_Cost > 0 ? (decimal?)model.Ship_Cost : null;
                 invoice.delivery_status = model.Delivery_Status;
 
