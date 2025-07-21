@@ -90,14 +90,14 @@ namespace Laundry_Online_Web_FE.Models.Dao
             using (var en = new Entities.OnlineLaundryEntities())
             {
                 return en.Employees
-                         .Where(e => e.active == 1)
+    
                          .Select(e => new EmployeeView
                          {
                              Id = e.employee_id,
                              FirstName = e.first_name,
                              LastName = e.last_name,
                              Phone = e.phone_number,
-                             Role = (int)e.role,
+                             Role = e.role,
                              HireDate = (DateTime)e.hire_date,
                              Salary = (int)(e.salary ?? 0),
                              Active = (int)e.active

@@ -22,7 +22,8 @@ namespace Laundry_Online_Web_FE
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             _autoUpdateTimer = new System.Timers.Timer(5 * 60 * 1000); // 5 phút
-            _autoUpdateTimer.Elapsed += (sender, e) => {
+            _autoUpdateTimer.Elapsed += (sender, e) =>
+            {
                 try
                 {
                     InvoiceRepository.Instance.AutoUpdateExpiredOrders();
@@ -88,7 +89,12 @@ namespace Laundry_Online_Web_FE
     {
         "/admin/index",
         "/admin/dashboard",
-        "/admin/profile",
+        "/admin/AllCustomerList",
+        "/admin/CustomerActive",
+        "/admin/CustomerInAcitve",
+        "/admin/Admin_create_customer",
+        "/admin/Admin_edit_customer",
+        "/admin/CustomerDetail",
         "/admin/orders"
         // Thêm các url hợp lệ nếu cần
     };

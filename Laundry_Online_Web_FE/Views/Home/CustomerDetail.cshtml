@@ -53,7 +53,7 @@
                                         <th>Unit</th>
                                     </tr>
                                 </thead>
-                                <tbody>                                 
+                                <tbody>
                                     @foreach (var cp in Model.CustomerPackages)
                                     {
                                         <tr>
@@ -63,14 +63,11 @@
                                             </td>
                                             <td>
                                                 @cp.Package_Name
-                                                <a href="@Url.Action("AdminDetail", new { Id = cp.Package_Id })">
-                                                    <i class="bi-pencil"></i>
-                                                </a>
                                             </td>
                                             <td>@cp.Date_Start.ToString("dd/MM/yyyy")</td>
                                             <td>@cp.Date_End.ToString("dd/MM/yyyy")</td>
                                             <td>@cp.Value</td>
-                                            <td>@cp.Unite</td>                                            
+                                            <td>@cp.Unite</td>
                                         </tr>
                                         i++;
                                     }
@@ -93,7 +90,7 @@
                 <div class="h3 text-center bg-success" style="color:white">@Model.Customer.LastName's Ivoice</div>
                 <div class="card mb-4">
                     <div class="card-header">
-                        
+
                     </div>
                     <div class="card-body mt-0">
                         <table id="datatablesSimple">
