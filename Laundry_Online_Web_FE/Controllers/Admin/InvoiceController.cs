@@ -170,8 +170,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             try
             {
-                var employeeId = Convert.ToInt32(Session["EmployeeId"]);
-                var employee = _employeeRepository.GetEmployeeById(employeeId);
+                var employee = Session["employee"] as EmployeeView;
+                var admin = Session["employee"] as EmployeeView;
 
                 if (employee == null)
                 {
@@ -229,13 +229,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     return RedirectToAction("Create");
                 }
 
-                // Validate dates
-                if (model.Delivery_Date <= model.Pickup_Date)
-                {
-                    TempData["ErrorMessage"] = "Delivery date must be after pickup date.";
-                    return RedirectToAction("Create");
-                }
-
+         
                 // Validate customer exists
                 var customer = _customerRepository.GetCustomerById(model.Customer_Id);
                 if (customer == null)
