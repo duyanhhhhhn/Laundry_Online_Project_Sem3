@@ -306,7 +306,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 Text = $"Gói #{p.Package_Id} - HSD: {p.Date_End:dd/MM/yyyy} - Còn: {p.Value:N0}đ",
                 Value = p.Id.ToString()
             }).ToList();
-
+            var itemTotal = items.Sum(i => i.SubTotal);
+            var totalAmount = itemTotal + invoice.Ship_Cost;
             var viewModel = new InvoiceForm
             {
                 Id = invoice.Id,
@@ -321,7 +322,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 Order_Status = invoice.Order_Status,
                 Delivery_Status = invoice.Delivery_Status,
                 Ship_Cost = invoice.Ship_Cost,
-
+                TotalAmountInvoice = totalAmount,
                 // Fixed: Thêm các trường bị thiếu
                 Payment_Type = invoice.Payment_Type,
                 Invoice_Type = invoice.Invoice_Type,
@@ -337,6 +338,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     Unit_Price = i.UnitPrice,
                     Service_Id = i.ServiceId,
                     BarCode = i.BarCode ?? "",
+                    SubTotalItem= i.SubTotal,
                     Service_Name = services.ContainsKey(i.ServiceId) ? services[i.ServiceId].Title : "",
                 }).ToList()
             };
@@ -352,85 +354,127 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         [Route("Edit/{id:int}")]
         public ActionResult Edit(int id, InvoiceForm model)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                TempData["Error"] = "Model is invalid.";
-                return RedirectToAction("Edit", new { id });
-            }
+                // Log để debug
+                System.Diagnostics.Debug.WriteLine($"Edit Invoice - ID: {id}");
+                System.Diagnostics.Debug.WriteLine($"Model Items Count: {model.InvoiceItems?.Count ?? 0}");
 
-            var invoice = _invoiceRepository.GetById(id);
-            if (invoice == null)
-            {
-                TempData["Error"] = "Invoice not found.";
-                return RedirectToAction("Index");
-            }
-
-            // Cập nhật thông tin hóa đơn
-            invoice.Notes = model.Notes;
-            invoice.Pickup_Date = model.Pickup_Date;
-            invoice.Delivery_Date = model.Delivery_Date;
-            invoice.Delivery_Status = model.Delivery_Status;
-
-            // Cập nhật các field bị thiếu
-            invoice.Ship_Cost = model.Ship_Cost;
-
-            invoice.CustomerPackage_Id = model.CustomerPackage_Id == 0 ? (int?)null : model.CustomerPackage_Id;
-
-            // Xử lý các mục hóa đơn (InvoiceItems)
-            var existingItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
-            var updatedItemIds = new HashSet<int>();
-
-            foreach (var item in model.InvoiceItems)
-            {
-                if (item.Id > 0)
+                if (!ModelState.IsValid)
                 {
-                    var existingItem = existingItems.FirstOrDefault(i => i.Id == item.Id);
-                    if (existingItem != null)
+                    // Log lỗi validation
+                    foreach (var error in ModelState)
                     {
-                        existingItem.ItemName = item.ItemName;
-                        existingItem.Quantity = item.Quantity;
-                        existingItem.UnitPrice = item.Unit_Price;
-                        existingItem.SubTotal = item.Quantity * item.Unit_Price;
-                        existingItem.ServiceId = item.Service_Id;
-
-                        InvoiceItemRepo.Instance.UpdateInvoiceItem(existingItem);
-                        updatedItemIds.Add(existingItem.Id);
+                        System.Diagnostics.Debug.WriteLine($"ModelState Error - {error.Key}: {string.Join(", ", error.Value.Errors.Select(e => e.ErrorMessage))}");
                     }
+
+                    TempData["Error"] = "Please correct the validation errors and try again.";
+                    return RedirectToAction("Edit", new { id });
+                }
+
+                var invoice = _invoiceRepository.GetById(id);
+                if (invoice == null)
+                {
+                    TempData["Error"] = "Invoice not found.";
+                    return RedirectToAction("Index");
+                }
+
+                // Cập nhật thông tin hóa đơn cơ bản
+                invoice.Notes = model.Notes?.Trim();
+                invoice.Pickup_Date = model.Pickup_Date;
+                invoice.Delivery_Date = model.Delivery_Date;
+                invoice.Delivery_Status = model.Delivery_Status;
+                invoice.Ship_Cost = model.Ship_Cost;
+                invoice.Payment_Type = model.Payment_Type;
+                invoice.Invoice_Type = model.Invoice_Type;
+
+                // Xử lý CustomerPackage_Id
+                invoice.CustomerPackage_Id = model.CustomerPackage_Id == 0 ? (int?)null : model.CustomerPackage_Id;
+
+                // Xử lý các mục hóa đơn (InvoiceItems)
+                var existingItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
+                var processedItemIds = new HashSet<int>();
+
+                // Xử lý các items từ model
+                if (model.InvoiceItems != null && model.InvoiceItems.Count > 0)
+                {
+                    foreach (var item in model.InvoiceItems)
+                    {
+                        if (item.Id > 0) // Existing item
+                        {
+                            var existingItem = existingItems.FirstOrDefault(i => i.Id == item.Id);
+                            if (existingItem != null)
+                            {
+                                // Cập nhật item hiện có
+                                existingItem.ItemName = item.ItemName?.Trim();
+                                existingItem.Quantity = item.Quantity;
+                                existingItem.UnitPrice = item.Unit_Price;
+                                existingItem.SubTotal = item.Quantity * item.Unit_Price;
+                                existingItem.ServiceId = item.Service_Id;
+
+                                InvoiceItemRepo.Instance.UpdateInvoiceItem(existingItem);
+                                processedItemIds.Add(existingItem.Id);
+
+                                System.Diagnostics.Debug.WriteLine($"Updated existing item: {existingItem.Id} - {existingItem.ItemName}");
+                            }
+                        }
+                        else // New item (Id = 0 or negative)
+                        {
+                            // Tạo item mới
+                            var newItem = new InvoiceItem
+                            {
+                                invoice_id = id,
+                                item_name = item.ItemName?.Trim(),
+                                quantity = item.Quantity,
+                                unit_price = item.Unit_Price,
+                                sub_total = item.Quantity * item.Unit_Price,
+                                s_id = item.Service_Id,
+                                barcode = item.BarCode
+                            };
+
+                            var newItemId = InvoiceItemRepo.Instance.AddItem(newItem);
+                            System.Diagnostics.Debug.WriteLine($"Added new item: {newItemId} - {newItem.item_name}");
+                        }
+                    }
+                }
+
+                // Xóa các items không còn trong danh sách
+                var itemsToDelete = existingItems.Where(i => !processedItemIds.Contains(i.Id)).ToList();
+                foreach (var itemToDelete in itemsToDelete)
+                {
+                    InvoiceItemRepo.Instance.DeleteInvoiceItem(itemToDelete.Id);
+                    System.Diagnostics.Debug.WriteLine($"Deleted item: {itemToDelete.Id} - {itemToDelete.ItemName}");
+                }
+
+                // Tính lại tổng tiền
+                var updatedInvoiceItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
+                decimal itemsTotal = updatedInvoiceItems?.Sum(i => i.SubTotal) ?? 0;
+                invoice.Total_Amount = itemsTotal + model.Ship_Cost;
+
+                System.Diagnostics.Debug.WriteLine($"Items Total: {itemsTotal}, Ship Cost: {model.Ship_Cost}, Total Amount: {invoice.Total_Amount}");
+
+                // Lưu cập nhật invoice
+                bool updateResult = _invoiceRepository.Update(invoice);
+
+                if (updateResult)
+                {
+                    TempData["Success"] = "Invoice updated successfully.";
                 }
                 else
                 {
-                    var newItem = new InvoiceItem
-                    {
-                        invoice_id = id,
-                        item_name = item.ItemName,
-                        quantity = item.Quantity,
-                        unit_price = item.Unit_Price,
-                        sub_total = item.Quantity * item.Unit_Price,
-                        s_id = item.Service_Id,
-                        barcode = item.BarCode
-                    };
-                    InvoiceItemRepo.Instance.AddItem(newItem);
+                    TempData["Error"] = "Failed to update invoice. Please try again.";
                 }
-            }
 
-            // Xoá item nào đã bị remove khỏi form
-            foreach (var oldItem in existingItems)
+                return RedirectToAction("Edit", new { id });
+            }
+            catch (Exception ex)
             {
-                if (!updatedItemIds.Contains(oldItem.Id))
-                {
-                    InvoiceItemRepo.Instance.DeleteInvoiceItem(oldItem.Id);
-                }
+                System.Diagnostics.Debug.WriteLine($"Error updating invoice: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                TempData["Error"] = "An error occurred while updating the invoice. Please try again.";
+                return RedirectToAction("Edit", new { id });
             }
-
-            // Tính lại tổng tiền
-            var invoiceItems = InvoiceItemRepo.Instance.GetItemsByInvoiceId(id);
-            invoice.Total_Amount = invoiceItems.Sum(i => i.SubTotal) + model.Ship_Cost;
-
-
-            _invoiceRepository.Update(invoice);
-
-            TempData["Success"] = "Invoice updated successfully.";
-            return RedirectToAction("Edit", new { id });
         }
 
 
@@ -675,32 +719,14 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ConfirmPayment(int invoiceId, InvoiceForm model)
+        [Route("ConfirmPayment/{invoiceId:int}")]
+        public ActionResult ConfirmPayment(int invoiceId)
         {
-            // Thêm logging
-            System.Diagnostics.Debug.WriteLine($"ConfirmPayment called for InvoiceId: {invoiceId}");
-
-            var invoice = _invoiceRepository.GetById(invoiceId);
-            if (invoice == null)
-            {
-                System.Diagnostics.Debug.WriteLine($"Invoice not found: {invoiceId}");
-                return RedirectToAction("Index", "Invoice");
-            }
-
-            // Log trước khi update
-            System.Diagnostics.Debug.WriteLine($"Updating Invoice {invoiceId} from status {invoice.Order_Status} to 2");
-
-            invoice.Order_Status = 2;
-            invoice.Delivery_Status = model.Delivery_Status;
-            invoice.Notes = model.Notes;
-
-            bool result = _invoiceRepository.Update(invoice);
-
-            // Log kết quả
-            System.Diagnostics.Debug.WriteLine($"Update result for Invoice {invoiceId}: {result}");
-
-            return RedirectToAction("Index", "Invoice");
+            // chỉ update status
+            var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
+            return RedirectToAction("Index");
         }
+
         // Thêm các method này vào InvoiceController
 
         [HttpPost]

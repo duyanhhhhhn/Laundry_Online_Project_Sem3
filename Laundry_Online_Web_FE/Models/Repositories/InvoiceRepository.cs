@@ -447,6 +447,18 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return false;
             }
         }
+        public bool UpdateOrderStatus(int invoiceId, int newStatus)
+        {
+          
+            {
+                var invoice = _context.Invoices.Find(invoiceId);
+                if (invoice == null)
+                    return false;
+
+                invoice.order_status = newStatus;
+                return _context.SaveChanges() > 0;
+            }
+        }
 
     }
 
