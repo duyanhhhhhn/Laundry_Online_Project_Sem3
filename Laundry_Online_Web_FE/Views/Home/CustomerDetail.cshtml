@@ -141,7 +141,16 @@
                                                     }
                                                 }
                                             </td>
-                                            <td>@iv.Status</td>
+                                            <td>
+                                                @if (iv.Status == 1)
+                                                {
+                                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-x-circle-fill text-danger"></i>
+                                                }
+                                            </td>
                                             <td>
                                                 @if (iv.Delivery_Date.HasValue && iv.Delivery_Date.Value != DateTime.MinValue)
                                                 {

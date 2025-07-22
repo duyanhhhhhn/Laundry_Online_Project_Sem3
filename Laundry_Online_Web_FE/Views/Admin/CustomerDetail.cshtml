@@ -81,7 +81,7 @@
                 <div class="h4 text-center" style="color:blue">Customer's Ivoice</div>
                 <div class="card mb-4">
                     <div class="card-header">
-                        <a href="@Url.Action("createService")" class="btn btn-success m-0" style="float: right;">New Invoice</a>
+                        <a href="@Url.Action("Create","Invoice")" class="btn btn-success m-0" style="float: right;">New Invoice</a>
                     </div>
                     <div class="card-body">
                         <table id="datatablesSimple">
@@ -120,7 +120,16 @@
                                                 }
                                             }
                                         </td>
-                                        <td>@iv.Status</td>
+                                        <td>
+                                            @if (iv.Status == 1)
+                                            {
+                                                <i class="bi bi-check-circle-fill text-success"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-x-circle-fill text-danger"></i>
+                                            }
+                                        </td>
                                         <td>
                                             @if (iv.Delivery_Date.HasValue && iv.Delivery_Date.Value != DateTime.MinValue)
                                             {
