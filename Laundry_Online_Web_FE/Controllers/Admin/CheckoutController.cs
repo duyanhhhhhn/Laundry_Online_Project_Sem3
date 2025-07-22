@@ -56,19 +56,13 @@ namespace Laundry_Online_Web_FE.Controllers
                 TempData["ErrorMessage"] = "Không tìm thấy hóa đơn.";
                 return RedirectToAction("Index", "Invoice");
             }
-
+            var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
             if (employee == null)
             {
-                Session["employee"] = new EmployeeView
-                {
-                    Id = 1,
-                    FirstName = "Test",
-                    LastName = "Employee"
-                };
-                Session["employee"] = employee;
-                //TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục.";
-                //return RedirectToAction("Login", "Home");
+
+                TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục.";
+                return RedirectToAction("Login", "Home");
             }
 
             if (invoice.Order_Status == 2)
