@@ -77,7 +77,7 @@
                                 }
                                 else
                                 {
-                            <li class="level1 parent item fix-navs">No Packages available</li>
+                                    <li class="level1 parent item fix-navs">No Packages available</li>
                                 }
 
                             </ul>
@@ -97,31 +97,29 @@
                 @if (!string.IsNullOrEmpty(name))
                 {
                     <li class="nav-item booking-history-item">
-                       <a href="@(customer != null? Url.Action("CustomerDetail", new { id = customer.Id }): Url.Action("Login", "Home")
+                        <a href="@(customer != null? Url.Action("CustomerDetail", new { id = customer.Id }): Url.Action("Login", "Home")
                                 )" class="nav-link" aria-label="Account" title="Account">
-                           <span>Customer Detail</span>
+                            <span>Customer Detail</span>
                         </a>
                     </li>
                 }
                 <li>
 
                 </li>
-
                 <li class="nav-item evo-header-account ml-auto">
-                    <a
+                    <div  aria-label="Account" title="Account">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
                         @if (!string.IsNullOrEmpty(name))
                         {
-
                             <span style="margin-left: 5px; color: white;">@name</span>
-
                         }
+                    </div>
                     <ul class="account-dropdown">
                         @if (!string.IsNullOrEmpty(name))
                         {
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
                             <li>
                                 <a href="@Url.Action("Logout", "Home")" title="Logout">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -132,7 +130,6 @@
                                     Logout
                                 </a>
                             </li>
-
                         }
                         else
                         {
@@ -160,6 +157,9 @@
                         }
                     </ul>
                 </li>
+
+
+              
 
                 <li class="nav-item booking-calendar-item">
                     <a class="nav-link" href="@Url.Action("BookService","Home")" title="Book a service">
