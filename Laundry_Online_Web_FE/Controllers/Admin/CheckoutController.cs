@@ -58,6 +58,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
+            //Employee_Name = employee.LastName + " " + employee.FirstName,
             if (employee == null && customer == null)
             {
                 
@@ -95,6 +96,12 @@ namespace Laundry_Online_Web_FE.Controllers
                     }
                 }
             }
+            if (Session["employee"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+            else if (Session["customer"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml";
+            else
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml"; // mặc định
 
             var invoiceItems = _invoiceItemRepository
                 .GetItemsByInvoiceId(invoiceId)
@@ -122,7 +129,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Id = invoice.Id,
                 Customer_Name = invoice.CustomerName,
                 Customer_Id = invoice.Customer_Id,
-                Employee_Name = employee.LastName + " " + employee.FirstName,
+                
                 Employee_Id = (int)invoice.Employee_Id,
                 Delivery_Date = (DateTime)invoice.Delivery_Date,
                 Pickup_Date = (DateTime)invoice.Pickup_Date,
@@ -138,8 +145,10 @@ namespace Laundry_Online_Web_FE.Controllers
             };
             ViewBag.discountPrice = priceDiscount;
             Session["invoice"] = model;
+           
+            return View("PayInvoice", model);
 
-            return View(model);
+
         }
 
 
@@ -179,9 +188,13 @@ namespace Laundry_Online_Web_FE.Controllers
                 Customer_Phone = customer.PhoneNumber
             };
             // IMPROVEMENT: Store customer package in session for payment callback
-            Session["customerPackage"] = model;
+
+          
 
             return View(model);
+
+          
+            
         }
 
         // Callback from VNPay after payment

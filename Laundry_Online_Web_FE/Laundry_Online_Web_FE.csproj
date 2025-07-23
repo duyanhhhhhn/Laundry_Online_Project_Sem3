@@ -225,6 +225,9 @@
     <Compile Include="Models\Entities\Service.cs">
       <DependentUpon>LaundryOnlineModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
+      <DependentUpon>LaundryOnlineModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
     <Compile Include="Models\ModelViews\CustomerPackageView.cs" />
     <Compile Include="Models\ModelViews\CustomerView.cs" />
