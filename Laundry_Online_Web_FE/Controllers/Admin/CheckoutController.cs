@@ -58,9 +58,9 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
-            if (employee == null || customer == null)
+            if (employee == null && customer == null)
             {
-
+                
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục.";
                 return RedirectToAction("Login", "Home");
             }
