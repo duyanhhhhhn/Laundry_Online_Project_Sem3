@@ -27,9 +27,9 @@
                 <div class="col-md-6">
                     <strong>Customer:</strong> @Model.Customer_Name
                 </div>
-                @*<div class="col-md-6">
-                    <strong>Employee:</strong> @Model.Employee_Name
-                </div>*@
+                <div class="col-md-6">
+                        <strong>Employee:</strong> @Model.Employee_Name
+                    </div>
             </div>
 
             <div class="row mb-3">
@@ -68,6 +68,12 @@
             <div class="mb-3">
                 <strong>Shipping Cost:</strong> @Model.Ship_Cost.ToString("N0") đ
             </div>
+            @if (ViewBag.DiscountPrice != null)
+            {
+                <div class="mb-3">
+                    <strong>Discount Price:</strong> @(ViewBag.DiscountPrice.ToString("C0")) đ
+                </div>
+            }
 
             <div class="mb-3 fs-5 fw-bold">
                 <strong>Total:</strong> <span class="text-danger">@Model.TotalAmountFromDb.ToString("N0") đ</span>

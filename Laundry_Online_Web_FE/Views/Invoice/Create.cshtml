@@ -160,14 +160,14 @@
             });
 
             // Set default delivery date (3 days after pickup)
-            $("#Pickup_Date").on("change", function () {
-                var pickupDate = new Date($(this).val());
-                if (!isNaN(pickupDate)) {
-                    pickupDate.setDate(pickupDate.getDate() + 3);
-                    var deliveryDateStr = pickupDate.toISOString().split('T')[0];
-                    $("#Delivery_Date").val(deliveryDateStr);
-                }
-            });
+            //$("#Pickup_Date").on("change", function () {
+            //    var pickupDate = new Date($(this).val());
+            //    if (!isNaN(pickupDate)) {
+            //        pickupDate.setDate(pickupDate.getDate() + 3);
+            //        var deliveryDateStr = pickupDate.toISOString().split('T')[0];
+            //        $("#Delivery_Date").val(deliveryDateStr);
+            //    }
+            //});
 
             function displaySuggestions(customers) {
                 var suggestions = $("#customer-suggestions");

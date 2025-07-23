@@ -58,9 +58,9 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
-            if (employee == null)
+            if (employee == null && customer == null)
             {
-
+                
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục.";
                 return RedirectToAction("Login", "Home");
             }
@@ -69,6 +69,31 @@ namespace Laundry_Online_Web_FE.Controllers
             {
                 TempData["ErrorMessage"] = "Hóa đơn này đã được thanh toán.";
                 return RedirectToAction("Index", "Invoice", new { id = invoiceId });
+            }
+            decimal priceDiscount = 0;
+            int totalQuantityForUnit = 0;
+
+            if (invoice.CustomerPackage_Id != null && invoice.CustomerPackage_Id != 0)
+            {
+                var customerPackage = _customerPackageRepository.GetById((int)invoice.CustomerPackage_Id);
+                if (customerPackage != null)
+                {
+                    var package = _packageRepository.GetById(customerPackage.Package_Id);
+                    if (package != null)
+                    {
+                        // Tính tổng số lượng sử dụng trong hóa đơn với đơn vị phù hợp
+                        totalQuantityForUnit = CalculateQuantityForMatchingUnit(invoice.Id, package.Unit);
+
+                        int initialValue = package.Value;
+                        int usedThisInvoice = totalQuantityForUnit;
+
+                        if (initialValue > 0)
+                        {
+                            var usedRatio = (decimal)usedThisInvoice / initialValue;
+                            priceDiscount = usedRatio * package.Price;
+                        }
+                    }
+                }
             }
 
             var invoiceItems = _invoiceItemRepository
@@ -97,7 +122,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Id = invoice.Id,
                 Customer_Name = invoice.CustomerName,
                 Customer_Id = invoice.Customer_Id,
-               // Employee_Name = employee.LastName + " " + employee.FirstName,
+                Employee_Name = employee.LastName + " " + employee.FirstName,
                 Employee_Id = (int)invoice.Employee_Id,
                 Delivery_Date = (DateTime)invoice.Delivery_Date,
                 Pickup_Date = (DateTime)invoice.Pickup_Date,
@@ -108,10 +133,10 @@ namespace Laundry_Online_Web_FE.Controllers
                 Ship_Cost = invoice.Ship_Cost,
                 Notes = invoice.Notes,
                 Order_Status = invoice.Order_Status,
-                TotalAmountFromDb=invoice.Total_Amount,
+                TotalAmountFromDb=invoice.Total_Amount-priceDiscount,
 
             };
-
+            ViewBag.discountPrice = priceDiscount;
             Session["invoice"] = model;
 
             return View(model);
