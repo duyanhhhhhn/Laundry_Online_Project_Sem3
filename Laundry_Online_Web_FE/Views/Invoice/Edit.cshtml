@@ -205,17 +205,16 @@
         {
             if (Model.Payment_Type == 1 && Model.Order_Status == 1)
             {
-                <div class="d-flex justify-content-end gap-2 mt-2">
-                    @using (Html.BeginForm("ConfirmPayment", "Invoice", new { invoiceId = Model.Id }, FormMethod.Post))
-                    {
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-warning px-4">
-                            <i class="fas fa-check"></i> Confirm Payment Cash
-                        </button>
-                    }
+                <div class="d-flex justify-content-start gap-2">
+                    <button type="button"
+                            class="btn btn-warning px-4 confirm-payment-btn"
+                            data-invoice-id="@Model.Id">
+                        <i class="fas fa-check"></i> Confirm Payment Cash
+                    </button>
                 </div>
             }
-            else if(Model.Payment_Type == 2 && Model.Order_Status == 1 && string.IsNullOrEmpty(Model.Payment_Id))
+
+            else if (Model.Payment_Type == 2 && Model.Order_Status == 1 && string.IsNullOrEmpty(Model.Payment_Id))
             {
                 <div class="d-flex justify-content-end gap-2 mt-2">
                     <a href="@Url.Action("PayInvoice", "Checkout", new { invoiceId = Model.Id })" class="btn btn-success px-4">
@@ -406,7 +405,43 @@
                 return true;
             });
         });
-       
+        $(document).ready(function () {
+            $('.confirm-payment-btn').click(function (e) {
+                e.preventDefault();
+
+                const invoiceId = $(this).data('invoice-id'); // lấy từ thuộc tính HTML
+
+                $.ajax({
+                    url: '/Invoice/ConfirmPayment',
+                    type: 'POST',
+                    data: { invoiceId: invoiceId },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đã xác nhận thanh toán!'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: response.message || 'Đã xảy ra lỗi.'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Không thể kết nối máy chủ: ' + error
+                        });
+                    }
+                });
+            });
+        });
         function updateAddSubTotal() {
             const quantity = parseFloat($('#quantity').val() || 0);
             const unitPrice = parseFloat($('#unitPrice').val() || 0);
@@ -839,7 +874,7 @@ function getServiceNameById(serviceId) {
                     return false;
                 }
 
-      
+
             const requiredFields = [
                 { name: 'Payment_Type', label: 'Payment Type', disallowZero: true },
                 { name: 'Invoice_Type', label: 'Invoice Type', disallowZero: false },
@@ -908,7 +943,44 @@ function getServiceNameById(serviceId) {
                 $('body').removeClass('modal-open').css('padding-right', '');
             }, 300);
         }
+        // Add to your Edit view to display messages
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+// JavaScript to handle form submission errors
+$(document).ready(function() {
+    $('.confirm-payment-form').on('submit', function(e) {
+        const form = $(this);
+        const button = form.find('.confirm-payment-btn');
+
+        // Prevent double submission
+        if (button.prop('disabled')) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Show loading state
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+
+        // Re-enable after timeout to prevent permanent disable
+        setTimeout(function() {
+            button.prop('disabled', false).html('<i class="fas fa-check"></i> Confirm Payment Cash');
+        }, 10000);
+    });
+});
 
     </script>
 }

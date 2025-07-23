@@ -153,7 +153,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     Id = i.Id,
                     ItemName = string.IsNullOrEmpty(i.ItemName) ? "Unknown" : i.ItemName,
                     Quantity = (int)i.Quantity,
-                    Unit_Price = i.UnitPrice,                 
+                    Unit_Price = i.UnitPrice,
                     Service_Id = i.ServiceId,
                     BarCode = string.IsNullOrEmpty(i.BarCode) ? "Unknown" : i.BarCode,
                     Service_Name = services.ContainsKey(i.ServiceId)
@@ -170,8 +170,8 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         {
             try
             {
-                var employeeId = Convert.ToInt32(Session["EmployeeId"]);
-                var employee = _employeeRepository.GetEmployeeById(employeeId);
+                var employee = Session["employee"] as EmployeeView;
+                var admin = Session["employee"] as EmployeeView;
 
                 if (employee == null)
                 {
@@ -229,13 +229,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     return RedirectToAction("Create");
                 }
 
-                // Validate dates
-                if (model.Delivery_Date <= model.Pickup_Date)
-                {
-                    TempData["ErrorMessage"] = "Delivery date must be after pickup date.";
-                    return RedirectToAction("Create");
-                }
-
+         
                 // Validate customer exists
                 var customer = _customerRepository.GetCustomerById(model.Customer_Id);
                 if (customer == null)
@@ -441,7 +435,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     Unit_Price = i.UnitPrice,
                     Service_Id = i.ServiceId,
                     BarCode = i.BarCode ?? "",
-                    SubTotalItem= i.SubTotal,
+                    SubTotalItem = i.SubTotal,
                     Service_Name = services.ContainsKey(i.ServiceId) ? services[i.ServiceId].Title : "",
                 }).ToList()
             };
@@ -821,14 +815,35 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         //}
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("ConfirmPayment/{invoiceId:int}")]
         public ActionResult ConfirmPayment(int invoiceId)
         {
-            // chỉ update status
-            var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
-            return RedirectToAction("Index");
+            try
+            {
+                if (invoiceId <= 0)
+                    return Json(new { success = false, message = "Invalid invoice ID." });
+
+                var invoice = _invoiceRepository.GetById(invoiceId);
+                if (invoice == null)
+                    return Json(new { success = false, message = "Invoice not found." });
+
+                if (invoice.Order_Status != 1)
+                    return Json(new { success = false, message = "Invoice is not in a pending state." });
+
+                if (invoice.Payment_Type != 1)
+                    return Json(new { success = false, message = "Only cash payments can be confirmed via this method." });
+
+                var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
+                if (result)
+                    return Json(new { success = true });
+                else
+                    return Json(new { success = false, message = "Failed to update status." });
+            }
+            catch
+            {
+                return Json(new { success = false, message = "An error occurred during confirmation." });
+            }
         }
+
 
         // Thêm các method này vào InvoiceController
 
@@ -1016,7 +1031,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             }
         }
 
-      
+
 
     }
 }
