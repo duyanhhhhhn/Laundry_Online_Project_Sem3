@@ -9,51 +9,51 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-plus"></i> Thêm gói dịch vụ mới
+                        <i class="fas fa-plus"></i> Add new package
                     </h3>
                 </div>
                 <div class="card-body">
                     @using (Html.BeginForm("CreatePackage", "Package", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", role = "form" }))
                     {
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Tên gói</label>
+                            <label class="col-md-3 col-form-label">Package Name</label>
                             <div class="col-md-9">
-                                <input type="text" name="Package_Name" class="form-control" placeholder="Nhập tên gói dịch vụ" required />
+                                <input type="text" name="Package_Name" class="form-control" placeholder="Input Package Name" required />
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Mô tả</label>
+                            <label class="col-md-3 col-form-label">Description</label>
                             <div class="col-md-9">
-                                <textarea name="Description" class="form-control" rows="3" placeholder="Nhập mô tả gói dịch vụ"></textarea>
+                                <textarea name="Description" class="form-control" rows="3" placeholder="Input description"></textarea>
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Giá</label>
+                            <label class="col-md-3 col-form-label">Price</label>
                             <div class="col-md-9">
-                                <input type="number" name="Price" class="form-control" step="0.01" min="0" placeholder="Nhập giá" required />
+                                <input type="number" name="Price" class="form-control" step="0.01" min="0" placeholder="input price" required />
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Giá trị</label>
+                            <label class="col-md-3 col-form-label">Value</label>
                             <div class="col-md-9">
-                                <input type="number" name="Value" class="form-control" min="0" placeholder="Nhập giá trị" required />
+                                <input type="number" name="Value" class="form-control" min="0" placeholder="Input Value" required />
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Đơn vị</label>
+                            <label class="col-md-3 col-form-label">Unit</label>
                             <div class="col-md-9">
-                                <input type="text" name="Unit" class="form-control" placeholder="Nhập đơn vị (kg, lần, ...)" required />
+                                <input type="text" name="Unit" class="form-control" placeholder="Input Unit (kg, times, ...)" required />
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">Số ngày hiệu lực</label>
+                            <label class="col-md-3 col-form-label">Validity Day</label>
                             <div class="col-md-9">
-                                <input type="number" name="Validity_Day" class="form-control" min="1" placeholder="Nhập số ngày hiệu lực" required />
+                                <input type="number" name="Validity_Day" class="form-control" min="1" placeholder="Input Validity Day" required />
                             </div>
                         </div>
                         <div class="form-group row">
@@ -67,9 +67,9 @@
                         <div class="form-group row">
                             <div class="col-md-9 offset-md-3">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Lưu
+                                    <i class="fas fa-save"></i> Create Package  
                                 </button>
-                                @Html.ActionLink("Hủy", "Index", null, new { @class = "btn btn-secondary" })
+                                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
                             </div>
                         </div>
                     }
