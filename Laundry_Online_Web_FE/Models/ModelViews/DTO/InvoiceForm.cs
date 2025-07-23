@@ -64,8 +64,10 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         {
             return new List<SelectListItem>
             {
+               
                 new SelectListItem { Value = "1", Text = "Cash" },
-                new SelectListItem { Value = "2", Text = "VNPay" }
+                new SelectListItem { Value = "2", Text = "VNPay" },
+                 new SelectListItem { Value = "3", Text = "QR Code" },
             };
         }
 
