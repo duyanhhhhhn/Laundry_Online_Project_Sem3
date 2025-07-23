@@ -829,9 +829,9 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                 if (invoice.Order_Status != 1)
                     return Json(new { success = false, message = "Invoice is not in a pending state." });
 
-                if (invoice.Payment_Type != 1)
-                    return Json(new { success = false, message = "Only cash payments can be confirmed via this method." });
-
+                if (invoice.Payment_Type != 1 && invoice.Payment_Type != 3)
+                    return Json(new { success = false, message = "Only QR code and Cash payments can be confirmed via this method." });
+               
                 var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
                 if (result)
                     return Json(new { success = true });

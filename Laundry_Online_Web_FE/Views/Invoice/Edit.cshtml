@@ -213,6 +213,16 @@
                     </button>
                 </div>
             }
+            else if (Model.Payment_Type == 3 && Model.Order_Status == 1)
+            {
+                <div class="d-flex justify-content-start gap-2">
+                    <button type="button"
+                            class="btn btn-warning px-4 confirm-payment-btn"
+                            data-invoice-id="@Model.Id">
+                        <i class="fas fa-check"></i> QR Code
+                    </button>
+                </div>
+            }
 
             else if (Model.Payment_Type == 2 && Model.Order_Status == 1 && string.IsNullOrEmpty(Model.Payment_Id))
             {
@@ -579,6 +589,9 @@
                         resetAddForm();
                         updateTotals();
                         showNotification('Item added successfully with barcode!', 'success');
+                        setTimeout(() => {
+                            window.location.href = `/Invoice/Edit/${invoiceId}`;
+                        }, 800);
                     } else {
                         const errorMessage = response && response.message ? response.message : 'Failed to add item';
                         showNotification('Error: ' + errorMessage, 'error');

@@ -115,6 +115,10 @@
                                         {
                                             <span class="badge bg-primary">VNPay</span>
                                         }
+                                        else if (invoice.Payment_Type == 3)
+                                        {
+                                            <span class="badge badge-light">QR Code</span>
+                                        }
                                     </td>
                                     <td>
                                         @if (invoice.Order_Status == 0)
