@@ -517,7 +517,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage =  "Register Error. Try again";
+                ViewBag.ErrorMessage = "The phone number has already been used! Please use a different phone number to create an account!";
                 return View("Register");
             }
         }

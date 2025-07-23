@@ -87,36 +87,23 @@ namespace Laundry_Online_Web_FE
                 // Các URL mà EMPLOYEE (role = 0) được phép truy cập
                 var allowedForEmployee = new List<string>
 {
-    "/admin/index",
-    "/admin/allcustomerlist",
-    "/admin/customeractive",
-    "/admin/customerinacitve",
-    "/admin/admin_create_customer",
-    "/admin/admin_edit_customer",
-    "/admin/customerdetail",
-    "/admin/orders",
-    "/admin/invoice",
-    "/admin/servicelist",
-    "/admin/admin_create_service",
-    "/admin/admin_edit_service",
-    "/admin/packagelist",
-    "/admin/admin_create_package",
-    "/admin/admin_edit_package",
-    "/admin/blogpostlist",
-    "/admin/invoice"
+    "/admin/allEmployeelist",
+    "/admin/employeelist",
+    "/admin/adminlist",
 };
 
 
-                //if (role == 0) // Là nhân viên thường
-                //{
-                //    if (!allowedForEmployee.Contains(currentPath))
-                //    {
-                //        context.Response.RedirectToRoute(new { controller = "Admin", action = "AccessDenied" });
-                //        return;
-                //    }
-                //}
+                if (role == 0) // Là nhân viên thường
+                {
+                    if (allowedForEmployee.Contains(currentPath))
+                    {
+                        context.Response.RedirectToRoute(new { controller = "Admin", action = "AccessDenied" });
+                        return;
+                    }
+                }
             }
-        }}
+        }
+    }
 }
    
 
