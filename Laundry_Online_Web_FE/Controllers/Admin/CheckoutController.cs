@@ -188,8 +188,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Customer_Phone = customer.PhoneNumber
             };
             // IMPROVEMENT: Store customer package in session for payment callback
-
-          
+            Session["customerPackage"] = model;
 
             return View(model);
 
@@ -221,19 +220,19 @@ namespace Laundry_Online_Web_FE.Controllers
                     else
                     {
                         TempData["ErrorMessage"] = "Không tìm thấy thông tin thanh toán trong session!";
-                        return RedirectToAction("PaymentFailedAdmin");
+                        return RedirectToAction("PaymentFailed");
                     }
                 }
                 else
                 {
                     TempData["ErrorMessage"] = $"Thanh toán thất bại: {response.VnPayResponseCode}";
-                    return RedirectToAction("PaymentFailedAdmin");
+                    return RedirectToAction("PaymentFailed");
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán: " + ex.Message;
-                return RedirectToAction("PaymentFailedAdmin");
+                return RedirectToAction("PaymentFailed");
             }
         }
 
