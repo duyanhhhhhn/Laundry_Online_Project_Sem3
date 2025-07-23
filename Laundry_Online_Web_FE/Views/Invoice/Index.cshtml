@@ -105,7 +105,8 @@
                                     <td>@invoice.Invoice_Date.ToString("dd/MM/yyyy")</td>
                                     <td>@invoice.Delivery_Date.ToString("dd/MM/yyyy")</td>
                                     <td>@invoice.Pickup_Date.ToString("dd/MM/yyyy")</td>
-                                    <td>@invoice.TotalAmountFromDb.ToString("C")</td>
+                                    <td>@invoice.TotalAmountFromDb.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</td>
+
                                     <td>
                                         @if (invoice.Payment_Type == 1)
                                         {

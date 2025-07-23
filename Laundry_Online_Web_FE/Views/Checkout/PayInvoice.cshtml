@@ -1,7 +1,7 @@
 ﻿@model Laundry_Online_Web_FE.Models.ModelViews.DTO.InvoiceForm
 @{
     ViewBag.Title = "Pay Invoice";
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = ViewBag.Layout?.ToString();
 }
 
 @functions {
