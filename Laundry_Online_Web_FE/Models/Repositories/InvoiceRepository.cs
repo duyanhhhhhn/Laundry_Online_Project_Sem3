@@ -34,7 +34,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
-        // ✅ ADDED: Helper method to safely handle DateTime values
+        //  ADDED: Helper method to safely handle DateTime values
         private static DateTime? SafeDateTime(DateTime dateTime)
         {
             if (dateTime == DateTime.MinValue)
@@ -88,8 +88,11 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == id);
-                return invoice != null ? MapToView(invoice) : null;
+                using (var en = new OnlineLaundryEntities())
+                {
+                    var invoice = en.Invoices.FirstOrDefault(i => i.invoice_id == id);
+                    return invoice != null ? MapToView(invoice) : null;
+                }
             }
             catch (Exception ex)
             {
@@ -97,7 +100,25 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return null;
             }
         }
-
+        public HashSet<InvoiceView> GetByCustomerIdUsing(int customerId)
+        {
+            try
+            {
+                using (var en = new OnlineLaundryEntities())
+                {
+                    var invoices = en.Invoices
+                        .Where(i => i.customer_id == customerId)
+                        .OrderByDescending(i => i.invoice_date)
+                        .ToList();
+                    return invoices.Select(i => MapToView(i)).ToHashSet();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetByCustomerId Invoice Error: " + ex.Message);
+                return new HashSet<InvoiceView>();
+            }
+        }
         public HashSet<InvoiceView> GetByCustomerId(int customerId)
         {
             try
