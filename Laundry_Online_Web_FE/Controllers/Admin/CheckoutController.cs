@@ -141,13 +141,8 @@ namespace Laundry_Online_Web_FE.Controllers
                     };
                 }).ToList();
             var items = InvoiceItemRepo.Instance.GetItemsByInvoiceId(invoiceId);
-            var itemTotal = items.Sum(i =>
-            {
-                var service = _serviceRepository.GetById(i.ServiceId);
-                return i.SubTotal + (service?.Price ?? 0);
-            });
-
-            var totalAmount = itemTotal + invoice.Ship_Cost;
+            var itemTotal = items.Sum(i => i.SubTotal);
+            var totalAmount = itemTotal + invoice.Ship_Cost;         
             var model = new InvoiceForm
             {
                 Id = invoice.Id,
