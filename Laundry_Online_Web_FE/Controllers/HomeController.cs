@@ -36,7 +36,7 @@ namespace Laundry_Online_Web_FE.Controllers
             // Kiểm tra đăng nhập
             if (Session["customer"] == null)
             {
-                TempData["Message"] = "Bạn cần đăng nhập để đặt lịch dịch vụ.";
+                TempData["Message"] = "Please login to book service.";
                 return RedirectToAction("Login");
             }
 
