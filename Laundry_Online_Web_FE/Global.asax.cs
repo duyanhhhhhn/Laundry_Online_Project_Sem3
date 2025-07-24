@@ -87,7 +87,7 @@ namespace Laundry_Online_Web_FE
                 // Các URL mà EMPLOYEE (role = 0) được phép truy cập
                 var allowedForEmployee = new List<string>
 {
-    "/admin/allEmployeelist",
+    "/admin/allemployeelist",
     "/admin/employeelist",
     "/admin/adminlist",
 };
