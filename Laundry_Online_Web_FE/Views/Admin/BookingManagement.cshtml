@@ -42,7 +42,7 @@
                                 <input type="text"
                                        id="searchKeyword"
                                        class="form-control"
-                                       placeholder="Search by ID, customer name, phone, or notes..."
+                                       placeholder="Search by customer name, phone, or notes..."
                                        autocomplete="off">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button" onclick="performSearch()">
@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                             <small class="form-text text-muted">
-                                Search in: Booking ID, Customer Name, Phone Number, Notes, Payment ID
+                                Search in: Customer Name, Phone Number, Notes, Payment ID
                             </small>
                             <!-- Loading indicator -->
                             <div id="searchLoading" class="text-center mt-2" style="display: none;">
@@ -79,20 +79,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Search Results Info -->
-                    <div id="searchResultsInfo" class="row mt-3" style="display: none;">
-                        <div class="col-md-12">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Search Results:</strong>
-                                <span id="searchResultText"></span>
-                                <button class="btn btn-link alert-link ml-2 p-0" onclick="clearSearch()">
-                                    <i class="fas fa-arrow-left"></i> View All Bookings
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -106,7 +92,7 @@
                 <table class="table table-striped table-hover" id="bookingsTable">
                     <thead class="thead-dark">
                         <tr>
-                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-list-ol"></i> No.</th> <!-- ✅ CHANGED: ID thành No. -->
                             <th><i class="fas fa-user"></i> Customer</th>
                             <th><i class="fas fa-phone"></i> Phone</th>
                             <th><i class="fas fa-calendar"></i> Date</th>
@@ -205,60 +191,31 @@ $(document).ready(function () {
 
 // Load bookings via AJAX
 function loadBookings(keyword = '') {
-    console.log('loadBookings called with keyword:', keyword);
     showLoading(true);
-
-    // Add debug info
-    const ajaxData = { keyword: keyword };
-    console.log('AJAX data:', ajaxData);
-    console.log('AJAX URL:', '@Url.Action("SearchBookingsAjax", "Admin")');
 
     $.ajax({
         url: '@Url.Action("SearchBookingsAjax", "Admin")',
         type: 'POST',
-        data: ajaxData,
+        data: { keyword: keyword },
         dataType: 'json',
         success: function(response) {
-            console.log('AJAX Success Response:', response);
-
             if (response && response.success) {
                 allBookingsData = response.data;
                 currentSearchKeyword = keyword;
 
                 renderBookings(response.data);
                 updateSummaryCards(response.stats);
-                updateSearchInfo(keyword, response.stats.Total);
+                updateSearchControls(keyword);
                 updateServerTime(response.serverTime);
 
                 console.log(`Loaded ${response.data.length} bookings`);
             } else {
-                console.error('Response indicates failure:', response);
                 showAlert('error', response.message || 'Unknown error occurred');
             }
         },
         error: function(xhr, status, error) {
-            console.error('AJAX Error Details:', {
-                xhr: xhr,
-                status: status,
-                error: error,
-                responseText: xhr.responseText,
-                readyState: xhr.readyState,
-                statusText: xhr.statusText
-            });
-
-            let errorMessage = 'Failed to load bookings. ';
-            if (xhr.responseText) {
-                try {
-                    const errorResponse = JSON.parse(xhr.responseText);
-                    errorMessage += errorResponse.message || 'Please try again.';
-                } catch (e) {
-                    errorMessage += `Server error: ${xhr.status} ${xhr.statusText}`;
-                }
-            } else {
-                errorMessage += `Network error: ${error}`;
-            }
-
-            showAlert('error', errorMessage);
+            console.error('AJAX Error:', { xhr, status, error });
+            showAlert('error', 'Failed to load bookings. Please try again.');
         },
         complete: function() {
             showLoading(false);
@@ -285,9 +242,8 @@ function clearSearch() {
     $('.btn-group .btn').removeClass('active');
     $('#filterAll').addClass('active');
 
-    // Hide clear button and search info
+    // Hide clear button
     $('#clearBtn').hide();
-    $('#searchResultsInfo').hide();
 
     loadBookings('');
 }
@@ -308,7 +264,7 @@ function filterByStatus(status) {
     }
 }
 
-// Render bookings table
+// ✅ UPDATED: Render bookings table với số thứ tự
 function renderBookings(bookings) {
     const tbody = $('#bookingsTableBody');
     tbody.empty();
@@ -330,24 +286,22 @@ function renderBookings(bookings) {
     $('#bookingsTable').show();
     $('#noResultsMessage').hide();
 
-    bookings.forEach(booking => {
-        const highlightClass = (booking.MatchesId || booking.MatchesCustomer || booking.MatchesPhone || booking.MatchesNotes) ? 'table-warning' : '';
+    // ✅ ADD: Số thứ tự bắt đầu từ 1
+    bookings.forEach((booking, index) => {
+        const orderNumber = index + 1; // Số thứ tự
 
         const row = `
-            <tr data-booking-id="${booking.Id}" class="${highlightClass}">
+            <tr data-booking-id="${booking.Id}">
                 <td class="text-primary font-weight-bold">
-                    #${booking.Id}
-                    ${booking.MatchesId ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
+                    ${orderNumber} <!-- ✅ CHANGED: Hiển thị số thứ tự thay vì #${booking.Id} -->
                 </td>
                 <td>
                     <strong>${booking.CustomerName}</strong>
-                    ${booking.MatchesCustomer ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
                 </td>
                 <td>
                     ${booking.CustomerPhone ?
                         `<a href="tel:${booking.CustomerPhone}" class="text-decoration-none">
                             <i class="fas fa-phone text-success"></i> ${booking.CustomerPhone}
-                            ${booking.MatchesPhone ? '<i class="fas fa-search text-warning ml-1" title="Search match"></i>' : ''}
                         </a>` :
                         '<span class="text-muted">N/A</span>'
                     }
@@ -372,13 +326,12 @@ function renderBookings(bookings) {
                 <td class="notes-cell">
                     ${booking.HasNotes ?
                         `<button type="button"
-                                class="btn btn-sm btn-info notes-btn ${booking.MatchesNotes ? 'btn-warning' : ''}"
+                                class="btn btn-sm btn-info notes-btn"
                                 data-toggle="tooltip"
                                 data-placement="top"
-                                title="Click to view notes and history${booking.MatchesNotes ? ' - Contains search term' : ''}"
+                                title="Click to view notes and history"
                                 onclick="showNotesModal(${booking.Id}, '${escapeForJs(booking.Notes)}')">
                             <i class="fas fa-sticky-note"></i>
-                            ${booking.MatchesNotes ? '<i class="fas fa-search"></i>' : ''}
                         </button>` :
                         '<span class="text-muted"><i class="fas fa-file-alt"></i></span>'
                     }
@@ -453,7 +406,7 @@ function renderActionButtons(booking) {
 // Update summary cards
 function updateSummaryCards(stats) {
     const summaryHtml = `
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center border-primary">
                 <div class="card-body">
                     <h3 class="text-primary">${stats.Total}</h3>
@@ -461,7 +414,7 @@ function updateSummaryCards(stats) {
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center border-warning">
                 <div class="card-body">
                     <h3 class="text-warning">${stats.Pending}</h3>
@@ -469,7 +422,15 @@ function updateSummaryCards(stats) {
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h3 class="text-success">${stats.Confirmed}</h3>
+                    <p class="card-text">Confirmed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="card text-center border-danger">
                 <div class="card-body">
                     <h3 class="text-danger">${stats.Cancelled}</h3>
@@ -482,14 +443,11 @@ function updateSummaryCards(stats) {
     $('#summaryCards').html(summaryHtml);
 }
 
-// Update search info
-function updateSearchInfo(keyword, resultCount) {
+// Update search controls
+function updateSearchControls(keyword) {
     if (keyword && keyword.trim() !== '') {
-        $('#searchResultText').text(`Found ${resultCount} booking(s) for keyword "${keyword}"`);
-        $('#searchResultsInfo').show();
         $('#clearBtn').show();
     } else {
-        $('#searchResultsInfo').hide();
         $('#clearBtn').hide();
     }
 }
@@ -571,7 +529,7 @@ function updateStatus(bookingId, newStatus) {
     }
 }
 
-// Show admin notes modal
+// Show admin notes modal (vẫn hiển thị booking ID trong modal title)
 function showNotesModal(bookingId, notes) {
     try {
         $('#adminNotesModalLabel').html('<i class="fas fa-sticky-note"></i> Booking #' + bookingId + ' - Notes & History');
@@ -640,7 +598,7 @@ function showAlert(type, message) {
     }, 5000);
 }
 
-// Notes parsing functions
+// Notes parsing functions (giữ nguyên code cũ)
 function parseAndFormatNotes(notes) {
     try {
         const lines = notes.split(/[\r\n]+/).filter(line => line.trim() !== '');
@@ -764,7 +722,7 @@ function getLogColor(action) {
 
 function formatDate(dateStr) {
     try {
-        const parts = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);
+        const parts = dateStr.match(/(\d{2})\/(\d{2}\/\d{4}\s*\d{2}:\d{2})/);
         if (parts) {
             const [, day, month, year, hour, minute] = parts;
             const date = new Date(`${year}-${month}-${day}T${hour}:${minute}`);

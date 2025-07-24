@@ -616,6 +616,39 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return false;
             }
         }
+
+        // ✅ NEW: Update order status with employee tracking using existing employee_id column
+        public bool UpdateOrderStatusWithEmployee(int invoiceId, int newStatus, string updateLog, int employeeId)
+        {
+            try
+            {
+                using (var context = new OnlineLaundryEntities())
+                {
+                    var invoice = context.Invoices.FirstOrDefault(i => i.invoice_id == invoiceId);
+                    if (invoice == null) return false;
+
+                    // Update status
+                    invoice.order_status = newStatus;
+
+                    // Update notes with employee tracking
+                    invoice.notes = (invoice.notes ?? "") + updateLog;
+
+                    // ✅ SET EMPLOYEE ID in the existing column
+                    invoice.employee_id = employeeId;
+
+                    context.SaveChanges();
+
+                    System.Diagnostics.Debug.WriteLine($"[UPDATE-STATUS-EMPLOYEE] Invoice #{invoiceId} updated to status {newStatus} by employee #{employeeId}");
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UPDATE-STATUS-EMPLOYEE] Error: {ex.Message}");
+                return false;
+            }
+        }
     }
 }
 
