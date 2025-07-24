@@ -9,6 +9,8 @@ using Laundry_Online_Web_FE.Models.Repositories;
 using Newtonsoft.Json;
 using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Entities;
+using Laundry_Online_Web_FE.Models.Dao;
+using System.Threading.Tasks;
 
 
 namespace Laundry_Online_Web_FE.Controllers.Admin
@@ -815,7 +817,7 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         //}
 
         [HttpPost]
-        public ActionResult ConfirmPayment(int invoiceId)
+        public async Task<ActionResult> ConfirmPayment(int invoiceId)
         {
             try
             {
@@ -831,19 +833,46 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
                 if (invoice.Payment_Type != 1 && invoice.Payment_Type != 3)
                     return Json(new { success = false, message = "Only QR code and Cash payments can be confirmed via this method." });
-               
+
                 var result = _invoiceRepository.UpdateOrderStatus(invoiceId, 2);
+
                 if (result)
+                {
+                    // ===============================================================
+                    // BẮT ĐẦU TÍCH HỢP GỬI SMS
+                    // ===============================================================
+                    try
+                    {
+                        // Thay đổi 2: Lấy SĐT từ đối tượng invoice đã có
+                        if (invoice != null && !string.IsNullOrEmpty(invoice.CustomerPhone))
+                        {
+                            string customerPhone = invoice.CustomerPhone;
+                            var smsService = new eSmsService();
+
+                            string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
+
+                            string smsResult = await smsService.SendAsync(customerPhone, welcomeMessage);
+
+                            System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("LOI GUI SMS XAC NHAN THANH TOAN: " + ex.Message);
+                    }
+
                     return Json(new { success = true });
+                }
                 else
+                {
                     return Json(new { success = false, message = "Failed to update status." });
+                }
             }
             catch
             {
                 return Json(new { success = false, message = "An error occurred during confirmation." });
             }
         }
-
 
         // Thêm các method này vào InvoiceController
 

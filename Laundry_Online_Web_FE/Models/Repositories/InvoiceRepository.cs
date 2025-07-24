@@ -376,7 +376,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                     var start = new DateTime(year, month, 1);
                     var end = start.AddMonths(1);
                     var total = _context.Invoices
-                        .Where(inv => inv.invoice_date >= start && inv.invoice_date < end)
+                        .Where(inv => inv.invoice_date >= start && inv.invoice_date < end && inv.order_status == 2)
                         .Sum(inv => (decimal?)inv.total_amount) ?? 0;
                     revenues.Add(Math.Floor(total));
                 }
@@ -394,7 +394,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             try
             {
                 return _context.Invoices
-                    .Where(inv => inv.invoice_date.HasValue)
+                    .Where(inv => inv.invoice_date.HasValue && inv.order_status == 2)
                     .Select(inv => inv.invoice_date.Value.Year)
                     .Distinct()
                     .OrderByDescending(y => y)
