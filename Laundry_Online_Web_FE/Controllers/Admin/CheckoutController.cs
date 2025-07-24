@@ -128,8 +128,7 @@ namespace Laundry_Online_Web_FE.Controllers
             {
                 Id = invoice.Id,
                 Customer_Name = invoice.CustomerName,
-                Customer_Id = invoice.Customer_Id,
-                
+                Customer_Id = invoice.Customer_Id,              
                 Employee_Id = (int)invoice.Employee_Id,
                 Delivery_Date = (DateTime)invoice.Delivery_Date,
                 Pickup_Date = (DateTime)invoice.Pickup_Date,
