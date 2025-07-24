@@ -235,6 +235,19 @@
                             <td>Active:</td>
                             <td><span class="badge badge-@(Model.Status == 1 ? "success" : "danger")">@(Model.Status == 1 ? "Yes" : "No")</span></td>
                         </tr>
+                        <!-- ✅ NEW: Show employee who confirmed -->
+                        @if (ViewBag.ConfirmedByEmployee != null)
+                        {
+                            <tr>
+                                <td>Confirmed by:</td>
+                                <td>
+                                    <span class="badge badge-info">
+                                        <i class="fas fa-user"></i> @ViewBag.ConfirmedByEmployee
+                                    </span>
+                                    <small class="text-muted">(ID: @ViewBag.EmployeeId)</small>
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <td>Payment:</td>
                             <td><span class="badge badge-@(string.IsNullOrEmpty(Model.Payment_Id) ? "warning" : "success")">@(string.IsNullOrEmpty(Model.Payment_Id) ? "Pending" : "Completed")</span></td>

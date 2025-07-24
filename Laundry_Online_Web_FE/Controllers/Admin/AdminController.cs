@@ -471,7 +471,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return View(allBookings);
         }
-
         [HttpPost]
         public JsonResult UpdateBookingStatus(int id, int newStatus)
         {
@@ -482,16 +481,27 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                     return Json(new { success = false, message = "Invalid status value" });
                 }
 
+                // ✅ GET EMPLOYEE INFO FROM SESSION
+                var employeeSession = Session["employee"] as EmployeeView;
+                if (employeeSession == null)
+                {
+                    return Json(new { success = false, message = "Session expired. Please login again." });
+                }
+
                 // ✅ Use SQL Server time
                 var sqlServerTime = InvoiceRepository.Instance.GetSqlServerDateTime();
                 var statusText = GetBookingStatusText(newStatus);
-                var updateLog = $"\n[ADMIN UPDATE] {sqlServerTime:dd/MM/yyyy HH:mm}: Status changed to {statusText} by admin";
 
-                bool success = InvoiceRepository.Instance.UpdateOrderStatus(id, newStatus, updateLog);
+                // ✅ ENHANCED: Include employee information in the log
+                var employeeName = $"{employeeSession.FirstName} {employeeSession.LastName}";
+                var updateLog = $"\n[ADMIN UPDATE] {sqlServerTime:dd/MM/yyyy HH:mm}: Status changed to {statusText} by {employeeName} (ID: {employeeSession.Id})";
+
+                // ✅ ENHANCED: Pass employee ID to the update method
+                bool success = InvoiceRepository.Instance.UpdateOrderStatusWithEmployee(id, newStatus, updateLog, employeeSession.Id);
 
                 if (success)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[ADMIN-UPDATE] Booking #{id} status updated to {newStatus} by admin at {sqlServerTime:yyyy-MM-dd HH:mm:ss}");
+                    System.Diagnostics.Debug.WriteLine($"[ADMIN-UPDATE] Booking #{id} status updated to {newStatus} by employee #{employeeSession.Id} ({employeeName}) at {sqlServerTime:yyyy-MM-dd HH:mm:ss}");
 
                     // ✅ NẾU XÁC NHẬN ĐỚN (STATUS = 1), TRẢ VỀ URL CHUYỂN SANG EDIT INVOICE
                     if (newStatus == 1)
@@ -501,13 +511,15 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         return Json(new
                         {
                             success = true,
-                            message = "Đơn hàng đã được xác nhận thành công!",
+                            message = $"Order confirmed successfully by {employeeName}!",
                             newStatusText = statusText,
                             newStatusClass = GetBookingStatusClass(newStatus),
                             updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm"),
+                            employeeName = employeeName,
+                            employeeId = employeeSession.Id,
                             redirectToEdit = true,
-                            editUrl = editUrl, // ✅ THÊM URL ĐỂ REDIRECT
-                            confirmMessage = "Đơn hàng đã được xác nhận. Bạn sẽ được chuyển đến trang chỉnh sửa hóa đơn."
+                            editUrl = editUrl,
+                            confirmMessage = "Order confirmed successfully. You will be redirected to invoice editing page."
                         });
                     }
                     else
@@ -515,23 +527,25 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
                         return Json(new
                         {
                             success = true,
-                            message = "Trạng thái đã được cập nhật thành công!",
+                            message = $"Status updated successfully by {employeeName}!",
                             newStatusText = statusText,
                             newStatusClass = GetBookingStatusClass(newStatus),
                             updateTime = sqlServerTime.ToString("dd/MM/yyyy HH:mm"),
+                            employeeName = employeeName,
+                            employeeId = employeeSession.Id,
                             redirectToEdit = false
                         });
                     }
                 }
                 else
                 {
-                    return Json(new { success = false, message = "Lỗi cập nhật cơ sở dữ liệu" });
+                    return Json(new { success = false, message = "Database update error" });
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"UpdateBookingStatus Error: {ex.Message}");
-                return Json(new { success = false, message = "Đã xảy ra lỗi: " + ex.Message });
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }
 
@@ -655,6 +669,17 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
             {
                 booking.CustomerName = $"{customer.FirstName} {customer.LastName}";
                 booking.CustomerPhone = customer.PhoneNumber;
+            }
+
+            // ✅ NEW: Get employee information if available
+            if (booking.Employee_Id.HasValue && booking.Employee_Id.Value > 0)
+            {
+                var employee = EmployeeRepo.Instance.GetEmployeeById(booking.Employee_Id.Value);
+                if (employee != null)
+                {
+                    ViewBag.ConfirmedByEmployee = $"{employee.FirstName} {employee.LastName}";
+                    ViewBag.EmployeeId = employee.Id;
+                }
             }
 
             ViewBag.GetStatusText = new Func<int, string>(GetBookingStatusText);
