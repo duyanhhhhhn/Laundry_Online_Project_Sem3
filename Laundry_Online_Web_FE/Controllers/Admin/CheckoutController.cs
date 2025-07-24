@@ -12,6 +12,7 @@ using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews.Payments;
 using System.Linq;
+using static iTextSharp.text.pdf.AcroFields;
 
 
 namespace Laundry_Online_Web_FE.Controllers
@@ -24,6 +25,8 @@ namespace Laundry_Online_Web_FE.Controllers
         private readonly PackageRepository _packageRepository;
         private readonly InvoiceItemRepo _invoiceItemRepository;
         private readonly ServiceRepository _serviceRepository;
+        private readonly CustomerRepo _customerRepository;
+        private readonly EmployeeRepo _employeeRepository;
 
         // IMPROVEMENT: Use dependency injection instead of manual instantiation
         public CheckoutController()
@@ -34,6 +37,8 @@ namespace Laundry_Online_Web_FE.Controllers
             _packageRepository = PackageRepository.Instance;
             _invoiceItemRepository = InvoiceItemRepo.Instance;
             _serviceRepository = ServiceRepository.Instance;
+            _customerRepository = CustomerRepo.Instance;
+            _employeeRepository = EmployeeRepo.Instance;
         }
 
         // Constructor for dependency injection (better for testing)
@@ -43,6 +48,8 @@ namespace Laundry_Online_Web_FE.Controllers
             _invoiceRepository = InvoiceRepository.Instance;
             _customerPackageRepository = CustomerPackageRepository.Instance;
             _packageRepository = PackageRepository.Instance;
+            _customerRepository = CustomerRepo.Instance;
+            _employeeRepository = EmployeeRepo.Instance;
         }
 
         // Method for Invoice Controller to call
@@ -56,9 +63,15 @@ namespace Laundry_Online_Web_FE.Controllers
                 TempData["ErrorMessage"] = "Không tìm thấy hóa đơn.";
                 return RedirectToAction("Index", "Invoice");
             }
+            if (Session["employee"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+            else if (Session["customer"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml";
+            else
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml"; // mặc định
             var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
-            //Employee_Name = employee.LastName + " " + employee.FirstName,
+                    
             if (employee == null && customer == null)
             {
                 
@@ -96,12 +109,16 @@ namespace Laundry_Online_Web_FE.Controllers
                     }
                 }
             }
-            if (Session["employee"] != null)
-                ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-            else if (Session["customer"] != null)
-                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml";
-            else
-                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml"; // mặc định
+            var customerInfo = _customerRepository.GetCustomerById(invoice.Customer_Id);
+            string employeeName = "Unknown"; // Giá trị mặc định
+            if (invoice.Employee_Id != null && invoice.Employee_Id > 0)
+            {
+                var employeeInfo = _employeeRepository.GetEmployeeById(invoice.Employee_Id.Value);
+                if (employeeInfo != null)
+                {
+                    employeeName = employeeInfo.LastName+ " "+ employeeInfo.FirstName; 
+                }
+            }
 
             var invoiceItems = _invoiceItemRepository
                 .GetItemsByInvoiceId(invoiceId)
@@ -120,16 +137,23 @@ namespace Laundry_Online_Web_FE.Controllers
                         Service_Name = service.Title ?? "",
                         Service_Description = service?.Description ?? "",
                         Service_Price = service?.Price ?? 0,
-                        ItemUnit = service?.Unit ?? ""                        
+                        ItemUnit = service?.Unit ?? ""
                     };
                 }).ToList();
+            var items = InvoiceItemRepo.Instance.GetItemsByInvoiceId(invoiceId);
+            var itemTotal = items.Sum(i =>
+            {
+                var service = _serviceRepository.GetById(i.ServiceId);
+                return i.SubTotal + (service?.Price ?? 0);
+            });
 
-            var model= new InvoiceForm
+            var totalAmount = itemTotal + invoice.Ship_Cost;
+            var model = new InvoiceForm
             {
                 Id = invoice.Id,
-                Customer_Name = invoice.CustomerName,
-                Customer_Id = invoice.Customer_Id,
-                
+                Customer_Name = customerInfo.LastName+ " " + customerInfo.FirstName,
+                Customer_Id = invoice.Customer_Id,               
+                Employee_Name= employeeName,
                 Employee_Id = (int)invoice.Employee_Id,
                 Delivery_Date = (DateTime)invoice.Delivery_Date,
                 Pickup_Date = (DateTime)invoice.Pickup_Date,
@@ -140,7 +164,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Ship_Cost = invoice.Ship_Cost,
                 Notes = invoice.Notes,
                 Order_Status = invoice.Order_Status,
-                TotalAmountFromDb=invoice.Total_Amount-priceDiscount,
+                TotalAmountFromDb= totalAmount - priceDiscount,
 
             };
             ViewBag.discountPrice = priceDiscount;
