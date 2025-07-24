@@ -90,6 +90,8 @@ namespace Laundry_Online_Web_FE
     "/admin/allemployeelist",
     "/admin/employeelist",
     "/admin/adminlist",
+    "/admin/admin_create_employee",
+    "/admin/admin_edit_employee",
 };
 
 

@@ -346,7 +346,6 @@ namespace Laundry_Online_Web_FE.Controllers
                         var smsService = new eSmsService();
 
 
-
                         string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
 
                         string smsResult = await smsService.SendAsync(customerPhone, welcomeMessage);

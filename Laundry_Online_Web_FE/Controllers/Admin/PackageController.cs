@@ -238,7 +238,6 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
         //    return RedirectToAction("Index");
         //}
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             var result = _packageRepository.Delete(id);
