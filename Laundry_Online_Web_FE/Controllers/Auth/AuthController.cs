@@ -17,7 +17,7 @@ namespace Laundry_Online_Web_FE.Controllers.Auth
         public ActionResult Login_Employee()
         {
             // Kiểm tra xem người dùng đã đăng nhập chưa
-            if (Session["customer"] != null || Session["employee"] != null)
+            if (Session["employee"] != null)
             {
                 // Nếu đã đăng nhập, chuyển hướng đến trang chính
                 return RedirectToAction("Admin", "Index");
