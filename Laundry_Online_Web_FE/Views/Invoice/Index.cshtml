@@ -58,8 +58,9 @@
                                 <option value="3" @(ViewBag.CurrentStatus == 2 ? "selected" : "")>Paid</option>
                                 <option value="4" @(ViewBag.CurrentStatus == 3 ? "selected" : "")>Cancelled</option>
                                 <button></button> class="btn btn-outline-primary" type="submit">
-                                    <i class="fas fa-filter"></i> Filter
+                                <i class="fas fa-filter"></i> Filter
                                 </button>
+                            </select>
                         </div>
                     </form>
                 </div>
@@ -102,9 +103,18 @@
                                     <td></td> <!-- STT sẽ render sau bằng JS -->
                                     <td>@invoice.Customer_Name</td>
                                     <td>@invoice.Employee_Name</td>
-                                    <td>@invoice.Invoice_Date.ToString("dd/MM/yyyy")</td>
-                                    <td>@invoice.Delivery_Date.ToString("dd/MM/yyyy")</td>
-                                    <td>@invoice.Pickup_Date.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @(invoice.Invoice_Date != null && invoice.Invoice_Date != DateTime.MinValue
+                                        ? invoice.Invoice_Date.ToString("dd/MM/yyyy"): "")
+                                    </td>
+                                    <td>
+                                        @(invoice.Delivery_Date != null && invoice.Delivery_Date != DateTime.MinValue
+                                        ? invoice.Delivery_Date.ToString("dd/MM/yyyy"): "Unspecified")
+                                    </td>
+                                    <td>
+                                        @(invoice.Pickup_Date != null && invoice.Pickup_Date != DateTime.MinValue
+                                        ? invoice.Pickup_Date.ToString("dd/MM/yyyy"): "Unconfirmed")
+                                    </td>
                                     <td>@invoice.TotalAmountFromDb.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</td>
 
                                     <td>
@@ -177,10 +187,6 @@
                                                     <i class="fas fa-credit-card"></i>
                                                 </a>
                                             }
-
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@invoice.Id)" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>

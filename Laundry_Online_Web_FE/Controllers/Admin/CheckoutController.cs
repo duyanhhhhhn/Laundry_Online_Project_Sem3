@@ -12,6 +12,9 @@ using Laundry_Online_Web_FE.Models.ModelViews.DTO;
 using Laundry_Online_Web_FE.Models.Entities;
 using Laundry_Online_Web_FE.Models.ModelViews.Payments;
 using System.Linq;
+using static iTextSharp.text.pdf.AcroFields;
+using Laundry_Online_Web_FE.Models.Dao;
+using System.Threading.Tasks;
 
 
 namespace Laundry_Online_Web_FE.Controllers
@@ -24,6 +27,8 @@ namespace Laundry_Online_Web_FE.Controllers
         private readonly PackageRepository _packageRepository;
         private readonly InvoiceItemRepo _invoiceItemRepository;
         private readonly ServiceRepository _serviceRepository;
+        private readonly CustomerRepo _customerRepository;
+        private readonly EmployeeRepo _employeeRepository;
 
         // IMPROVEMENT: Use dependency injection instead of manual instantiation
         public CheckoutController()
@@ -34,6 +39,8 @@ namespace Laundry_Online_Web_FE.Controllers
             _packageRepository = PackageRepository.Instance;
             _invoiceItemRepository = InvoiceItemRepo.Instance;
             _serviceRepository = ServiceRepository.Instance;
+            _customerRepository = CustomerRepo.Instance;
+            _employeeRepository = EmployeeRepo.Instance;
         }
 
         // Constructor for dependency injection (better for testing)
@@ -43,6 +50,8 @@ namespace Laundry_Online_Web_FE.Controllers
             _invoiceRepository = InvoiceRepository.Instance;
             _customerPackageRepository = CustomerPackageRepository.Instance;
             _packageRepository = PackageRepository.Instance;
+            _customerRepository = CustomerRepo.Instance;
+            _employeeRepository = EmployeeRepo.Instance;
         }
 
         // Method for Invoice Controller to call
@@ -56,9 +65,15 @@ namespace Laundry_Online_Web_FE.Controllers
                 TempData["ErrorMessage"] = "Không tìm thấy hóa đơn.";
                 return RedirectToAction("Index", "Invoice");
             }
+            if (Session["employee"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+            else if (Session["customer"] != null)
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml";
+            else
+                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml"; // mặc định
             var customer = Session["customer"] as CustomerView;
             var employee = Session["employee"] as EmployeeView;
-            //Employee_Name = employee.LastName + " " + employee.FirstName,
+                    
             if (employee == null && customer == null)
             {
                 
@@ -96,12 +111,16 @@ namespace Laundry_Online_Web_FE.Controllers
                     }
                 }
             }
-            if (Session["employee"] != null)
-                ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-            else if (Session["customer"] != null)
-                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml";
-            else
-                ViewBag.Layout = "~/Views/Shared/_LayoutClient.cshtml"; // mặc định
+            var customerInfo = _customerRepository.GetCustomerById(invoice.Customer_Id);
+            string employeeName = "Unknown"; // Giá trị mặc định
+            if (invoice.Employee_Id != null && invoice.Employee_Id > 0)
+            {
+                var employeeInfo = _employeeRepository.GetEmployeeById(invoice.Employee_Id.Value);
+                if (employeeInfo != null)
+                {
+                    employeeName = employeeInfo.LastName+ " "+ employeeInfo.FirstName; 
+                }
+            }
 
             var invoiceItems = _invoiceItemRepository
                 .GetItemsByInvoiceId(invoiceId)
@@ -120,16 +139,18 @@ namespace Laundry_Online_Web_FE.Controllers
                         Service_Name = service.Title ?? "",
                         Service_Description = service?.Description ?? "",
                         Service_Price = service?.Price ?? 0,
-                        ItemUnit = service?.Unit ?? ""                        
+                        ItemUnit = service?.Unit ?? ""
                     };
                 }).ToList();
-
-            var model= new InvoiceForm
+            var items = InvoiceItemRepo.Instance.GetItemsByInvoiceId(invoiceId);
+            var itemTotal = items.Sum(i => i.SubTotal);
+            var totalAmount = itemTotal + invoice.Ship_Cost;         
+            var model = new InvoiceForm
             {
                 Id = invoice.Id,
-                Customer_Name = invoice.CustomerName,
-                Customer_Id = invoice.Customer_Id,
-                
+                Customer_Name = customerInfo.LastName+ " " + customerInfo.FirstName,
+                Customer_Id = invoice.Customer_Id,               
+                Employee_Name= employeeName,
                 Employee_Id = (int)invoice.Employee_Id,
                 Delivery_Date = (DateTime)invoice.Delivery_Date,
                 Pickup_Date = (DateTime)invoice.Pickup_Date,
@@ -140,7 +161,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Ship_Cost = invoice.Ship_Cost,
                 Notes = invoice.Notes,
                 Order_Status = invoice.Order_Status,
-                TotalAmountFromDb=invoice.Total_Amount-priceDiscount,
+                TotalAmountFromDb= totalAmount - priceDiscount,
 
             };
             ViewBag.discountPrice = priceDiscount;
@@ -188,8 +209,7 @@ namespace Laundry_Online_Web_FE.Controllers
                 Customer_Phone = customer.PhoneNumber
             };
             // IMPROVEMENT: Store customer package in session for payment callback
-
-          
+            Session["customerPackage"] = model;
 
             return View(model);
 
@@ -199,7 +219,7 @@ namespace Laundry_Online_Web_FE.Controllers
 
         // Callback from VNPay after payment
         [HttpGet]
-        public ActionResult PaymentCallbackVnpay()
+        public async Task<ActionResult> PaymentCallbackVnpay()
         {
             try
             {
@@ -212,34 +232,34 @@ namespace Laundry_Online_Web_FE.Controllers
 
                     if (invoice != null)
                     {
-                        return ProcessInvoicePayment(invoice,response);
+                        return await ProcessInvoicePayment(invoice, response);
                     }
                     else if (package != null)
                     {
-                        return ProcessPackagePayment(package, response); // ✅ Truyền thêm response để lấy transactionId
+                        return await ProcessPackagePayment(package, response);// ✅ Truyền thêm response để lấy transactionId
                     }
                     else
                     {
                         TempData["ErrorMessage"] = "Không tìm thấy thông tin thanh toán trong session!";
-                        return RedirectToAction("PaymentFailedAdmin");
+                        return RedirectToAction("PaymentFailed");
                     }
                 }
                 else
                 {
                     TempData["ErrorMessage"] = $"Thanh toán thất bại: {response.VnPayResponseCode}";
-                    return RedirectToAction("PaymentFailedAdmin");
+                    return RedirectToAction("PaymentFailed");
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán: " + ex.Message;
-                return RedirectToAction("PaymentFailedAdmin");
+                return RedirectToAction("PaymentFailed");
             }
         }
 
 
         // IMPROVEMENT: Extract invoice payment logic to separate method
-        private ActionResult ProcessInvoicePayment(InvoiceForm invoice, PaymentResponseModel response)
+        private async Task<ActionResult> ProcessInvoicePayment(InvoiceForm invoice, PaymentResponseModel response)
         {
             var employee = Session["employee"] as EmployeeView;
             bool success = false;
@@ -299,8 +319,45 @@ namespace Laundry_Online_Web_FE.Controllers
             // IMPROVEMENT: Update invoice status regardless of package update
             var invoiceUpdateSuccess = _invoiceRepository.ConfirmInvoicePayment(invoice.Id, response.TransactionId);
 
+            //if (invoiceUpdateSuccess)
+            //{
+            //    Session.Remove("invoice");
+            //    TempData["SuccessMessage"] = "Thanh toán hóa đơn thành công!";
+            //    return RedirectToAction("PaymentSuccess");
+            //}
+            //else
+            //{
+            //    TempData["ErrorMessage"] = "Thanh toán thành công nhưng có lỗi khi cập nhật hóa đơn!";
+            //    return RedirectToAction("Index", "Invoice", new { id = invoice.Id });
+            //}
             if (invoiceUpdateSuccess)
             {
+                // ===============================================================
+                // BẮT ĐẦU TÍCH HỢP GỬI SMS KHI THANH TOÁN THÀNH CÔNG
+                // ===============================================================
+                try
+                {
+                    // Thay đổi 2: Lấy thông tin khách hàng để có số điện thoại
+                    // Lưu ý: Bạn có thể cần điều chỉnh lại cách lấy SĐT cho phù hợp với cấu trúc của bạn
+                    var currentInvoice = _invoiceRepository.GetById(invoice.Id);
+                    if (currentInvoice != null )
+                    {
+                        string customerPhone = currentInvoice.CustomerPhone;
+                        var smsService = new eSmsService();
+
+
+                        string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
+
+                        string smsResult = await smsService.SendAsync(customerPhone, welcomeMessage);
+
+                        System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("LOI GUI SMS THANH TOAN: " + ex.Message);
+                }
+
                 Session.Remove("invoice");
                 TempData["SuccessMessage"] = "Thanh toán hóa đơn thành công!";
                 return RedirectToAction("PaymentSuccess");
@@ -349,7 +406,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
         }
         // IMPROVEMENT: Extract customer package payment logic to separate method
-        private ActionResult ProcessPackagePayment(PayPackageInfor payModel, PaymentResponseModel response)
+        private async Task<ActionResult> ProcessPackagePayment(PayPackageInfor payModel, PaymentResponseModel response)
         {
             var customer = Session["customer"] as CustomerView;
 
@@ -371,8 +428,38 @@ namespace Laundry_Online_Web_FE.Controllers
 
             var created = _customerPackageRepository.Add(customerPackage);
 
+            //if (created)
+            //{
+            //    Session.Remove("customerPackage");
+            //    TempData["SuccessMessage"] = "Thanh toán gói dịch vụ thành công!";
+            //    return RedirectToAction("PaymentSuccess");
+            //}
+            //else
+            //{
+            //    TempData["ErrorMessage"] = "Thanh toán thành công nhưng lỗi khi lưu gói dịch vụ.";
+            //    return RedirectToAction("Index", "CustomerPackage");
+            //}
             if (created)
             {
+                // ===============================================================
+                // BẮT ĐẦU TÍCH HỢP GỬI SMS
+                // ===============================================================
+                try
+                {
+                    string customerPhone = customer.PhoneNumber;
+                    var smsService = new eSmsService();
+
+                    string welcomeMessage = "Cam on quy khach da su dung dich vu cua chung toi. Chuc quy khach mot ngay tot lanh!";
+
+                    string smsResult = await smsService.SendAsync(customerPhone, welcomeMessage);
+
+                    System.Diagnostics.Debug.WriteLine("Ket qua gui SMS: " + smsResult);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("LOI GUI SMS MUA GOI: " + ex.Message);
+                }
+
                 Session.Remove("customerPackage");
                 TempData["SuccessMessage"] = "Thanh toán gói dịch vụ thành công!";
                 return RedirectToAction("PaymentSuccess");

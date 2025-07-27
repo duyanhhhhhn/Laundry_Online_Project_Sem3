@@ -58,7 +58,7 @@
                     @foreach (var item in Model.InvoiceItems)
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            [@item.ItemName]:@item.Quantity (@item.ItemUnit) x @item.Unit_Price.ToString("N0") đ + (@item.Service_Price) đ (Service Name:@item.Service_Name)
+                            [@item.ItemName]:@item.Quantity (@item.ItemUnit) x @item.Unit_Price.ToString("N0") đ (Service Name:@item.Service_Name)
                             <span class="badge bg-success">@item.Sub_Total.ToString("N0") đ</span>
                         </li>
                     }

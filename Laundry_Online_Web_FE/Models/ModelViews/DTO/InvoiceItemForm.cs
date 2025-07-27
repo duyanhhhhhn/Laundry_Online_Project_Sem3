@@ -30,7 +30,7 @@ namespace Laundry_Online_Web_FE.Models.ModelViews.DTO
         public decimal Unit_Price { get; set; } = 0m;
 
         [Display(Name = "Sub Total")]
-        public decimal Sub_Total => (Quantity * Unit_Price) + Service_Price;
+        public decimal Sub_Total => (Quantity * Unit_Price);
           public decimal SubTotalItem { get; set; }
         [Display(Name = "Status")]
         public int Item_Status { get; set; } = 1;

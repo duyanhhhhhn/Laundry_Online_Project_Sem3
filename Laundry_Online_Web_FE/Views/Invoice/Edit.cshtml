@@ -178,7 +178,6 @@
                             <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(@Model.InvoiceItems[i].Id, this)">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
-
                         </td>
                     </tr>
                 }
@@ -588,7 +587,7 @@
                         updateTotals();
                         showNotification('Item added successfully with barcode!', 'success');
                         setTimeout(() => {
-                            window.location.href = `/Invoice/Edit/${invoiceId}`;
+                            window.location.reload();
                         }, 800);
                     } else {
                         const errorMessage = response && response.message ? response.message : 'Failed to add item';

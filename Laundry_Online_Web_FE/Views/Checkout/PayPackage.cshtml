@@ -33,10 +33,10 @@
                     <p><strong>SĐT:</strong> @Model.Customer_Phone</p>
 
                     <!-- Form thanh toán -->
-                    <form action="/Payment/CreatePaymentUrlVnpay" method="post" class="mt-4">
+                    <form action="/Payment/CreatePaymentUrlVnpayForPackage" method="post" class="mt-4">
                         <input type="hidden" name="Name" value="@Model.Package_Name" />
                         <input type="hidden" name="Amount" value="@Model.Price" />
-                        <input type="hidden" name="OrderDescription" value="@Model.Description" />
+                        <input type="hidden" name="OrderDescription" value="Buy @Model.Package_Name" />
                         <input type="hidden" name="OrderType" value="Buy Package" />
 
                         <button type="submit" class="btn btn-success me-2">

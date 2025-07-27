@@ -34,7 +34,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             }
         }
 
-        // ✅ ADDED: Helper method to safely handle DateTime values
+        //  ADDED: Helper method to safely handle DateTime values
         private static DateTime? SafeDateTime(DateTime dateTime)
         {
             if (dateTime == DateTime.MinValue)
@@ -88,8 +88,11 @@ namespace Laundry_Online_Web_BE.Models.Repositories
         {
             try
             {
-                var invoice = _context.Invoices.FirstOrDefault(i => i.invoice_id == id);
-                return invoice != null ? MapToView(invoice) : null;
+                using (var en = new OnlineLaundryEntities())
+                {
+                    var invoice = en.Invoices.FirstOrDefault(i => i.invoice_id == id);
+                    return invoice != null ? MapToView(invoice) : null;
+                }
             }
             catch (Exception ex)
             {
@@ -97,7 +100,25 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                 return null;
             }
         }
-
+        public HashSet<InvoiceView> GetByCustomerIdUsing(int customerId)
+        {
+            try
+            {
+                using (var en = new OnlineLaundryEntities())
+                {
+                    var invoices = en.Invoices
+                        .Where(i => i.customer_id == customerId)
+                        .OrderByDescending(i => i.invoice_date)
+                        .ToList();
+                    return invoices.Select(i => MapToView(i)).ToHashSet();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("GetByCustomerId Invoice Error: " + ex.Message);
+                return new HashSet<InvoiceView>();
+            }
+        }
         public HashSet<InvoiceView> GetByCustomerId(int customerId)
         {
             try
@@ -355,7 +376,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
                     var start = new DateTime(year, month, 1);
                     var end = start.AddMonths(1);
                     var total = _context.Invoices
-                        .Where(inv => inv.invoice_date >= start && inv.invoice_date < end)
+                        .Where(inv => inv.invoice_date >= start && inv.invoice_date < end && inv.order_status == 2)
                         .Sum(inv => (decimal?)inv.total_amount) ?? 0;
                     revenues.Add(Math.Floor(total));
                 }
@@ -373,7 +394,7 @@ namespace Laundry_Online_Web_BE.Models.Repositories
             try
             {
                 return _context.Invoices
-                    .Where(inv => inv.invoice_date.HasValue)
+                    .Where(inv => inv.invoice_date.HasValue && inv.order_status == 2)
                     .Select(inv => inv.invoice_date.Value.Year)
                     .Distinct()
                     .OrderByDescending(y => y)

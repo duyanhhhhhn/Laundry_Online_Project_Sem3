@@ -209,9 +209,29 @@
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+        .evo-header-account > div {
+            display: flex;
+            align-items: center;
+            cursor: pointer; /* ✅ Thêm dòng này để hiện bàn tay khi hover */
+        }
 
-        .evo-header-account:hover .account-dropdown {
-            display: block; /* Hiện menu khi di chuột qua */
+    .account-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #333;
+        border-radius: 4px;
+        list-style: none;
+        padding: 5px 0;
+        margin: 5px 0 0 0;
+        width: 160px;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .account-dropdown.show {
+            display: block;
         }
 
     .account-dropdown a {
@@ -291,3 +311,21 @@
             }
     }
 </style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const accountToggle = document.querySelector(".evo-header-account");
+        const dropdownMenu = document.querySelector(".evo-header-account .account-dropdown");
+
+        if (accountToggle && dropdownMenu) {
+            accountToggle.addEventListener("click", function (e) {
+                e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+                dropdownMenu.classList.toggle("show");
+            });
+
+            // Ẩn dropdown nếu click ra ngoài
+            document.addEventListener("click", function () {
+                dropdownMenu.classList.remove("show");
+            });
+        }
+    });
+</script>

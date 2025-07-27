@@ -30,6 +30,13 @@ namespace Laundry_Online_Web_FE.Controllers.Admin
 
             return Redirect(url);
         }
+        public ActionResult CreatePaymentUrlVnpayForPackage(PaymentInformation model,CustomerPackageView  package)
+        {
+            var url = _vnPayService.CreatePaymentUrl(model, System.Web.HttpContext.Current);
+
+            return Redirect(url);
+        }
+
     }
 
 }

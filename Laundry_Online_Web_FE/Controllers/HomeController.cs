@@ -69,7 +69,7 @@ namespace Laundry_Online_Web_FE.Controllers
             var customer = Session["customer"] as CustomerView;
 
             // Get all customer bookings (only active ones)
-            var allBookings = InvoiceRepository.Instance.GetByCustomerId(customer.Id)
+            var allBookings = InvoiceRepository.Instance.GetByCustomerIdUsing(customer.Id)
                 .Where(b => b.Status == 1) // Only show active bookings
                 .ToList();
 
@@ -517,7 +517,7 @@ namespace Laundry_Online_Web_FE.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage =  "Register Error. Try again";
+                ViewBag.ErrorMessage = "The phone number has already been used! Please use a different phone number to create an account!";
                 return View("Register");
             }
         }
