@@ -209,20 +209,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>OnlineLaundryModel.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\OnlineLaundryModel.Designer.cs">
-      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Models\Entities\OnlineLaundryModel1.cs">
+    <Compile Include="Models\Entities\OnlineLaundryModel.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\OnlineLaundryModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Package.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Service.cs">
+      <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Entities\sysdiagram.cs">
       <DependentUpon>OnlineLaundryModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Libraries\VnPayLibrary.cs" />
@@ -542,7 +545,7 @@
     <Content Include="Models\Entities\OnlineLaundryModel.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>OnlineLaundryModel.edmx</DependentUpon>
-      <LastGenOutput>OnlineLaundryModel1.cs</LastGenOutput>
+      <LastGenOutput>OnlineLaundryModel.cs</LastGenOutput>
     </Content>
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
